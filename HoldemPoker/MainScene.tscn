@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://MainScene.gd" type="Script" id=1]
 [ext_resource path="res://images/BG.png" type="Texture" id=2]
 [ext_resource path="res://images/table.png" type="Texture" id=3]
+[ext_resource path="res://TitleBar.gd" type="Script" id=4]
+[ext_resource path="res://images/leftward_black.png" type="Texture" id=5]
+[ext_resource path="res://images/leftward_white.png" type="Texture" id=6]
 
 [node name="MainScene" type="Node2D"]
 script = ExtResource( 1 )
@@ -11,6 +14,26 @@ script = ExtResource( 1 )
 margin_right = 40.0
 margin_bottom = 40.0
 texture = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TitleBar" type="ColorRect" parent="."]
+margin_right = 500.0
+margin_bottom = 50.0
+color = Color( 0.180392, 0.309804, 0.309804, 1 )
+script = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BackButton" type="TextureButton" parent="TitleBar"]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 49.0
+margin_bottom = 49.0
+texture_normal = ExtResource( 6 )
+texture_pressed = ExtResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
