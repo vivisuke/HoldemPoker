@@ -3,7 +3,8 @@ extends Node2D
 enum { CLUB = 0, DIAMOND, HEART, SPADE, }
 
 func _ready():
-	$PlayerBG1.set_BG(1)	
+	$PlayerBG1.set_name("vivisuke")
+	$PlayerBG1.set_BG(1)
 	$PlayerBG2.set_BG(2)
 	#
 	$Table/Card1.set_sn(CLUB, 1)

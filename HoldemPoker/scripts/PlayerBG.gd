@@ -6,3 +6,5 @@ func _ready():
 
 func set_BG(id):
 	set_frame(id)
+func set_name(name : String):
+	$NameLabel.text = name

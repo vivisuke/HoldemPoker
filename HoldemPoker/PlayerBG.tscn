@@ -14,7 +14,7 @@ texture = ExtResource( 1 )
 hframes = 3
 script = ExtResource( 4 )
 
-[node name="Label" type="Label" parent="."]
+[node name="NameLabel" type="Label" parent="."]
 margin_left = -40.0
 margin_top = -47.0
 margin_right = 40.0
