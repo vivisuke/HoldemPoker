@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://scripts/MainScene.gd" type="Script" id=1]
 [ext_resource path="res://images/BG.png" type="Texture" id=2]
@@ -7,13 +7,8 @@
 [ext_resource path="res://images/leftward_black.png" type="Texture" id=5]
 [ext_resource path="res://images/leftward_white.png" type="Texture" id=6]
 [ext_resource path="res://images/card-deck.png" type="Texture" id=7]
-[ext_resource path="res://images/player-BG_x3.png" type="Texture" id=8]
-[ext_resource path="res://fonts/FlopDesignFONT.otf" type="DynamicFontData" id=9]
+[ext_resource path="res://PlayerBG.tscn" type="PackedScene" id=8]
 [ext_resource path="res://Card.tscn" type="PackedScene" id=10]
-
-[sub_resource type="DynamicFont" id=1]
-size = 10
-font_data = ExtResource( 9 )
 
 [node name="MainScene" type="Node2D"]
 script = ExtResource( 1 )
@@ -55,130 +50,8 @@ position = Vector2( 0, -50 )
 scale = Vector2( 0.2, 0.2 )
 texture = ExtResource( 7 )
 
-[node name="PlayerBG1" type="Sprite" parent="Table"]
-position = Vector2( 0, 230 )
-texture = ExtResource( 8 )
-hframes = 3
-frame = 1
-
-[node name="Label" type="Label" parent="Table/PlayerBG1"]
-margin_left = -40.0
-margin_top = -47.0
-margin_right = 40.0
-margin_bottom = -32.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_fonts/font = SubResource( 1 )
-text = "player name"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PlayerBG2" type="Sprite" parent="Table"]
-position = Vector2( -195, 100 )
-texture = ExtResource( 8 )
-hframes = 3
-
-[node name="Label" type="Label" parent="Table/PlayerBG2"]
-margin_left = -40.0
-margin_top = -47.0
-margin_right = 40.0
-margin_bottom = -32.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_fonts/font = SubResource( 1 )
-text = "player name"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PlayerBG3" type="Sprite" parent="Table"]
-position = Vector2( -195, -100 )
-texture = ExtResource( 8 )
-hframes = 3
-
-[node name="Label" type="Label" parent="Table/PlayerBG3"]
-margin_left = -40.0
-margin_top = -47.0
-margin_right = 40.0
-margin_bottom = -32.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_fonts/font = SubResource( 1 )
-text = "player name"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PlayerBG4" type="Sprite" parent="Table"]
-position = Vector2( 0, -245 )
-texture = ExtResource( 8 )
-hframes = 3
-
-[node name="Label" type="Label" parent="Table/PlayerBG4"]
-margin_left = -40.0
-margin_top = -47.0
-margin_right = 40.0
-margin_bottom = -32.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_fonts/font = SubResource( 1 )
-text = "player name"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PlayerBG5" type="Sprite" parent="Table"]
-position = Vector2( 195, -100 )
-texture = ExtResource( 8 )
-hframes = 3
-
-[node name="Label" type="Label" parent="Table/PlayerBG5"]
-margin_left = -40.0
-margin_top = -47.0
-margin_right = 40.0
-margin_bottom = -32.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_fonts/font = SubResource( 1 )
-text = "player name"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="PlayerBG6" type="Sprite" parent="Table"]
-position = Vector2( 195, 100 )
-texture = ExtResource( 8 )
-hframes = 3
-frame = 2
-
-[node name="Label" type="Label" parent="Table/PlayerBG6"]
-margin_left = -40.0
-margin_top = -47.0
-margin_right = 40.0
-margin_bottom = -32.0
-custom_colors/font_color = Color( 0, 0, 0, 1 )
-custom_fonts/font = SubResource( 1 )
-text = "player name"
-align = 1
-valign = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="Card1" parent="Table" instance=ExtResource( 10 )]
 position = Vector2( 0, 72 )
-
-[node name="Card6" parent="Table" instance=ExtResource( 10 )]
-position = Vector2( -20, 228 )
-
-[node name="Card7" parent="Table" instance=ExtResource( 10 )]
-position = Vector2( 20, 228 )
 
 [node name="Card2" parent="Table" instance=ExtResource( 10 )]
 position = Vector2( 40, 72 )
@@ -191,3 +64,21 @@ position = Vector2( -40, 72 )
 
 [node name="Card5" parent="Table" instance=ExtResource( 10 )]
 position = Vector2( -80, 72 )
+
+[node name="PlayerBG1" parent="." instance=ExtResource( 8 )]
+position = Vector2( 250, 657 )
+
+[node name="PlayerBG2" parent="." instance=ExtResource( 8 )]
+position = Vector2( 55, 520 )
+
+[node name="PlayerBG3" parent="." instance=ExtResource( 8 )]
+position = Vector2( 49, 320 )
+
+[node name="PlayerBG4" parent="." instance=ExtResource( 8 )]
+position = Vector2( 250, 183 )
+
+[node name="PlayerBG5" parent="." instance=ExtResource( 8 )]
+position = Vector2( 445, 320 )
+
+[node name="PlayerBG6" parent="." instance=ExtResource( 8 )]
+position = Vector2( 445, 520 )
