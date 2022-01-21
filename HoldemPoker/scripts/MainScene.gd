@@ -11,15 +11,27 @@ enum {
 #const N_SUIT = 4
 #const N_RANK = 13
 const N_CARDS = N_RANK*N_SUIT
+const N_COMU_CARS = 5			# 共通カード枚数
 const RANK_MASK = 0x0f
 const N_RANK_BITS = 4
 
-var deck = []		# 要素：(suit << 4) | rank
-var players = []	# プレイヤーパネル配列、[0] for Human
-var nPlayers = 6	# 6 players
+var deck = []			# 要素：(suit << 4) | rank
+var comu_cards = []		# コミュニティカード
+var players = []		# プレイヤーパネル配列、[0] for Human
+var nPlayers = 6		# 6 players
 
 func _ready():
 	randomize()
+	#
+	players = []
+	for i in range(nPlayers):
+		var pb = get_node("Table/PlayerBG%d" % (i+1))
+		players.push_back(pb)
+	for i in range(N_COMU_CARS):
+		var cd = get_node("Table/Card%d" % (i+1))
+		comu_cards.push_back(cd)
+	#
+	# デッキカードシャフル
 	deck.resize(N_CARDS)
 	for i in range(N_CARDS):
 		var st : int = i / N_RANK
@@ -27,11 +39,7 @@ func _ready():
 		deck[i] = (st<<N_RANK_BITS) | rank
 	deck.shuffle()
 	#
-	players = []
-	for i in range(nPlayers):
-		var pb = get_node("Table/PlayerBG%d" % (i+1))
-		players.push_back(pb)
-	#
+	# 各プレイヤーにカード配布
 	var ix = 0
 	for i in range(nPlayers):
 		var st : int = deck[ix] >> N_RANK_BITS
@@ -43,6 +51,13 @@ func _ready():
 		var rank : int = deck[ix] & RANK_MASK
 		ix += 1
 		players[i].set_card2(st, rank)
+	#
+	# 共通カード配布
+	for i in range(N_COMU_CARS):
+		var st : int = deck[ix] >> N_RANK_BITS
+		var rank : int = deck[ix] & RANK_MASK
+		ix += 1
+		comu_cards[i].set_sr(st, rank)
 	#
 	$Table/PlayerBG1.set_name("vivisuke")
 	#Table/$PlayerBG1.set_card1(SPADES, RANK_A)
