@@ -18,10 +18,10 @@ func set_BG(id):
 	set_frame(id)
 func set_name(name : String):
 	$NameLabel.text = name
-func set_card1(st, num):
-	$Card1.set_sn(st, num)
-func set_card2(st, num):
-	$Card2.set_sn(st, num)
+func set_card1(st, rank):
+	$Card1.set_sr(st, rank)
+func set_card2(st, rank):
+	$Card2.set_sr(st, rank)
 func open_cards():
 	#opening = true
 	opening = OPENING_FH

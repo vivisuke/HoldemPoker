@@ -6,11 +6,11 @@ func _ready():
 
 func set_suit(st):
 	$Suit.set_frame(st)
-func set_number(num):
-	if num == 10:
+func set_rank(rank):
+	if rank == 10:
 		$Label.text = "10"
 	else:
-		$Label.text = NumTable[num-1]
-func set_sn(st, num):
+		$Label.text = NumTable[rank-1]
+func set_sr(st, rank):
 	set_suit(st)
-	set_number(num)
+	set_rank(rank)
