@@ -22,7 +22,14 @@ func _ready():
 	#$Table/Card3.set_number(10)
 	#$Table/Card4.set_number(12)
 	#$Table/Card5.set_number(13)
+	#
+	#$PlayerBG1.open_cards()
 	pass
+
+func _input(event):
+	if event is InputEventMouseButton:
+		$PlayerBG1.open_cards()
+		
 
 func _process(delta):
 	#$Card1.set_suit(0)
