@@ -31,6 +31,22 @@ func _ready():
 		var cd = get_node("Table/Card%d" % (i+1))
 		comu_cards.push_back(cd)
 	#
+	$Table/PlayerBG1.set_name("vivisuke")
+	#Table/$PlayerBG1.set_card1(SPADES, RANK_A)
+	#$Table/PlayerBG1.set_card2(SPADES, RANK_K)
+	$Table/PlayerBG1.set_BG(1)
+	$Table/PlayerBG2.set_BG(2)
+	#
+	#$Table/Card1.set_sr(CLUBS, RANK_A)
+	#$Table/Card2.set_sr(DIAMONDS, RANK_5)
+	#$Table/Card3.set_sr(HEARTS, RANK_10)
+	#$Table/Card4.set_sr(SPADES, RANK_Q)
+	#$Table/Card5.set_sr(HEARTS, RANK_K)
+	#
+	#$PlayerBG1.open_cards()
+	pass
+
+func deal_cards():
 	# デッキカードシャフル
 	deck.resize(N_CARDS)
 	for i in range(N_CARDS):
@@ -59,23 +75,9 @@ func _ready():
 		ix += 1
 		comu_cards[i].set_sr(st, rank)
 	#
-	$Table/PlayerBG1.set_name("vivisuke")
-	#Table/$PlayerBG1.set_card1(SPADES, RANK_A)
-	#$Table/PlayerBG1.set_card2(SPADES, RANK_K)
-	$Table/PlayerBG1.set_BG(1)
-	$Table/PlayerBG2.set_BG(2)
-	#
-	#$Table/Card1.set_sr(CLUBS, RANK_A)
-	#$Table/Card2.set_sr(DIAMONDS, RANK_5)
-	#$Table/Card3.set_sr(HEARTS, RANK_10)
-	#$Table/Card4.set_sr(SPADES, RANK_Q)
-	#$Table/Card5.set_sr(HEARTS, RANK_K)
-	#
-	#$PlayerBG1.open_cards()
-	pass
-
 func _input(event):
 	if event is InputEventMouseButton:
+		deal_cards()
 		#$PlayerBG1.open_cards()
 		for i in range(nPlayers):
 			players[i].open_cards()
