@@ -24,6 +24,8 @@ func set_card1(st, rank):
 	$Card1.set_sr(st, rank)
 func set_card2(st, rank):
 	$Card2.set_sr(st, rank)
+func set_hand(txt):
+	$HandLabel.text = txt
 func open_cards():
 	#opening = true
 	opening = OPENING_FH

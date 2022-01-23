@@ -49,8 +49,8 @@ var nPlayers = 6		# 6 players
 var n_opening = 0
 
 func _ready():
-	#randomize()
-	seed(0)
+	randomize()
+	#seed(0)
 	#
 	players = []
 	for i in range(nPlayers):
@@ -111,6 +111,8 @@ func deal_cards():
 func _input(event):
 	if event is InputEventMouseButton:
 		deal_cards()
+		for i in range(nPlayers):
+			players[i].set_hand("")
 		#$PlayerBG1.open_cards()
 		n_opening = nPlayers
 		for i in range(nPlayers):
@@ -192,10 +194,12 @@ func _on_PlayerBG_open_finished():
 		n_opening -= 1
 		if n_opening == 0:
 			print("finished opening")
-			var v = []
-			v.push_back(players_card1[0])
-			v.push_back(players_card2[0])
-			for i in range(5): v.push_back(comu_cards[i].get_sr())
-			print("v = ", v)
-			print("hand = ", handName[check_hand(v)])
+			for i in range(nPlayers):
+				var v = []
+				v.push_back(players_card1[i])
+				v.push_back(players_card2[i])
+				for k in range(5): v.push_back(comu_cards[k].get_sr())
+				print("v = ", v)
+				print("hand = ", handName[check_hand(v)])
+				players[i].set_hand(handName[check_hand(v)])
 	pass
