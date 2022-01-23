@@ -12,7 +12,7 @@ size = 10
 font_data = ExtResource( 2 )
 
 [sub_resource type="DynamicFont" id=2]
-size = 12
+size = 11
 font_data = ExtResource( 6 )
 
 [node name="PlayerBG" type="Sprite"]
@@ -22,9 +22,9 @@ script = ExtResource( 4 )
 
 [node name="NameLabel" type="Label" parent="."]
 margin_left = -40.0
-margin_top = -47.0
+margin_top = -50.0
 margin_right = 40.0
-margin_bottom = -32.0
+margin_bottom = -35.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 custom_fonts/font = SubResource( 1 )
 text = "player name"
@@ -36,9 +36,9 @@ __meta__ = {
 
 [node name="HandLabel" type="Label" parent="."]
 margin_left = -40.0
-margin_top = 28.0
+margin_top = 26.0
 margin_right = 40.0
-margin_bottom = 42.0
+margin_bottom = 39.0
 custom_colors/font_color = Color( 0, 1, 1, 1 )
 custom_fonts/font = SubResource( 2 )
 text = "poker hand"
@@ -47,16 +47,29 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="ChipsLabel" type="Label" parent="."]
+margin_left = -40.0
+margin_top = 37.0
+margin_right = 40.0
+margin_bottom = 50.0
+custom_colors/font_color = Color( 0, 1, 1, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "cihps"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="FaceDownCard1" type="Sprite" parent="."]
-position = Vector2( -20, -2 )
+position = Vector2( -20, -4 )
 texture = ExtResource( 3 )
 
 [node name="FaceDownCard2" type="Sprite" parent="."]
-position = Vector2( 20, -2 )
+position = Vector2( 20, -4 )
 texture = ExtResource( 3 )
 
 [node name="Card1" parent="." instance=ExtResource( 5 )]
-position = Vector2( -20, -2 )
+position = Vector2( -20, -4 )
 
 [node name="Card2" parent="." instance=ExtResource( 5 )]
-position = Vector2( 20, -2 )
+position = Vector2( 20, -4 )
