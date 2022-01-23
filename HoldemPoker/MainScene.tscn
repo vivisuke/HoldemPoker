@@ -81,3 +81,10 @@ position = Vector2( 200, -100 )
 
 [node name="PlayerBG6" parent="Table" instance=ExtResource( 8 )]
 position = Vector2( 200, 100 )
+
+[connection signal="open_finished" from="Table/PlayerBG1" to="." method="_on_PlayerBG_open_finished"]
+[connection signal="open_finished" from="Table/PlayerBG2" to="." method="_on_PlayerBG_open_finished"]
+[connection signal="open_finished" from="Table/PlayerBG3" to="." method="_on_PlayerBG_open_finished"]
+[connection signal="open_finished" from="Table/PlayerBG4" to="." method="_on_PlayerBG_open_finished"]
+[connection signal="open_finished" from="Table/PlayerBG5" to="." method="_on_PlayerBG_open_finished"]
+[connection signal="open_finished" from="Table/PlayerBG6" to="." method="_on_PlayerBG_open_finished"]

@@ -1,5 +1,7 @@
 extends Sprite
 
+signal open_finished
+
 const OPENING_NONE = 0
 const OPENING_FH = 1	# 前半
 const OPENING_SH = 2	# 後半
@@ -58,4 +60,5 @@ func _process(delta):
 			opening = OPENING_NONE
 			$Card1.set_scale(Vector2(1.0, 1.0))
 			$Card2.set_scale(Vector2(1.0, 1.0))
+			emit_signal("open_finished")
 	pass
