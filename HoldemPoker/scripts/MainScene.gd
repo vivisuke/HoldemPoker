@@ -117,6 +117,7 @@ func _input(event):
 		n_opening = nPlayers
 		for i in range(nPlayers):
 			players[i].open_cards()
+		$Table/CardBF.do_open()
 
 func _process(delta):
 	pass
