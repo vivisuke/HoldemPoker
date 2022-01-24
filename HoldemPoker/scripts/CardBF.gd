@@ -6,7 +6,11 @@ const OPENING_NONE = 0
 const OPENING_FH = 1	# 蜑榊濠
 const OPENING_SH = 2	# 蠕悟濠
 const TH_SCALE = 1.5
+const RANK_10 = 10 - 2
+const NumTable = "234567890JQKA"
+const N_RANK_BITS = 4
 
+var sr = 0		# (suit << 4) | rank
 var opening : int = 0
 var theta = 0.0
 
@@ -14,6 +18,19 @@ func _ready():
 	$Back.show()
 	$Front.hide()
 	pass
+func get_sr():
+	return sr
+func set_suit(st):
+	$Front/Suit.set_frame(st)
+func set_rank(rank):
+	if rank == RANK_10:
+		$Front/Label.text = "10"
+	else:
+		$Front/Label.text = NumTable[rank]
+func set_sr(st, rank):
+	sr = (st << N_RANK_BITS) | rank
+	set_suit(st)
+	set_rank(rank)
 func do_open():
 	opening = OPENING_FH
 	theta = 0.0

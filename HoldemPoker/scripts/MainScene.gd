@@ -57,7 +57,7 @@ func _ready():
 		var pb = get_node("Table/PlayerBG%d" % (i+1))
 		players.push_back(pb)
 	for i in range(N_COMU_CARS):
-		var cd = get_node("Table/Card%d" % (i+1))
+		var cd = get_node("Table/CardBF%d" % (i+1))
 		comu_cards.push_back(cd)
 	#
 	$Table/PlayerBG1.set_name("vivisuke")
@@ -65,14 +65,6 @@ func _ready():
 	#$Table/PlayerBG1.set_card2(SPADES, RANK_K)
 	$Table/PlayerBG1.set_BG(1)
 	$Table/PlayerBG2.set_BG(2)
-	#
-	#$Table/Card1.set_sr(CLUBS, RANK_A)
-	#$Table/Card2.set_sr(DIAMONDS, RANK_5)
-	#$Table/Card3.set_sr(HEARTS, RANK_10)
-	#$Table/Card4.set_sr(SPADES, RANK_Q)
-	#$Table/Card5.set_sr(HEARTS, RANK_K)
-	#
-	#$PlayerBG1.open_cards()
 	pass
 
 func deal_cards():
@@ -117,7 +109,9 @@ func _input(event):
 		n_opening = nPlayers
 		for i in range(nPlayers):
 			players[i].open_cards()
-		$Table/CardBF.do_open()
+		#$Table/CardBF.do_open()
+		for i in range(N_COMU_CARS):
+			comu_cards[i].do_open()
 
 func _process(delta):
 	pass
