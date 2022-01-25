@@ -20,12 +20,22 @@ enum {
 	ROYAL_FLUSH,
 	N_KIND_HAND,
 };
+enum {		# 状態
+	INIT = 0,
+	PRE_FLOP,
+	FLOP,
+	TURN,
+	REVER,
+	
+}
 #const N_SUIT = 4
 #const N_RANK = 13
 const N_CARDS = N_RANK*N_SUIT
 const N_COMU_CARS = 5			# 共通カード枚数
 const RANK_MASK = 0x0f
 const N_RANK_BITS = 4
+const CARD_WIDTH = 40
+const COMU_CARD_PY = 80
 const handName = [
 	"highCard",
 	"onePair",
@@ -39,6 +49,7 @@ const handName = [
 	"RoyalFlush",
 ]
 
+var state = INIT		# 状態
 var deck = []			# 要素：(suit << 4) | rank
 var comu_cards = []		# コミュニティカード
 var players = []		# プレイヤーパネル配列、[0] for Human
@@ -46,19 +57,24 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card1 = []		#
 var players_card2 = []		#
 var nPlayers = 6		# 6 players
+var n_moving = 0
 var n_opening = 0
+var deck_pos
+
+var CardBF = load("res://CardBF.tscn")
 
 func _ready():
 	randomize()
 	#seed(0)
 	#
+	deck_pos = $Table/CardDeck.get_position()
 	players = []
 	for i in range(nPlayers):
 		var pb = get_node("Table/PlayerBG%d" % (i+1))
 		players.push_back(pb)
-	for i in range(N_COMU_CARS):
-		var cd = get_node("Table/CardBF%d" % (i+1))
-		comu_cards.push_back(cd)
+	#for i in range(N_COMU_CARS):
+	#	var cd = get_node("Table/CardBF%d" % (i+1))
+	#	comu_cards.push_back(cd)
 	#
 	$Table/PlayerBG1.set_name("vivisuke")
 	#Table/$PlayerBG1.set_card1(SPADES, RANK_A)
@@ -94,24 +110,43 @@ func deal_cards():
 		players[i].set_card2(st, rank)
 	#
 	# 共通カード配布
-	for i in range(N_COMU_CARS):
-		var st : int = deck[ix] >> N_RANK_BITS
-		var rank : int = deck[ix] & RANK_MASK
-		ix += 1
-		comu_cards[i].set_sr(st, rank)
+	#for i in range(N_COMU_CARS):
+	#	var st : int = deck[ix] >> N_RANK_BITS
+	#	var rank : int = deck[ix] & RANK_MASK
+	#	ix += 1
+	#	comu_cards[i].set_sr(st, rank)
 	#
 func _input(event):
 	if event is InputEventMouseButton && event.is_pressed():
-		deal_cards()
-		for i in range(nPlayers):
-			players[i].set_hand("")
-		n_opening = nPlayers
-		for i in range(nPlayers):
-			players[i].open_cards()
+		if state == INIT:
+			deal_cards()
+			state = FLOP
+			comu_cards = []
+			n_moving = 3		# 3 for FLOP
+			for i in range(n_moving):
+				var cd = CardBF.instance()
+				comu_cards.push_back(cd)
+				cd.set_position(deck_pos)
+				$Table.add_child(cd)
+				cd.connect("move_finished", self, "move_finished")
+				cd.move_to(Vector2((i-2)*CARD_WIDTH, COMU_CARD_PY), 0.3)
+				
+		#for i in range(nPlayers):
+		#	players[i].set_hand("")
+		#n_opening = nPlayers
+		#for i in range(nPlayers):
+		#	players[i].open_cards()
 		#for i in range(N_COMU_CARS):
 		#	comu_cards[i].do_open()
-		print(comu_cards[0].get_position())
-		comu_cards[0].do_move(Vector2(0, 0), 0.3)
+		#print(comu_cards[0].get_position())
+		#comu_cards[0].do_move(Vector2(0, 0), 0.3)
+func move_finished():
+	n_moving -= 1
+	if n_moving == 0:
+		print("move_finished")
+		if state == FLOP:
+			for i in range(3):		# 3 for FLOP
+				comu_cards[i].do_open()
 
 func _process(delta):
 	pass

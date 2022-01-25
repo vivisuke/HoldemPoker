@@ -37,7 +37,7 @@ func set_sr(st, rank):
 	sr = (st << N_RANK_BITS) | rank
 	set_suit(st)
 	set_rank(rank)
-func do_move(dst : Vector2, dur : float):
+func move_to(dst : Vector2, dur : float):
 	src_pos = get_position()
 	dst_pos = dst
 	move_dur = dur
