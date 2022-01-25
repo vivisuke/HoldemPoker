@@ -64,7 +64,7 @@ func _ready():
 	#Table/$PlayerBG1.set_card1(SPADES, RANK_A)
 	#$Table/PlayerBG1.set_card2(SPADES, RANK_K)
 	$Table/PlayerBG1.set_BG(1)
-	$Table/PlayerBG2.set_BG(2)
+	#$Table/PlayerBG2.set_BG(2)
 	pass
 
 func deal_cards():
