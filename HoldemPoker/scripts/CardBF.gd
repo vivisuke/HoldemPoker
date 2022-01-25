@@ -1,6 +1,7 @@
 extends Node2D
 
 signal open_finished
+signal move_finished
 
 const OPENING_NONE = 0
 const OPENING_FH = 1	# 蜑榊濠
@@ -57,6 +58,7 @@ func _process(delta):
 		set_position(src_pos * (1.0 - r) + dst_pos * r)
 		if move_elapsed == move_dur:
 			moving = false
+			emit_signal("move_finished")
 	if opening == OPENING_FH:
 		theta += delta * TH_SCALE
 		if theta < PI/2:

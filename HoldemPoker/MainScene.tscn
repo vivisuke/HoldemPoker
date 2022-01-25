@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=10 format=2]
 
 [ext_resource path="res://scripts/MainScene.gd" type="Script" id=1]
 [ext_resource path="res://images/BG.png" type="Texture" id=2]
@@ -9,7 +9,6 @@
 [ext_resource path="res://images/card-deck_40.png" type="Texture" id=7]
 [ext_resource path="res://PlayerBG.tscn" type="PackedScene" id=8]
 [ext_resource path="res://CardBF.tscn" type="PackedScene" id=9]
-[ext_resource path="res://scripts/CardBF.gd" type="Script" id=10]
 
 [node name="MainScene" type="Node2D"]
 script = ExtResource( 1 )
@@ -55,19 +54,15 @@ position = Vector2( -80, 72 )
 
 [node name="CardBF2" parent="Table" instance=ExtResource( 9 )]
 position = Vector2( -40, 72 )
-script = ExtResource( 10 )
 
 [node name="CardBF3" parent="Table" instance=ExtResource( 9 )]
 position = Vector2( 0, 72 )
-script = ExtResource( 10 )
 
 [node name="CardBF4" parent="Table" instance=ExtResource( 9 )]
 position = Vector2( 40, 72 )
-script = ExtResource( 10 )
 
 [node name="CardBF5" parent="Table" instance=ExtResource( 9 )]
 position = Vector2( 80, 72 )
-script = ExtResource( 10 )
 
 [node name="PlayerBG1" parent="Table" instance=ExtResource( 8 )]
 position = Vector2( 0, 237 )
