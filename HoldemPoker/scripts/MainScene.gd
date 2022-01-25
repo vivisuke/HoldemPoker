@@ -53,7 +53,7 @@ var state = INIT		# 状態
 var deck = []			# 要素：(suit << 4) | rank
 var comu_cards = []		# コミュニティカード
 var players = []		# プレイヤーパネル配列、[0] for Human
-#var players_cards[]		# [0], [1] for Player-1, ...
+#var players_cards = []		# プレイヤーカード、[0], [1] for Player-1, ...
 var players_card1 = []		#
 var players_card2 = []		#
 var nPlayers = 6		# 6 players
@@ -84,7 +84,7 @@ func _ready():
 	#$Table/PlayerBG2.set_BG(2)
 	pass
 
-func deal_cards():
+func shuffle_cards():
 	# デッキカードシャフル
 	deck.resize(N_CARDS)
 	for i in range(N_CARDS):
@@ -92,6 +92,8 @@ func deal_cards():
 		var rank : int = i % N_RANK
 		deck[i] = (st<<N_RANK_BITS) | rank
 	deck.shuffle()
+func deal_cards():
+	shuffle_cards()
 	#
 	# 各プレイヤーにカード配布
 	players_card1 = []
@@ -119,8 +121,32 @@ func deal_cards():
 	#
 func _input(event):
 	if event is InputEventMouseButton && event.is_pressed():
+		if n_moving != 0: return;		# カード移動中
 		if state == INIT:
-			deal_cards()
+			state = PRE_FLOP
+			shuffle_cards()
+			n_moving = nPlayers * 2		# 各プレイヤーにカードを２枚配布
+			#players_cards.resize(nPlayers * 2)
+			players_card1.resize(nPlayers)
+			for i in range(nPlayers):
+				var cd = CardBF.instance()
+				players_card1[i] = cd
+				cd.set_position(deck_pos)
+				$Table.add_child(cd)
+				cd.connect("move_finished", self, "move_finished")
+				var dst = players[i].get_position() + Vector2(-CARD_WIDTH/2, -4)
+				cd.move_to(dst, 0.3)
+			players_card2.resize(nPlayers)
+			for i in range(nPlayers):
+				var cd = CardBF.instance()
+				players_card2[i] = cd
+				cd.set_position(deck_pos)
+				$Table.add_child(cd)
+				cd.connect("move_finished", self, "move_finished")
+				var dst = players[i].get_position() + Vector2(CARD_WIDTH/2, -4)
+				cd.move_to(dst, 0.3)
+		elif state == PRE_FLOP:
+			#deal_cards()
 			state = FLOP
 			comu_cards = []
 			n_moving = 3		# 3 for FLOP
@@ -145,7 +171,10 @@ func move_finished():
 	n_moving -= 1
 	if n_moving == 0:
 		print("move_finished")
-		if state == FLOP:
+		if state == PRE_FLOP:
+			players_card1[0].do_open()
+			players_card2[0].do_open()
+		elif state == FLOP:
 			for i in range(3):		# 3 for FLOP
 				comu_cards[i].do_open()
 
