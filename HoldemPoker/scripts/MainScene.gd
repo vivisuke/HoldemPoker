@@ -71,6 +71,7 @@ func _ready():
 	players = []
 	for i in range(nPlayers):
 		var pb = get_node("Table/PlayerBG%d" % (i+1))
+		pb.set_chips(200)
 		players.push_back(pb)
 	#for i in range(N_COMU_CARS):
 	#	var cd = get_node("Table/CardBF%d" % (i+1))
