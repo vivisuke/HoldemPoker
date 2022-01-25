@@ -135,7 +135,7 @@ func _input(event):
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
 				var dst = players[i].get_position() + Vector2(-CARD_WIDTH/2, -4)
-				cd.move_to(dst, 0.3)
+				cd.wait_move_to(i * 0.1, dst, 0.3)
 			players_card2.resize(nPlayers)
 			for i in range(nPlayers):
 				var cd = CardBF.instance()
@@ -144,7 +144,7 @@ func _input(event):
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
 				var dst = players[i].get_position() + Vector2(CARD_WIDTH/2, -4)
-				cd.move_to(dst, 0.3)
+				cd.wait_move_to((nPlayers + i) * 0.1, dst, 0.3)
 		elif state == PRE_FLOP:
 			#deal_cards()
 			state = FLOP

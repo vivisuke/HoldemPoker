@@ -15,6 +15,8 @@ var sr = 0		# (suit << 4) | rank
 var opening : int = 0
 var theta = 0.0
 var moving = false
+var waiting_time = 0.0			# ウェイト時間（単位：秒）
+#var wait_elapsed = 0.0			# ウェイト経過時間（単位：秒）
 var move_dur = 0.0				# 移動所要時間（単位：秒）
 var move_elapsed = 0.0			# 移動経過時間（単位：秒）
 var src_pos = Vector2(0, 0)
@@ -37,6 +39,10 @@ func set_sr(st, rank):
 	sr = (st << N_RANK_BITS) | rank
 	set_suit(st)
 	set_rank(rank)
+func wait_move_to(wait : float, dst : Vector2, dur : float):
+	waiting_time = wait
+	#wait_elapsed = 0.0
+	move_to(dst, dur)
 func move_to(dst : Vector2, dur : float):
 	src_pos = get_position()
 	dst_pos = dst
@@ -51,6 +57,9 @@ func do_open():
 	$Back.show()
 	$Back.set_scale(Vector2(1.0, 1.0))
 func _process(delta):
+	if waiting_time > 0.0:
+		waiting_time -= delta
+		return
 	if moving:
 		move_elapsed += delta
 		move_elapsed = min(move_elapsed, move_dur)
