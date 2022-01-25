@@ -101,17 +101,17 @@ func deal_cards():
 		comu_cards[i].set_sr(st, rank)
 	#
 func _input(event):
-	if event is InputEventMouseButton:
+	if event is InputEventMouseButton && event.is_pressed():
 		deal_cards()
 		for i in range(nPlayers):
 			players[i].set_hand("")
-		#$PlayerBG1.open_cards()
 		n_opening = nPlayers
 		for i in range(nPlayers):
 			players[i].open_cards()
-		#$Table/CardBF.do_open()
-		for i in range(N_COMU_CARS):
-			comu_cards[i].do_open()
+		#for i in range(N_COMU_CARS):
+		#	comu_cards[i].do_open()
+		print(comu_cards[0].get_position())
+		comu_cards[0].do_move(Vector2(0, 0), 0.3)
 
 func _process(delta):
 	pass

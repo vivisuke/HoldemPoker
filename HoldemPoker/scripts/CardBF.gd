@@ -13,6 +13,11 @@ const N_RANK_BITS = 4
 var sr = 0		# (suit << 4) | rank
 var opening : int = 0
 var theta = 0.0
+var moving = false
+var move_dur = 0.0				# 移動所要時間（単位：秒）
+var move_elapsed = 0.0			# 移動経過時間（単位：秒）
+var src_pos = Vector2(0, 0)
+var dst_pos = Vector2(0, 0)
 
 func _ready():
 	$Back.show()
@@ -31,6 +36,13 @@ func set_sr(st, rank):
 	sr = (st << N_RANK_BITS) | rank
 	set_suit(st)
 	set_rank(rank)
+func do_move(dst : Vector2, dur : float):
+	src_pos = get_position()
+	dst_pos = dst
+	move_dur = dur
+	move_elapsed = 0.0
+	moving = true
+	pass
 func do_open():
 	opening = OPENING_FH
 	theta = 0.0
@@ -38,6 +50,13 @@ func do_open():
 	$Back.show()
 	$Back.set_scale(Vector2(1.0, 1.0))
 func _process(delta):
+	if moving:
+		move_elapsed += delta
+		move_elapsed = min(move_elapsed, move_dur)
+		var r = move_elapsed / move_dur
+		set_position(src_pos * (1.0 - r) + dst_pos * r)
+		if move_elapsed == move_dur:
+			moving = false
 	if opening == OPENING_FH:
 		theta += delta * TH_SCALE
 		if theta < PI/2:
