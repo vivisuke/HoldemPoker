@@ -74,6 +74,7 @@ func _ready():
 	players = []
 	for i in range(nPlayers):
 		var pb = get_node("Table/PlayerBG%d" % (i+1))
+		pb.set_hand("")
 		pb.set_chips(200)
 		players.push_back(pb)
 	#for i in range(N_COMU_CARS):
@@ -216,20 +217,33 @@ func move_finished():
 	if n_moving == 0:
 		print("move_finished")
 		if state == PRE_FLOP:
+			n_opening = 2
 			players_card1[0].do_open()
 			players_card2[0].do_open()
 		elif state == FLOP:
+			n_opening = N_FLOP_CARDS
 			for i in range(N_FLOP_CARDS):		# 3 for FLOP
 				comu_cards[i].do_open()
 		elif state == TURN:
+			n_opening = 1
 			comu_cards[N_FLOP_CARDS].do_open()
 		elif state == RIVER:
+			n_opening = 1
 			comu_cards[N_FLOP_CARDS + 1].do_open()
 func open_finished():
 	n_opening -= 1
 	print(n_opening)
 	if n_opening == 0:
-		show_hand()
+		if state == PRE_FLOP:
+			show_user_hand(0)
+		elif state == FLOP:
+			show_user_hand(3)
+		elif state == TURN:
+			show_user_hand(4)
+		elif state == RIVER:
+			show_user_hand(5)
+		elif state == SHOW_DOWN:
+			show_hand()
 
 func _process(delta):
 	pass
@@ -301,6 +315,14 @@ func check_hand(v : Array):
 	if( pairIX1 >= 0 ):
 		return ONE_PAIR;
 	return HIGH_CARD
+func show_user_hand(n):
+	var v = []
+	v.push_back(players_card1[0].get_sr())
+	v.push_back(players_card2[0].get_sr())
+	for k in range(n): v.push_back(comu_cards[k].get_sr())
+	#print("i = ", i, ", v = ", v)
+	#print("hand = ", handName[check_hand(v)])
+	players[0].set_hand(handName[check_hand(v)])
 func show_hand():
 	for i in range(nPlayers):
 		var v = []
