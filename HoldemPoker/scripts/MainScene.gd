@@ -144,6 +144,7 @@ func _input(event):
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
+				cd.connect("open_finished", self, "open_finished")
 				var dst = players[i].get_position() + Vector2(-CARD_WIDTH/2, -4)
 				cd.wait_move_to(i * 0.1, dst, 0.3)
 			players_card2.resize(nPlayers)
@@ -155,6 +156,7 @@ func _input(event):
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
+				cd.connect("open_finished", self, "open_finished")
 				var dst = players[i].get_position() + Vector2(CARD_WIDTH/2, -4)
 				cd.wait_move_to((nPlayers + i) * 0.1, dst, 0.3)
 		elif state == PRE_FLOP:
@@ -195,6 +197,7 @@ func _input(event):
 			cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
 		elif state == RIVER:
 			state = SHOW_DOWN
+			n_opening = (nPlayers - 1)*2
 			for i in range(1, nPlayers):
 				players_card1[i].do_open()
 				players_card2[i].do_open()
@@ -222,6 +225,11 @@ func move_finished():
 			comu_cards[N_FLOP_CARDS].do_open()
 		elif state == RIVER:
 			comu_cards[N_FLOP_CARDS + 1].do_open()
+func open_finished():
+	n_opening -= 1
+	print(n_opening)
+	if n_opening == 0:
+		show_hand()
 
 func _process(delta):
 	pass
@@ -293,7 +301,15 @@ func check_hand(v : Array):
 	if( pairIX1 >= 0 ):
 		return ONE_PAIR;
 	return HIGH_CARD
-
+func show_hand():
+	for i in range(nPlayers):
+		var v = []
+		v.push_back(players_card1[i].get_sr())
+		v.push_back(players_card2[i].get_sr())
+		for k in range(5): v.push_back(comu_cards[k].get_sr())
+		print("i = ", i, ", v = ", v)
+		print("hand = ", handName[check_hand(v)])
+		players[i].set_hand(handName[check_hand(v)])
 func _on_PlayerBG_open_finished():
 	if n_opening != 0:
 		n_opening -= 1
