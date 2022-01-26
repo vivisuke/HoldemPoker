@@ -25,7 +25,8 @@ enum {		# 状態
 	PRE_FLOP,
 	FLOP,
 	TURN,
-	REVER,
+	RIVER,
+	SHOW_DOWN,
 	
 }
 #const N_SUIT = 4
@@ -36,6 +37,7 @@ const RANK_MASK = 0x0f
 const N_RANK_BITS = 4
 const CARD_WIDTH = 40
 const COMU_CARD_PY = 80
+const N_FLOP_CARDS = 3
 const handName = [
 	"highCard",
 	"onePair",
@@ -159,7 +161,7 @@ func _input(event):
 			#deal_cards()
 			state = FLOP
 			comu_cards = []
-			n_moving = 3		# 3 for FLOP
+			n_moving = N_FLOP_CARDS		# 3 for FLOP
 			for i in range(n_moving):
 				var cd = CardBF.instance()
 				comu_cards.push_back(cd)
@@ -168,8 +170,35 @@ func _input(event):
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
-				cd.move_to(Vector2((i-2)*CARD_WIDTH, COMU_CARD_PY), 0.3)
-				
+				cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
+		elif state == FLOP:
+			state = TURN
+			n_moving = 1
+			var cd = CardBF.instance()
+			comu_cards.push_back(cd)
+			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+			deck_ix += 1
+			cd.set_position(deck_pos)
+			$Table.add_child(cd)
+			cd.connect("move_finished", self, "move_finished")
+			cd.move_to(Vector2(CARD_WIDTH, COMU_CARD_PY), 0.3)
+		elif state == TURN:
+			state = RIVER
+			n_moving = 1
+			var cd = CardBF.instance()
+			comu_cards.push_back(cd)
+			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+			deck_ix += 1
+			cd.set_position(deck_pos)
+			$Table.add_child(cd)
+			cd.connect("move_finished", self, "move_finished")
+			cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
+		elif state == RIVER:
+			state = SHOW_DOWN
+			for i in range(1, nPlayers):
+				players_card1[i].do_open()
+				players_card2[i].do_open()
+			pass
 		#for i in range(nPlayers):
 		#	players[i].set_hand("")
 		#n_opening = nPlayers
@@ -187,8 +216,12 @@ func move_finished():
 			players_card1[0].do_open()
 			players_card2[0].do_open()
 		elif state == FLOP:
-			for i in range(3):		# 3 for FLOP
+			for i in range(N_FLOP_CARDS):		# 3 for FLOP
 				comu_cards[i].do_open()
+		elif state == TURN:
+			comu_cards[N_FLOP_CARDS].do_open()
+		elif state == RIVER:
+			comu_cards[N_FLOP_CARDS + 1].do_open()
 
 func _process(delta):
 	pass
