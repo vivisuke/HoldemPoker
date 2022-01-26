@@ -50,6 +50,7 @@ const handName = [
 ]
 
 var state = INIT		# 状態
+var deck_ix = 0			# デッキトップインデックス
 var deck = []			# 要素：(suit << 4) | rank
 var comu_cards = []		# コミュニティカード
 var players = []		# プレイヤーパネル配列、[0] for Human
@@ -84,6 +85,8 @@ func _ready():
 	#$Table/PlayerBG2.set_BG(2)
 	pass
 
+func card_to_suit(cd): return cd >> N_RANK_BITS
+func card_to_rank(cd): return cd & RANK_MASK
 func shuffle_cards():
 	# デッキカードシャフル
 	deck.resize(N_CARDS)
@@ -92,6 +95,7 @@ func shuffle_cards():
 		var rank : int = i % N_RANK
 		deck[i] = (st<<N_RANK_BITS) | rank
 	deck.shuffle()
+	deck_ix = 0
 func deal_cards():
 	shuffle_cards()
 	#
@@ -100,8 +104,10 @@ func deal_cards():
 	var ix = 0
 	for i in range(nPlayers):
 		players_card1.push_back(deck[ix])
-		var st : int = deck[ix] >> N_RANK_BITS
-		var rank : int = deck[ix] & RANK_MASK
+		#var st : int = deck[ix] >> N_RANK_BITS
+		#var rank : int = deck[ix] & RANK_MASK
+		var st : int = card_to_suit(deck[ix])
+		var rank : int = card_to_rank(deck[ix])
 		ix += 1
 		players[i].set_card1(st, rank)
 	players_card2 = []
@@ -131,6 +137,8 @@ func _input(event):
 			for i in range(nPlayers):
 				var cd = CardBF.instance()
 				players_card1[i] = cd
+				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+				deck_ix += 1
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
@@ -140,6 +148,8 @@ func _input(event):
 			for i in range(nPlayers):
 				var cd = CardBF.instance()
 				players_card2[i] = cd
+				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+				deck_ix += 1
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
@@ -153,6 +163,8 @@ func _input(event):
 			for i in range(n_moving):
 				var cd = CardBF.instance()
 				comu_cards.push_back(cd)
+				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+				deck_ix += 1
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
