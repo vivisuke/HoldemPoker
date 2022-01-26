@@ -203,6 +203,14 @@ func _input(event):
 				players_card1[i].do_open()
 				players_card2[i].do_open()
 			pass
+		elif state == SHOW_DOWN:
+			state = INIT
+			for i in range(nPlayers):
+				players_card1[i].queue_free()
+				players_card2[i].queue_free()
+				players[i].set_hand("")
+			for i in range(comu_cards.size()):
+				comu_cards[i].queue_free()
 		#for i in range(nPlayers):
 		#	players[i].set_hand("")
 		#n_opening = nPlayers
