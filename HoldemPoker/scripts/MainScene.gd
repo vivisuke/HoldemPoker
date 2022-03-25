@@ -173,6 +173,7 @@ func _input(event):
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
+				cd.connect("open_finished", self, "open_finished")
 				cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
 		elif state == FLOP:
 			state = TURN
@@ -184,6 +185,7 @@ func _input(event):
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
 			cd.connect("move_finished", self, "move_finished")
+			cd.connect("open_finished", self, "open_finished")
 			cd.move_to(Vector2(CARD_WIDTH, COMU_CARD_PY), 0.3)
 		elif state == TURN:
 			state = RIVER
@@ -195,6 +197,7 @@ func _input(event):
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
 			cd.connect("move_finished", self, "move_finished")
+			cd.connect("open_finished", self, "open_finished")
 			cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
 		elif state == RIVER:
 			state = SHOW_DOWN
@@ -337,8 +340,8 @@ func show_hand():
 		v.push_back(players_card1[i].get_sr())
 		v.push_back(players_card2[i].get_sr())
 		for k in range(5): v.push_back(comu_cards[k].get_sr())
-		print("i = ", i, ", v = ", v)
-		print("hand = ", handName[check_hand(v)])
+		#print("i = ", i, ", v = ", v)
+		#print("hand = ", handName[check_hand(v)])
 		players[i].set_hand(handName[check_hand(v)])
 func _on_PlayerBG_open_finished():
 	if n_opening != 0:
