@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://scripts/MainScene.gd" type="Script" id=1]
 [ext_resource path="res://images/BG.png" type="Texture" id=2]
@@ -8,6 +8,15 @@
 [ext_resource path="res://images/leftward_white.png" type="Texture" id=6]
 [ext_resource path="res://images/card-deck_40.png" type="Texture" id=7]
 [ext_resource path="res://PlayerBG.tscn" type="PackedScene" id=8]
+[ext_resource path="res://fonts/arial.ttf" type="DynamicFontData" id=9]
+[ext_resource path="res://fonts/arialbd.ttf" type="DynamicFontData" id=10]
+
+[sub_resource type="DynamicFont" id=2]
+size = 30
+font_data = ExtResource( 10 )
+
+[sub_resource type="DynamicFont" id=1]
+font_data = ExtResource( 9 )
 
 [node name="MainScene" type="Node2D"]
 script = ExtResource( 1 )
@@ -25,9 +34,6 @@ margin_right = 500.0
 margin_bottom = 50.0
 color = Color( 0.180392, 0.309804, 0.309804, 1 )
 script = ExtResource( 4 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="BackButton" type="TextureButton" parent="TitleBar"]
 margin_left = 1.0
@@ -39,6 +45,14 @@ texture_pressed = ExtResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Label" type="Label" parent="TitleBar"]
+margin_right = 500.0
+margin_bottom = 50.0
+custom_fonts/font = SubResource( 2 )
+text = "6P Ring Game"
+align = 1
+valign = 1
 
 [node name="Table" type="Sprite" parent="."]
 position = Vector2( 250, 420 )
@@ -65,6 +79,45 @@ position = Vector2( 200, -100 )
 
 [node name="PlayerBG6" parent="Table" instance=ExtResource( 8 )]
 position = Vector2( 200, 100 )
+
+[node name="CheckButton" type="Button" parent="."]
+margin_top = 750.0
+margin_right = 100.0
+margin_bottom = 780.0
+custom_fonts/font = SubResource( 1 )
+text = "Check"
+
+[node name="CallButton" type="Button" parent="."]
+margin_left = 100.0
+margin_top = 750.0
+margin_right = 200.0
+margin_bottom = 780.0
+custom_fonts/font = SubResource( 1 )
+text = "Call"
+
+[node name="FoldButton" type="Button" parent="."]
+margin_left = 200.0
+margin_top = 750.0
+margin_right = 300.0
+margin_bottom = 780.0
+custom_fonts/font = SubResource( 1 )
+text = "Fold"
+
+[node name="RaiseButton" type="Button" parent="."]
+margin_left = 300.0
+margin_top = 750.0
+margin_right = 400.0
+margin_bottom = 780.0
+custom_fonts/font = SubResource( 1 )
+text = "Fold"
+
+[node name="AllInButton" type="Button" parent="."]
+margin_left = 400.0
+margin_top = 750.0
+margin_right = 500.0
+margin_bottom = 780.0
+custom_fonts/font = SubResource( 1 )
+text = "AllIn"
 
 [connection signal="open_finished" from="Table/PlayerBG1" to="." method="_on_PlayerBG_open_finished"]
 [connection signal="open_finished" from="Table/PlayerBG2" to="." method="_on_PlayerBG_open_finished"]
