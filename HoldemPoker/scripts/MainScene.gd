@@ -27,7 +27,11 @@ enum {		# 状態
 	TURN,
 	RIVER,
 	SHOW_DOWN,
-	
+}
+enum {
+	DEALER = 0,
+	SB,
+	BB,
 }
 #const N_SUIT = 4
 #const N_RANK = 13
@@ -52,6 +56,7 @@ const handName = [
 ]
 
 var state = INIT		# 状態
+var dealer_ix = 0
 var deck_ix = 0			# デッキトップインデックス
 var deck = []			# 要素：(suit << 4) | rank
 var comu_cards = []		# コミュニティカード
@@ -66,10 +71,14 @@ var deck_pos
 
 var CardBF = load("res://CardBF.tscn")
 
+var rng = RandomNumberGenerator.new()
+
 func _ready():
 	randomize()
+	rng.randomize()
 	#seed(0)
 	#
+	
 	deck_pos = $Table/CardDeck.get_position()
 	players = []
 	for i in range(nPlayers):
@@ -81,13 +90,25 @@ func _ready():
 	#	var cd = get_node("Table/CardBF%d" % (i+1))
 	#	comu_cards.push_back(cd)
 	#
-	$Table/PlayerBG1.set_name("vivisuke")
-	#Table/$PlayerBG1.set_card1(SPADES, RANK_A)
-	#$Table/PlayerBG1.set_card2(SPADES, RANK_K)
-	$Table/PlayerBG1.set_BG(1)
-	#$Table/PlayerBG2.set_BG(2)
+	players[0].set_name("vivisuke")
+	players[0].set_BG(1)
+	dealer_ix = rng.randi_range(0, players.size() - 1)
+	print("dealer_ix = ", dealer_ix)
+	update_d_SB_BB()
 	pass
-
+func update_d_SB_BB():
+	for i in range(players.size()):
+		var mk = players[i].get_node("Mark")
+		mk.show()
+		if dealer_ix == i:
+			mk.frame = DEALER
+		elif (dealer_ix + 1) % players.size() == i:
+			mk.frame = SB
+		elif (dealer_ix + 2) % players.size() == i:
+			mk.frame = BB
+		else:
+			mk.hide()
+			
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
 func shuffle_cards():
