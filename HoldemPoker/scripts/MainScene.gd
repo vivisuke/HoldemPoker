@@ -42,6 +42,10 @@ const N_RANK_BITS = 4
 const CARD_WIDTH = 40
 const COMU_CARD_PY = 80
 const N_FLOP_CARDS = 3
+const stateText = [
+	"",		# for INIT
+	"PreFlop", "Flop", "Turn", "River", "ShowDown",
+]
 const handName = [
 	"highCard",
 	"onePair",
@@ -95,7 +99,13 @@ func _ready():
 	dealer_ix = rng.randi_range(0, players.size() - 1)
 	print("dealer_ix = ", dealer_ix)
 	update_d_SB_BB()
+	update_title_text()
 	pass
+func update_title_text():
+	var txt = "6P Ring Game"
+	if state != INIT:
+		txt += " " + stateText[state]
+	$TitleBar/Label.text = txt
 func update_d_SB_BB():
 	for i in range(players.size()):
 		var mk = players[i].get_node("Mark")
@@ -235,15 +245,7 @@ func _input(event):
 				players[i].set_hand("")
 			for i in range(comu_cards.size()):
 				comu_cards[i].queue_free()
-		#for i in range(nPlayers):
-		#	players[i].set_hand("")
-		#n_opening = nPlayers
-		#for i in range(nPlayers):
-		#	players[i].open_cards()
-		#for i in range(N_COMU_CARS):
-		#	comu_cards[i].do_open()
-		#print(comu_cards[0].get_position())
-		#comu_cards[0].do_move(Vector2(0, 0), 0.3)
+		update_title_text()
 func move_finished():
 	n_moving -= 1
 	if n_moving == 0:

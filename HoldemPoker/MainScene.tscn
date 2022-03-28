@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://scripts/MainScene.gd" type="Script" id=1]
 [ext_resource path="res://images/BG.png" type="Texture" id=2]
@@ -9,11 +9,10 @@
 [ext_resource path="res://images/card-deck_40.png" type="Texture" id=7]
 [ext_resource path="res://PlayerBG.tscn" type="PackedScene" id=8]
 [ext_resource path="res://fonts/arial.ttf" type="DynamicFontData" id=9]
-[ext_resource path="res://fonts/arialbd.ttf" type="DynamicFontData" id=10]
 
 [sub_resource type="DynamicFont" id=2]
 size = 30
-font_data = ExtResource( 10 )
+font_data = ExtResource( 9 )
 
 [sub_resource type="DynamicFont" id=1]
 font_data = ExtResource( 9 )
