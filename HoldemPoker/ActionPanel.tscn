@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://fonts/arial.ttf" type="DynamicFontData" id=1]
+
+[sub_resource type="DynamicFont" id=1]
+size = 12
+font_data = ExtResource( 1 )
+
+[node name="ActionPanel" type="ColorRect"]
+margin_right = 80.0
+margin_bottom = 20.0
+color = Color( 0.501961, 0.501961, 0.501961, 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_right = 80.0
+margin_bottom = 20.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "Raised 200"
+align = 1
+valign = 1

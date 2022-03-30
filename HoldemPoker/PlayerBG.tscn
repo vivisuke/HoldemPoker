@@ -61,3 +61,13 @@ position = Vector2( -33, -43 )
 scale = Vector2( 0.25, 0.25 )
 texture = ExtResource( 3 )
 hframes = 3
+
+[node name="ResultLabel" type="Label" parent="."]
+visible = false
+margin_left = -39.0
+margin_top = -7.0
+margin_right = 40.0
+margin_bottom = 7.0
+text = "raised"
+align = 1
+valign = 1

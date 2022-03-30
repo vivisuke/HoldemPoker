@@ -68,12 +68,14 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 #var players_cards = []		# プレイヤーカード、[0], [1] for Player-1, ...
 var players_card1 = []		#
 var players_card2 = []		#
+var action_panels = []		# プレイヤーアクション表示パネル
 var nPlayers = 6		# 6 players
 var n_moving = 0
 var n_opening = 0
 var deck_pos
 
-var CardBF = load("res://CardBF.tscn")
+var CardBF = load("res://CardBF.tscn")		# カード裏面
+var ActionPanel = load("res://ActionPanel.tscn")
 
 var rng = RandomNumberGenerator.new()
 
@@ -86,10 +88,12 @@ func _ready():
 	deck_pos = $Table/CardDeck.get_position()
 	players = []
 	for i in range(nPlayers):
-		var pb = get_node("Table/PlayerBG%d" % (i+1))
+		var pb = get_node("Table/PlayerBG%d" % (i+1))		# プレイヤーパネル
+		#pb.get_node("ResultLabel").z_index = 2
 		pb.set_hand("")
 		pb.set_chips(200)
 		players.push_back(pb)
+	print("width = ", players[0].texture.get_width())
 	#for i in range(N_COMU_CARS):
 	#	var cd = get_node("Table/CardBF%d" % (i+1))
 	#	comu_cards.push_back(cd)
@@ -169,12 +173,13 @@ func _input(event):
 			#players_cards.resize(nPlayers * 2)
 			players_card1.resize(nPlayers)
 			for i in range(nPlayers):
-				var cd = CardBF.instance()
+				var cd = CardBF.instance()		# カード裏面
 				players_card1[i] = cd
 				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
 				deck_ix += 1
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
+				#players[i].get_node("CardParent").add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
 				cd.connect("open_finished", self, "open_finished")
 				var dst = players[i].get_position() + Vector2(-CARD_WIDTH/2, -4)
@@ -191,6 +196,13 @@ func _input(event):
 				cd.connect("open_finished", self, "open_finished")
 				var dst = players[i].get_position() + Vector2(CARD_WIDTH/2, -4)
 				cd.wait_move_to((nPlayers + i) * 0.1, dst, 0.3)
+			action_panels.resize(nPlayers)
+			for i in range(nPlayers):
+				var ap = ActionPanel.instance()
+				action_panels[i] = ap
+				ap.set_position(players[i].position - ap.rect_size/2)
+				$Table.add_child(ap)
+			print(action_panels[0].rect_size)
 		elif state == PRE_FLOP:
 			#deal_cards()
 			state = FLOP
@@ -239,10 +251,13 @@ func _input(event):
 			pass
 		elif state == SHOW_DOWN:
 			state = INIT
+			dealer_ix = (dealer_ix + 1) % players.size()
+			update_d_SB_BB()
 			for i in range(nPlayers):
 				players_card1[i].queue_free()
 				players_card2[i].queue_free()
 				players[i].set_hand("")
+				action_panels[i].queue_free()
 			for i in range(comu_cards.size()):
 				comu_cards[i].queue_free()
 		update_title_text()
