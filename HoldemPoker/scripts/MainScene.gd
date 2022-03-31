@@ -207,6 +207,9 @@ func _input(event):
 		elif state == PRE_FLOP:
 			#deal_cards()
 			state = FLOP
+			for i in range(nPlayers):		# 暫定コード
+				action_panels[i].set_text("called")
+				action_panels[i].show()
 			comu_cards = []
 			n_moving = N_FLOP_CARDS		# 3 for FLOP
 			for i in range(n_moving):
