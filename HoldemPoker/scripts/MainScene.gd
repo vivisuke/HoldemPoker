@@ -248,6 +248,8 @@ func _input(event):
 			cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
 		elif state == RIVER:
 			state = SHOW_DOWN
+			for i in range(nPlayers):		# 暫定コード
+				action_panels[i].hide()
 			n_opening = (nPlayers - 1)*2
 			for i in range(1, nPlayers):
 				players_card1[i].do_open()
