@@ -200,6 +200,7 @@ func _input(event):
 			for i in range(nPlayers):
 				var ap = ActionPanel.instance()
 				action_panels[i] = ap
+				ap.hide()
 				ap.set_position(players[i].position - ap.rect_size/2)
 				$Table.add_child(ap)
 			print(action_panels[0].rect_size)
