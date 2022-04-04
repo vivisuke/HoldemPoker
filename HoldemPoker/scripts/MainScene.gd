@@ -42,6 +42,9 @@ const N_RANK_BITS = 4
 const CARD_WIDTH = 40
 const COMU_CARD_PY = 80
 const N_FLOP_CARDS = 3
+const N_PLAYERS = 6
+const BB_CHIPS = 2
+const SB_CHIPS = BB_CHIPS / 2
 const stateText = [
 	"",		# for INIT
 	"PreFlop", "Flop", "Turn", "River", "ShowDown",
@@ -69,7 +72,9 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card1 = []		#
 var players_card2 = []		#
 var action_panels = []		# プレイヤーアクション表示パネル
-var nPlayers = 6		# 6 players
+var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
+#var bet_chips_total = []	# 各プレイヤー現ラウンドのトータルベットチップ数
+#var nPlayers = N_PLAYERS		# 6 players
 var n_moving = 0
 var n_opening = 0
 var deck_pos
@@ -87,7 +92,7 @@ func _ready():
 	
 	deck_pos = $Table/CardDeck.get_position()
 	players = []
-	for i in range(nPlayers):
+	for i in range(N_PLAYERS):
 		var pb = get_node("Table/PlayerBG%d" % (i+1))		# プレイヤーパネル
 		#pb.get_node("ResultLabel").z_index = 2
 		pb.set_hand("")
@@ -111,17 +116,27 @@ func update_title_text():
 		txt += " " + stateText[state]
 	$TitleBar/Label.text = txt
 func update_d_SB_BB():
+	bet_chips.resize(N_PLAYERS)
 	for i in range(players.size()):
 		var mk = players[i].get_node("Mark")
 		mk.show()
 		if dealer_ix == i:
 			mk.frame = DEALER
+			bet_chips[i] = 0
 		elif (dealer_ix + 1) % players.size() == i:
 			mk.frame = SB
+			bet_chips[i] = SB_CHIPS
 		elif (dealer_ix + 2) % players.size() == i:
 			mk.frame = BB
+			bet_chips[i] = BB_CHIPS
 		else:
 			mk.hide()
+			bet_chips[i] = 0
+		if bet_chips[i] == 0:
+			players[i].show_bet_chips(false)
+		else:
+			players[i].show_bet_chips(true)
+			players[i].set_bet_chips(bet_chips[i])
 			
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
@@ -140,7 +155,7 @@ func deal_cards():
 	# 各プレイヤーにカード配布
 	players_card1 = []
 	var ix = 0
-	for i in range(nPlayers):
+	for i in range(N_PLAYERS):
 		players_card1.push_back(deck[ix])
 		#var st : int = deck[ix] >> N_RANK_BITS
 		#var rank : int = deck[ix] & RANK_MASK
@@ -149,7 +164,7 @@ func deal_cards():
 		ix += 1
 		players[i].set_card1(st, rank)
 	players_card2 = []
-	for i in range(nPlayers):
+	for i in range(N_PLAYERS):
 		players_card2.push_back(deck[ix])
 		var st : int = deck[ix] >> N_RANK_BITS
 		var rank : int = deck[ix] & RANK_MASK
@@ -169,10 +184,10 @@ func _input(event):
 		if state == INIT:
 			state = PRE_FLOP
 			shuffle_cards()
-			n_moving = nPlayers * 2		# 各プレイヤーにカードを２枚配布
-			#players_cards.resize(nPlayers * 2)
-			players_card1.resize(nPlayers)
-			for i in range(nPlayers):
+			n_moving = N_PLAYERS * 2		# 各プレイヤーにカードを２枚配布
+			#players_cards.resize(N_PLAYERS * 2)
+			players_card1.resize(N_PLAYERS)
+			for i in range(N_PLAYERS):
 				var cd = CardBF.instance()		# カード裏面
 				players_card1[i] = cd
 				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
@@ -184,8 +199,8 @@ func _input(event):
 				cd.connect("open_finished", self, "open_finished")
 				var dst = players[i].get_position() + Vector2(-CARD_WIDTH/2, -4)
 				cd.wait_move_to(i * 0.1, dst, 0.3)
-			players_card2.resize(nPlayers)
-			for i in range(nPlayers):
+			players_card2.resize(N_PLAYERS)
+			for i in range(N_PLAYERS):
 				var cd = CardBF.instance()
 				players_card2[i] = cd
 				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
@@ -195,9 +210,9 @@ func _input(event):
 				cd.connect("move_finished", self, "move_finished")
 				cd.connect("open_finished", self, "open_finished")
 				var dst = players[i].get_position() + Vector2(CARD_WIDTH/2, -4)
-				cd.wait_move_to((nPlayers + i) * 0.1, dst, 0.3)
-			action_panels.resize(nPlayers)
-			for i in range(nPlayers):
+				cd.wait_move_to((N_PLAYERS + i) * 0.1, dst, 0.3)
+			action_panels.resize(N_PLAYERS)
+			for i in range(N_PLAYERS):
 				var ap = ActionPanel.instance()
 				action_panels[i] = ap
 				ap.hide()
@@ -207,7 +222,7 @@ func _input(event):
 		elif state == PRE_FLOP:
 			#deal_cards()
 			state = FLOP
-			for i in range(nPlayers):		# 暫定コード
+			for i in range(N_PLAYERS):		# 暫定コード
 				action_panels[i].set_text("called")
 				action_panels[i].show()
 			comu_cards = []
@@ -248,10 +263,10 @@ func _input(event):
 			cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
 		elif state == RIVER:
 			state = SHOW_DOWN
-			for i in range(nPlayers):		# 暫定コード
+			for i in range(N_PLAYERS):		# 暫定コード
 				action_panels[i].hide()
-			n_opening = (nPlayers - 1)*2
-			for i in range(1, nPlayers):
+			n_opening = (N_PLAYERS - 1)*2
+			for i in range(1, N_PLAYERS):
 				players_card1[i].do_open()
 				players_card2[i].do_open()
 			pass
@@ -259,7 +274,7 @@ func _input(event):
 			state = INIT
 			dealer_ix = (dealer_ix + 1) % players.size()
 			update_d_SB_BB()
-			for i in range(nPlayers):
+			for i in range(N_PLAYERS):
 				players_card1[i].queue_free()
 				players_card2[i].queue_free()
 				players[i].set_hand("")
@@ -379,7 +394,7 @@ func show_user_hand(n):
 	#print("hand = ", handName[check_hand(v)])
 	players[0].set_hand(handName[check_hand(v)])
 func show_hand():
-	for i in range(nPlayers):
+	for i in range(N_PLAYERS):
 		var v = []
 		v.push_back(players_card1[i].get_sr())
 		v.push_back(players_card2[i].get_sr())
@@ -392,7 +407,7 @@ func _on_PlayerBG_open_finished():
 		n_opening -= 1
 		if n_opening == 0:
 			print("finished opening")
-			for i in range(nPlayers):
+			for i in range(N_PLAYERS):
 				var v = []
 				v.push_back(players_card1[i])
 				v.push_back(players_card2[i])
