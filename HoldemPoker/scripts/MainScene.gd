@@ -137,6 +137,7 @@ func update_d_SB_BB():
 		else:
 			players[i].show_bet_chips(true)
 			players[i].set_bet_chips(bet_chips[i])
+			players[i].set_chips(players[i].get_chips() - bet_chips[i])
 			
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
