@@ -33,5 +33,10 @@ func set_chips(c : int):
 	$ChipsLabel.text = String(c)
 func open_cards():
 	pass
+func show_bet_chips(sw : bool):
+	if sw: $Chips.show()
+	else: $Chips.hide()
+func set_bet_chips(ch : int):
+	$Chips/BetLabel.text = String(ch)
 func _process(delta):
 	pass
