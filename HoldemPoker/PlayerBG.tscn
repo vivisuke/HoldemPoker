@@ -8,11 +8,11 @@
 [ext_resource path="res://fonts/arial.ttf" type="DynamicFontData" id=6]
 
 [sub_resource type="DynamicFont" id=1]
-size = 10
+size = 12
 font_data = ExtResource( 2 )
 
 [sub_resource type="DynamicFont" id=2]
-size = 11
+size = 12
 font_data = ExtResource( 6 )
 
 [node name="PlayerBG" type="Sprite"]
@@ -21,47 +21,44 @@ hframes = 3
 script = ExtResource( 4 )
 
 [node name="NameLabel" type="Label" parent="."]
-margin_left = -40.0
-margin_top = -50.0
-margin_right = 40.0
-margin_bottom = -35.0
+margin_left = -50.0
+margin_top = -60.0
+margin_right = 50.0
+margin_bottom = -44.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 custom_fonts/font = SubResource( 1 )
 text = "AI player"
 align = 1
-valign = 1
+valign = 2
 
 [node name="HandLabel" type="Label" parent="."]
-margin_left = -40.0
-margin_top = 26.0
-margin_right = 40.0
-margin_bottom = 39.0
+margin_left = -50.0
+margin_top = 33.0
+margin_right = 50.0
+margin_bottom = 47.0
 custom_colors/font_color = Color( 0, 1, 1, 1 )
 custom_fonts/font = SubResource( 2 )
 text = "poker hand"
 align = 1
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="ChipsLabel" type="Label" parent="."]
-margin_left = -40.0
-margin_top = 37.0
-margin_right = 40.0
-margin_bottom = 50.0
+margin_left = -48.0
+margin_top = 46.0
+margin_right = 50.0
+margin_bottom = 61.0
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 2 )
 text = "cihps"
 align = 1
 
 [node name="Mark" type="Sprite" parent="."]
-position = Vector2( -33, -43 )
+position = Vector2( -40, -50 )
 scale = Vector2( 0.25, 0.25 )
 texture = ExtResource( 3 )
 hframes = 3
 
 [node name="Chips" type="Sprite" parent="."]
-position = Vector2( -33, 60 )
+position = Vector2( -40, 72 )
 texture = ExtResource( 5 )
 
 [node name="BetLabel" type="Label" parent="Chips"]
