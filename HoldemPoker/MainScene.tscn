@@ -24,9 +24,6 @@ script = ExtResource( 1 )
 margin_right = 40.0
 margin_bottom = 40.0
 texture = ExtResource( 2 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="TitleBar" type="ColorRect" parent="."]
 margin_right = 500.0

@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=2]
 
-[ext_resource path="res://images/player-BG_x3.png" type="Texture" id=1]
+[ext_resource path="res://images/player-BG-100x3.png" type="Texture" id=1]
 [ext_resource path="res://fonts/FlopDesignFONT.otf" type="DynamicFontData" id=2]
 [ext_resource path="res://images/D-SB-BB.png" type="Texture" id=3]
 [ext_resource path="res://scripts/PlayerBG.gd" type="Script" id=4]
