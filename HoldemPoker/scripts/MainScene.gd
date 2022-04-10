@@ -189,8 +189,9 @@ func _input(event):
 			#players_cards.resize(N_PLAYERS * 2)
 			players_card1.resize(N_PLAYERS)
 			for i in range(N_PLAYERS):
+				var di = (dealer_ix + 1 + i) % N_PLAYERS
 				var cd = CardBF.instance()		# カード裏面
-				players_card1[i] = cd
+				players_card1[di] = cd
 				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
 				deck_ix += 1
 				cd.set_position(deck_pos)
@@ -198,19 +199,20 @@ func _input(event):
 				#players[i].get_node("CardParent").add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
 				cd.connect("open_finished", self, "open_finished")
-				var dst = players[i].get_position() + Vector2(-CARD_WIDTH/2, -4)
+				var dst = players[di].get_position() + Vector2(-CARD_WIDTH/2, -4)
 				cd.wait_move_to(i * 0.1, dst, 0.3)
 			players_card2.resize(N_PLAYERS)
 			for i in range(N_PLAYERS):
+				var di = (dealer_ix + 1 + i) % N_PLAYERS
 				var cd = CardBF.instance()
-				players_card2[i] = cd
+				players_card2[di] = cd
 				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
 				deck_ix += 1
 				cd.set_position(deck_pos)
 				$Table.add_child(cd)
 				cd.connect("move_finished", self, "move_finished")
 				cd.connect("open_finished", self, "open_finished")
-				var dst = players[i].get_position() + Vector2(CARD_WIDTH/2, -4)
+				var dst = players[di].get_position() + Vector2(CARD_WIDTH/2, -4)
 				cd.wait_move_to((N_PLAYERS + i) * 0.1, dst, 0.3)
 			action_panels.resize(N_PLAYERS)
 			for i in range(N_PLAYERS):
