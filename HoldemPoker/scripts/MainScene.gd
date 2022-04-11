@@ -355,6 +355,8 @@ func _process(delta):
 		print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 		if bet_chips_plyr[nix] < bet_chip:		# チェック出来ない場合
 			print("called")
+			action_panels[nix].set_text("called")
+			action_panels[nix].show()
 			players[nix].set_bet_chips(bet_chip)
 			players[nix].sub_chips(bet_chip - bet_chips_plyr[nix])
 		nix = (nix + 1) % N_PLAYERS
