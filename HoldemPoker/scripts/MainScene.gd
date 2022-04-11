@@ -33,6 +33,11 @@ enum {
 	SB,
 	BB,
 }
+enum {
+	READY = 0,
+	CARD_MOVING,
+	CARD_OPENING,
+}
 #const N_SUIT = 4
 #const N_RANK = 13
 const N_CARDS = N_RANK*N_SUIT
@@ -45,6 +50,7 @@ const N_FLOP_CARDS = 3
 const N_PLAYERS = 6
 const BB_CHIPS = 2
 const SB_CHIPS = BB_CHIPS / 2
+const USER_IX = 0					# プレイヤー： players[USER_IX]
 const stateText = [
 	"",		# for INIT
 	"PreFlop", "Flop", "Turn", "River", "ShowDown",
@@ -62,7 +68,11 @@ const handName = [
 	"RoyalFlush",
 ]
 
+var counter = 0.0
 var state = INIT		# 状態
+var sub_state = READY	# サブ状態
+var bet_chip = 0		# ベットされたチップ（1プレイヤー分合計）
+var nix = -1			# 次の手番
 var dealer_ix = 0
 var deck_ix = 0			# デッキトップインデックス
 var deck = []			# 要素：(suit << 4) | rank
@@ -72,7 +82,8 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card1 = []		#
 var players_card2 = []		#
 var action_panels = []		# プレイヤーアクション表示パネル
-var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
+var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
+#var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
 #var bet_chips_total = []	# 各プレイヤー現ラウンドのトータルベットチップ数
 #var nPlayers = N_PLAYERS		# 6 players
 var n_moving = 0
@@ -105,7 +116,7 @@ func _ready():
 	#
 	players[0].set_name("vivisuke")
 	players[0].set_BG(1)
-	dealer_ix = rng.randi_range(0, players.size() - 1)
+	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
 	print("dealer_ix = ", dealer_ix)
 	update_d_SB_BB()
 	update_title_text()
@@ -116,28 +127,31 @@ func update_title_text():
 		txt += " " + stateText[state]
 	$TitleBar/Label.text = txt
 func update_d_SB_BB():
-	bet_chips.resize(N_PLAYERS)
-	for i in range(players.size()):
+	bet_chip = BB_CHIPS
+	bet_chips_plyr.resize(N_PLAYERS)
+	for i in range(N_PLAYERS):
 		var mk = players[i].get_node("Mark")
 		mk.show()
 		if dealer_ix == i:
 			mk.frame = DEALER
-			bet_chips[i] = 0
-		elif (dealer_ix + 1) % players.size() == i:
+			bet_chips_plyr[i] = 0
+		elif (dealer_ix + 1) % N_PLAYERS == i:
 			mk.frame = SB
-			bet_chips[i] = SB_CHIPS
-		elif (dealer_ix + 2) % players.size() == i:
+			bet_chips_plyr[i] = SB_CHIPS
+		elif (dealer_ix + 2) % N_PLAYERS == i:
 			mk.frame = BB
-			bet_chips[i] = BB_CHIPS
+			bet_chips_plyr[i] = BB_CHIPS
+			nix = (i + 1) % N_PLAYERS		# 次の手番
 		else:
 			mk.hide()
-			bet_chips[i] = 0
-		if bet_chips[i] == 0:
+			bet_chips_plyr[i] = 0
+		if bet_chips_plyr[i] == 0:
 			players[i].show_bet_chips(false)
 		else:
 			players[i].show_bet_chips(true)
-			players[i].set_bet_chips(bet_chips[i])
-			players[i].set_chips(players[i].get_chips() - bet_chips[i])
+			players[i].set_bet_chips(bet_chips_plyr[i])
+			players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
+	print("nix = ", nix)
 			
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
@@ -186,6 +200,7 @@ func _input(event):
 			state = PRE_FLOP
 			shuffle_cards()
 			n_moving = N_PLAYERS * 2		# 各プレイヤーにカードを２枚配布
+			sub_state = CARD_MOVING
 			#players_cards.resize(N_PLAYERS * 2)
 			players_card1.resize(N_PLAYERS)
 			for i in range(N_PLAYERS):
@@ -230,6 +245,7 @@ func _input(event):
 				action_panels[i].show()
 			comu_cards = []
 			n_moving = N_FLOP_CARDS		# 3 for FLOP
+			sub_state = CARD_MOVING
 			for i in range(n_moving):
 				var cd = CardBF.instance()
 				comu_cards.push_back(cd)
@@ -243,6 +259,7 @@ func _input(event):
 		elif state == FLOP:
 			state = TURN
 			n_moving = 1
+			sub_state = CARD_MOVING
 			var cd = CardBF.instance()
 			comu_cards.push_back(cd)
 			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
@@ -255,6 +272,7 @@ func _input(event):
 		elif state == TURN:
 			state = RIVER
 			n_moving = 1
+			sub_state = CARD_MOVING
 			var cd = CardBF.instance()
 			comu_cards.push_back(cd)
 			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
@@ -269,13 +287,14 @@ func _input(event):
 			for i in range(N_PLAYERS):		# 暫定コード
 				action_panels[i].hide()
 			n_opening = (N_PLAYERS - 1)*2
+			sub_state = CARD_OPENING
 			for i in range(1, N_PLAYERS):
 				players_card1[i].do_open()
 				players_card2[i].do_open()
 			pass
 		elif state == SHOW_DOWN:
 			state = INIT
-			dealer_ix = (dealer_ix + 1) % players.size()
+			dealer_ix = (dealer_ix + 1) % N_PLAYERS
 			update_d_SB_BB()
 			for i in range(N_PLAYERS):
 				players_card1[i].queue_free()
@@ -289,6 +308,7 @@ func move_finished():
 	n_moving -= 1
 	if n_moving == 0:
 		print("move_finished")
+		sub_state = CARD_OPENING
 		if state == PRE_FLOP:
 			n_opening = 2
 			players_card1[0].do_open()
@@ -303,10 +323,13 @@ func move_finished():
 		elif state == RIVER:
 			n_opening = 1
 			comu_cards[N_FLOP_CARDS + 1].do_open()
+		else:
+			sub_state = READY
 func open_finished():
 	n_opening -= 1
 	print(n_opening)
 	if n_opening == 0:
+		sub_state = READY
 		if state == PRE_FLOP:
 			show_user_hand(0)
 		elif state == FLOP:
@@ -319,6 +342,22 @@ func open_finished():
 			show_hand()
 
 func _process(delta):
+	counter += delta
+	if counter < 1.0: return
+	counter -= 1.0
+	print("state = ", state)
+	print("sub_state = ", sub_state)
+	if sub_state != 0:
+		print("sub_state != 0")
+		return
+	print("nix = ", nix)
+	if state >= PRE_FLOP && nix >= 0 && nix != USER_IX:
+		print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
+		if bet_chips_plyr[nix] < bet_chip:		# チェック出来ない場合
+			print("called")
+			players[nix].set_bet_chips(bet_chip)
+			players[nix].sub_chips(bet_chip - bet_chips_plyr[nix])
+		nix = (nix + 1) % N_PLAYERS
 	pass
 
 func check_hand(v : Array):
@@ -410,6 +449,7 @@ func _on_PlayerBG_open_finished():
 		n_opening -= 1
 		if n_opening == 0:
 			print("finished opening")
+			sub_state = READY
 			for i in range(N_PLAYERS):
 				var v = []
 				v.push_back(players_card1[i])

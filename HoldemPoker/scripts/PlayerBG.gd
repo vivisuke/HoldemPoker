@@ -30,13 +30,17 @@ func set_hand(txt):
 func get_chips(): return chips
 func set_chips(c : int):
 	chips = c
-	$ChipsLabel.text = String(c)
+	$ChipsLabel.text = String(chips)
+func sub_chips(c : int):
+	chips -= c
+	$ChipsLabel.text = String(chips)
 func open_cards():
 	pass
 func show_bet_chips(sw : bool):
 	if sw: $Chips.show()
 	else: $Chips.hide()
 func set_bet_chips(ch : int):
+	show_bet_chips(true)
 	$Chips/BetLabel.text = String(ch)
 func _process(delta):
 	pass
