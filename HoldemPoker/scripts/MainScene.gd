@@ -38,6 +38,14 @@ enum {
 	CARD_MOVING,
 	CARD_OPENING,
 }
+enum {		# アクションボタン
+	CHECK = 0,
+	CALL,
+	FOLD,
+	RAISE,
+	ALL_IN,
+	N_ACT_BUTTONS,
+}
 #const N_SUIT = 4
 #const N_RANK = 13
 const N_CARDS = N_RANK*N_SUIT
@@ -86,6 +94,7 @@ var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチッ�
 #var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
 #var bet_chips_total = []	# 各プレイヤー現ラウンドのトータルベットチップ数
 #var nPlayers = N_PLAYERS		# 6 players
+var action_buttons = []
 var n_moving = 0
 var n_opening = 0
 var deck_pos
@@ -118,6 +127,16 @@ func _ready():
 	players[0].set_BG(1)
 	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
 	print("dealer_ix = ", dealer_ix)
+	#
+	action_buttons.resize(N_ACT_BUTTONS)
+	action_buttons[CHECK] = $CheckButton
+	action_buttons[CALL] = $CallButton
+	action_buttons[FOLD] = $FoldButton
+	action_buttons[RAISE] = $RaiseButton
+	action_buttons[ALL_IN] = $AllInButton
+	for i in range(N_ACT_BUTTONS):
+		action_buttons[i].disabled = true
+	#
 	update_d_SB_BB()
 	update_title_text()
 	pass
@@ -351,15 +370,19 @@ func _process(delta):
 		print("sub_state != 0")
 		return
 	print("nix = ", nix)
-	if state >= PRE_FLOP && nix >= 0 && nix != USER_IX:
-		print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
-		if bet_chips_plyr[nix] < bet_chip:		# チェック出来ない場合
-			print("called")
-			action_panels[nix].set_text("called")
-			action_panels[nix].show()
-			players[nix].set_bet_chips(bet_chip)
-			players[nix].sub_chips(bet_chip - bet_chips_plyr[nix])
-		nix = (nix + 1) % N_PLAYERS
+	if state >= PRE_FLOP && nix >= 0:
+		if nix == USER_IX:
+			for i in range(N_ACT_BUTTONS):
+				action_buttons[i].disabled = false
+		else:
+			print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
+			if bet_chips_plyr[nix] < bet_chip:		# チェック出来ない場合
+				print("called")
+				action_panels[nix].set_text("called")
+				action_panels[nix].show()
+				players[nix].set_bet_chips(bet_chip)
+				players[nix].sub_chips(bet_chip - bet_chips_plyr[nix])
+			nix = (nix + 1) % N_PLAYERS
 	pass
 
 func check_hand(v : Array):
