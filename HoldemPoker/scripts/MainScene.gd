@@ -76,7 +76,7 @@ const handName = [
 	"RoyalFlush",
 ]
 
-var counter = 0.0
+var sum_delta = 0.0
 var state = INIT		# 状態
 var sub_state = READY	# サブ状態
 var bet_chip = 0		# ベットされたチップ（1プレイヤー分合計）
@@ -160,6 +160,7 @@ func update_d_SB_BB():
 		elif (dealer_ix + 2) % N_PLAYERS == i:
 			mk.frame = BB
 			bet_chips_plyr[i] = BB_CHIPS
+			#next_player()
 			nix = (i + 1) % N_PLAYERS		# 次の手番
 		else:
 			mk.hide()
@@ -170,8 +171,11 @@ func update_d_SB_BB():
 			players[i].show_bet_chips(true)
 			players[i].set_bet_chips(bet_chips_plyr[i])
 			players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
+	update_next_player()
 	print("nix = ", nix)
-			
+func update_next_player():
+	for i in range(N_PLAYERS):
+		players[i].set_BG(1 if i == nix else 0)
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
 func shuffle_cards():
@@ -325,8 +329,8 @@ func next_round():
 	update_title_text()
 func _input(event):
 	if event is InputEventMouseButton && event.is_pressed():
-		if n_moving != 0:
-			return;			# カード移動中
+		if n_moving != 0: return;			# カード移動中
+		if event.position.y >= 700: return
 		next_round()		# 次のラウンドに遷移
 func move_finished():
 	n_moving -= 1
@@ -364,11 +368,15 @@ func open_finished():
 			show_user_hand(5)
 		elif state == SHOW_DOWN:
 			show_hand()
-
+func do_call(pix):
+	action_panels[pix].set_text("called")
+	action_panels[pix].show()
+	players[pix].set_bet_chips(bet_chip)
+	players[pix].sub_chips(bet_chip - bet_chips_plyr[pix])
 func _process(delta):
-	counter += delta
-	if counter < 1.0: return
-	counter -= 1.0
+	sum_delta += delta
+	if sum_delta < 1.0: return
+	sum_delta -= 1.0
 	print("state = ", state)
 	print("sub_state = ", sub_state)
 	if sub_state != 0:
@@ -377,17 +385,17 @@ func _process(delta):
 	print("nix = ", nix)
 	if state >= PRE_FLOP && nix >= 0:
 		if nix == USER_IX:
-			for i in range(N_ACT_BUTTONS):
+			action_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chip
+			action_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chip
+			for i in range(FOLD, N_ACT_BUTTONS):
 				action_buttons[i].disabled = false
 		else:
 			print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 			if bet_chips_plyr[nix] < bet_chip:		# チェック出来ない場合
 				print("called")
-				action_panels[nix].set_text("called")
-				action_panels[nix].show()
-				players[nix].set_bet_chips(bet_chip)
-				players[nix].sub_chips(bet_chip - bet_chips_plyr[nix])
-			nix = (nix + 1) % N_PLAYERS
+				do_call(nix)
+			next_player()
+			#nix = (nix + 1) % N_PLAYERS
 	pass
 
 func check_hand(v : Array):
@@ -489,3 +497,16 @@ func _on_PlayerBG_open_finished():
 				print("hand = ", handName[check_hand(v)])
 				players[i].set_hand(handName[check_hand(v)])
 	pass
+
+func disable_act_buttons():
+	for i in range(N_ACT_BUTTONS):
+		action_buttons[i].disabled = true
+func next_player():
+	nix = (nix + 1) % N_PLAYERS
+	update_next_player()
+func _on_CheckButton_pressed():
+	next_player()
+	pass # Replace with function body.
+func _on_CallButton_pressed():
+	do_call(USER_IX)
+	next_player()
