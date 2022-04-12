@@ -212,117 +212,122 @@ func deal_cards():
 	#	ix += 1
 	#	comu_cards[i].set_sr(st, rank)
 	#
+func next_round():
+	if state == INIT:
+		state = PRE_FLOP
+		shuffle_cards()
+		n_moving = N_PLAYERS * 2		# 各プレイヤーにカードを２枚配布
+		sub_state = CARD_MOVING
+		#players_cards.resize(N_PLAYERS * 2)
+		players_card1.resize(N_PLAYERS)
+		for i in range(N_PLAYERS):
+			var di = (dealer_ix + 1 + i) % N_PLAYERS
+			var cd = CardBF.instance()		# カード裏面
+			players_card1[di] = cd
+			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+			deck_ix += 1
+			cd.set_position(deck_pos)
+			$Table.add_child(cd)
+			#players[i].get_node("CardParent").add_child(cd)
+			cd.connect("move_finished", self, "move_finished")
+			cd.connect("open_finished", self, "open_finished")
+			var dst = players[di].get_position() + Vector2(-CARD_WIDTH/2, -4)
+			cd.wait_move_to(i * 0.1, dst, 0.3)
+		players_card2.resize(N_PLAYERS)
+		for i in range(N_PLAYERS):
+			var di = (dealer_ix + 1 + i) % N_PLAYERS
+			var cd = CardBF.instance()
+			players_card2[di] = cd
+			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+			deck_ix += 1
+			cd.set_position(deck_pos)
+			$Table.add_child(cd)
+			cd.connect("move_finished", self, "move_finished")
+			cd.connect("open_finished", self, "open_finished")
+			var dst = players[di].get_position() + Vector2(CARD_WIDTH/2, -4)
+			cd.wait_move_to((N_PLAYERS + i) * 0.1, dst, 0.3)
+		action_panels.resize(N_PLAYERS)
+		for i in range(N_PLAYERS):
+			var ap = ActionPanel.instance()
+			action_panels[i] = ap
+			ap.hide()
+			ap.set_position(players[i].position - ap.rect_size/2)
+			$Table.add_child(ap)
+		print(action_panels[0].rect_size)
+	elif state == PRE_FLOP:
+		#deal_cards()
+		state = FLOP
+		for i in range(N_PLAYERS):		# 暫定コード
+			action_panels[i].set_text("called")
+			action_panels[i].show()
+		comu_cards = []
+		n_moving = N_FLOP_CARDS		# 3 for FLOP
+		sub_state = CARD_MOVING
+		for i in range(n_moving):
+			var cd = CardBF.instance()
+			comu_cards.push_back(cd)
+			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+			deck_ix += 1
+			cd.set_position(deck_pos)
+			$Table.add_child(cd)
+			cd.connect("move_finished", self, "move_finished")
+			cd.connect("open_finished", self, "open_finished")
+			cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
+	elif state == FLOP:
+		state = TURN
+		n_moving = 1
+		sub_state = CARD_MOVING
+		var cd = CardBF.instance()
+		comu_cards.push_back(cd)
+		cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+		deck_ix += 1
+		cd.set_position(deck_pos)
+		$Table.add_child(cd)
+		cd.connect("move_finished", self, "move_finished")
+		cd.connect("open_finished", self, "open_finished")
+		cd.move_to(Vector2(CARD_WIDTH, COMU_CARD_PY), 0.3)
+	elif state == TURN:
+		state = RIVER
+		n_moving = 1
+		sub_state = CARD_MOVING
+		var cd = CardBF.instance()
+		comu_cards.push_back(cd)
+		cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+		deck_ix += 1
+		cd.set_position(deck_pos)
+		$Table.add_child(cd)
+		cd.connect("move_finished", self, "move_finished")
+		cd.connect("open_finished", self, "open_finished")
+		cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
+	elif state == RIVER:
+		state = SHOW_DOWN
+		for i in range(N_PLAYERS):		# 暫定コード
+			action_panels[i].hide()
+		n_opening = (N_PLAYERS - 1)*2
+		sub_state = CARD_OPENING
+		for i in range(1, N_PLAYERS):
+			players_card1[i].do_open()
+			players_card2[i].do_open()
+		pass
+	elif state == SHOW_DOWN:
+		state = INIT
+		dealer_ix = (dealer_ix + 1) % N_PLAYERS
+		update_d_SB_BB()
+		for i in range(N_PLAYERS):
+			players_card1[i].queue_free()
+			players_card2[i].queue_free()
+			players[i].set_hand("")
+			action_panels[i].queue_free()
+		for i in range(comu_cards.size()):
+			comu_cards[i].queue_free()
+	for i in range(N_PLAYERS):
+		action_panels[i].hide()
+	update_title_text()
 func _input(event):
 	if event is InputEventMouseButton && event.is_pressed():
-		if n_moving != 0: return;		# カード移動中
-		if state == INIT:
-			state = PRE_FLOP
-			shuffle_cards()
-			n_moving = N_PLAYERS * 2		# 各プレイヤーにカードを２枚配布
-			sub_state = CARD_MOVING
-			#players_cards.resize(N_PLAYERS * 2)
-			players_card1.resize(N_PLAYERS)
-			for i in range(N_PLAYERS):
-				var di = (dealer_ix + 1 + i) % N_PLAYERS
-				var cd = CardBF.instance()		# カード裏面
-				players_card1[di] = cd
-				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
-				deck_ix += 1
-				cd.set_position(deck_pos)
-				$Table.add_child(cd)
-				#players[i].get_node("CardParent").add_child(cd)
-				cd.connect("move_finished", self, "move_finished")
-				cd.connect("open_finished", self, "open_finished")
-				var dst = players[di].get_position() + Vector2(-CARD_WIDTH/2, -4)
-				cd.wait_move_to(i * 0.1, dst, 0.3)
-			players_card2.resize(N_PLAYERS)
-			for i in range(N_PLAYERS):
-				var di = (dealer_ix + 1 + i) % N_PLAYERS
-				var cd = CardBF.instance()
-				players_card2[di] = cd
-				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
-				deck_ix += 1
-				cd.set_position(deck_pos)
-				$Table.add_child(cd)
-				cd.connect("move_finished", self, "move_finished")
-				cd.connect("open_finished", self, "open_finished")
-				var dst = players[di].get_position() + Vector2(CARD_WIDTH/2, -4)
-				cd.wait_move_to((N_PLAYERS + i) * 0.1, dst, 0.3)
-			action_panels.resize(N_PLAYERS)
-			for i in range(N_PLAYERS):
-				var ap = ActionPanel.instance()
-				action_panels[i] = ap
-				ap.hide()
-				ap.set_position(players[i].position - ap.rect_size/2)
-				$Table.add_child(ap)
-			print(action_panels[0].rect_size)
-		elif state == PRE_FLOP:
-			#deal_cards()
-			state = FLOP
-			for i in range(N_PLAYERS):		# 暫定コード
-				action_panels[i].set_text("called")
-				action_panels[i].show()
-			comu_cards = []
-			n_moving = N_FLOP_CARDS		# 3 for FLOP
-			sub_state = CARD_MOVING
-			for i in range(n_moving):
-				var cd = CardBF.instance()
-				comu_cards.push_back(cd)
-				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
-				deck_ix += 1
-				cd.set_position(deck_pos)
-				$Table.add_child(cd)
-				cd.connect("move_finished", self, "move_finished")
-				cd.connect("open_finished", self, "open_finished")
-				cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
-		elif state == FLOP:
-			state = TURN
-			n_moving = 1
-			sub_state = CARD_MOVING
-			var cd = CardBF.instance()
-			comu_cards.push_back(cd)
-			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
-			deck_ix += 1
-			cd.set_position(deck_pos)
-			$Table.add_child(cd)
-			cd.connect("move_finished", self, "move_finished")
-			cd.connect("open_finished", self, "open_finished")
-			cd.move_to(Vector2(CARD_WIDTH, COMU_CARD_PY), 0.3)
-		elif state == TURN:
-			state = RIVER
-			n_moving = 1
-			sub_state = CARD_MOVING
-			var cd = CardBF.instance()
-			comu_cards.push_back(cd)
-			cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
-			deck_ix += 1
-			cd.set_position(deck_pos)
-			$Table.add_child(cd)
-			cd.connect("move_finished", self, "move_finished")
-			cd.connect("open_finished", self, "open_finished")
-			cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
-		elif state == RIVER:
-			state = SHOW_DOWN
-			for i in range(N_PLAYERS):		# 暫定コード
-				action_panels[i].hide()
-			n_opening = (N_PLAYERS - 1)*2
-			sub_state = CARD_OPENING
-			for i in range(1, N_PLAYERS):
-				players_card1[i].do_open()
-				players_card2[i].do_open()
-			pass
-		elif state == SHOW_DOWN:
-			state = INIT
-			dealer_ix = (dealer_ix + 1) % N_PLAYERS
-			update_d_SB_BB()
-			for i in range(N_PLAYERS):
-				players_card1[i].queue_free()
-				players_card2[i].queue_free()
-				players[i].set_hand("")
-				action_panels[i].queue_free()
-			for i in range(comu_cards.size()):
-				comu_cards[i].queue_free()
-		update_title_text()
+		if n_moving != 0:
+			return;			# カード移動中
+		next_round()		# 次のラウンドに遷移
 func move_finished():
 	n_moving -= 1
 	if n_moving == 0:
