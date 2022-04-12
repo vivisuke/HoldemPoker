@@ -391,22 +391,23 @@ func _process(delta):
 		return
 	print("nix = ", nix)
 	if state >= PRE_FLOP && nix >= 0:
-		if nix == USER_IX:
-			act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chip
-			act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chip
-			for i in range(FOLD, N_ACT_BUTTONS):
-				act_buttons[i].disabled = false
+		if( act_panels[nix].get_text() != "" &&		# 行動済み
+			bet_chips_plyr[nix] == bet_chip ):		# チェック可能
+				next_round()
 		else:
-			print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
-			if bet_chips_plyr[nix] < bet_chip:		# チェック出来ない場合
-				print("called")
-				do_call(nix)
-			else:		# チェック可能な場合
-				if act_panels[nix].get_text() == "":	# 未行動の場合
-					do_check(nix)
-				else:	# チェック可能 && 行動済み
-					next_round()
-					return
+			if nix == USER_IX:
+				act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chip
+				act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chip
+				for i in range(FOLD, N_ACT_BUTTONS):
+					act_buttons[i].disabled = false
+			else:
+				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
+				if bet_chips_plyr[nix] < bet_chip:		# チェック出来ない場合
+					print("called")
+					do_call(nix)
+				else:		# チェック可能な場合
+					if act_panels[nix].get_text() == "":	# 未行動の場合
+						do_check(nix)
 			next_player()
 			#nix = (nix + 1) % N_PLAYERS
 	pass
