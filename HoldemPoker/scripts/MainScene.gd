@@ -415,8 +415,7 @@ func _process(delta):
 				else:		# チェック可能な場合
 					if act_panels[nix].get_text() == "":	# 未行動の場合
 						do_check(nix)
-			next_player()
-			#nix = (nix + 1) % N_PLAYERS
+				next_player()
 	pass
 
 func check_hand(v : Array):
