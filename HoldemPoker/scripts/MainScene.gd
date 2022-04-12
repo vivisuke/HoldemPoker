@@ -137,7 +137,7 @@ func _ready():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
 	#
-	update_d_SB_BB()
+	update_d_SB_BB()	# D, SB, BB マーク設置
 	update_title_text()
 	pass
 func update_title_text():
@@ -154,6 +154,8 @@ func update_d_SB_BB():
 		if dealer_ix == i:
 			mk.frame = DEALER
 			bet_chips_plyr[i] = 0
+			if state >= FLOP:
+				nix = (i + 1) % N_PLAYERS		# 次の手番
 		elif (dealer_ix + 1) % N_PLAYERS == i:
 			mk.frame = SB
 			bet_chips_plyr[i] = SB_CHIPS
@@ -161,7 +163,8 @@ func update_d_SB_BB():
 			mk.frame = BB
 			bet_chips_plyr[i] = BB_CHIPS
 			#next_player()
-			nix = (i + 1) % N_PLAYERS		# 次の手番
+			if state < FLOP:
+				nix = (i + 1) % N_PLAYERS		# 次の手番
 		else:
 			mk.hide()
 			bet_chips_plyr[i] = 0
@@ -326,6 +329,9 @@ func next_round():
 			comu_cards[i].queue_free()
 	hide_act_panels()
 	update_title_text()
+	if state >= FLOP:
+		nix = (dealer_ix + 1) % N_PLAYERS		# 次の手番
+	update_next_player()
 func hide_act_panels():
 	for i in range(N_PLAYERS):
 		act_panels[i].hide()
@@ -385,6 +391,7 @@ func _process(delta):
 	if sum_delta < 1.0: return
 	sum_delta -= 1.0
 	print("state = ", state)
+	if state == INIT || state == SHOW_DOWN: return
 	print("sub_state = ", sub_state)
 	if sub_state != 0:
 		print("sub_state != 0")
