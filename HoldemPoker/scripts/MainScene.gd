@@ -340,7 +340,8 @@ func _input(event):
 	if event is InputEventMouseButton && event.is_pressed():
 		if n_moving != 0: return;			# カード移動中
 		if event.position.y >= 700: return
-		next_round()		# 次のラウンドに遷移
+		if state == INIT:
+			next_round()		# 次のラウンドに遷移
 func move_finished():
 	n_moving -= 1
 	if n_moving == 0:
