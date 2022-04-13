@@ -124,7 +124,7 @@ func _ready():
 	#	comu_cards.push_back(cd)
 	#
 	players[0].set_name("vivisuke")
-	players[0].set_BG(1)
+	#players[0].set_BG(1)
 	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
 	print("dealer_ix = ", dealer_ix)
 	#
@@ -178,7 +178,7 @@ func update_d_SB_BB():
 	print("nix = ", nix)
 func update_next_player():
 	for i in range(N_PLAYERS):
-		players[i].set_BG(1 if i == nix else 0)
+		players[i].set_BG(1 if state != INIT && i == nix else 0)
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
 func shuffle_cards():
