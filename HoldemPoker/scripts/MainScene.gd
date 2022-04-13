@@ -79,7 +79,8 @@ const handName = [
 var sum_delta = 0.0
 var state = INIT		# 状態
 var sub_state = READY	# サブ状態
-var bet_chip = 0		# ベットされたチップ（1プレイヤー分合計）
+var bet_chips = 0		# ベットされたチップ数（1プレイヤー分合計）
+var pot_chips = 0		# ポットチップ数
 var nix = -1			# 次の手番
 var dealer_ix = 0
 var deck_ix = 0			# デッキトップインデックス
@@ -146,7 +147,7 @@ func update_title_text():
 		txt += " " + stateText[state]
 	$TitleBar/Label.text = txt
 func update_d_SB_BB():
-	bet_chip = BB_CHIPS
+	bet_chips = BB_CHIPS
 	bet_chips_plyr.resize(N_PLAYERS)
 	for i in range(N_PLAYERS):
 		var mk = players[i].get_node("Mark")
@@ -220,6 +221,15 @@ func deal_cards():
 	#	comu_cards[i].set_sr(st, rank)
 	#
 func next_round():
+	if state >= PRE_FLOP && state <= RIVER:
+		var sum = 0
+		for i in range(N_PLAYERS):
+			sum += bet_chips_plyr[i]
+			bet_chips_plyr[i] = 0
+			players[i].set_bet_chips(0)
+			players[i].show_bet_chips(false)
+		pot_chips += sum
+		$Table/Chips/PotLabel.text = String(pot_chips)
 	if state == INIT:
 		state = PRE_FLOP
 		shuffle_cards()
@@ -384,9 +394,9 @@ func do_check(pix):
 func do_call(pix):
 	act_panels[pix].set_text("called")
 	act_panels[pix].show()
-	players[pix].set_bet_chips(bet_chip)
-	players[pix].sub_chips(bet_chip - bet_chips_plyr[pix])
-	bet_chips_plyr[pix] = bet_chip
+	players[pix].set_bet_chips(bet_chips)
+	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
+	bet_chips_plyr[pix] = bet_chips
 func _process(delta):
 	sum_delta += delta
 	if sum_delta < 1.0: return
@@ -400,17 +410,17 @@ func _process(delta):
 	print("nix = ", nix)
 	if state >= PRE_FLOP && nix >= 0:
 		if( act_panels[nix].get_text() != "" &&		# 行動済み
-			bet_chips_plyr[nix] == bet_chip ):		# チェック可能
+			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
 				next_round()
 		else:
 			if nix == USER_IX:
-				act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chip
-				act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chip
+				act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chips
+				act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chips
 				for i in range(FOLD, N_ACT_BUTTONS):
 					act_buttons[i].disabled = false
 			else:
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
-				if bet_chips_plyr[nix] < bet_chip:		# チェック出来ない場合
+				if bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
 					print("called")
 					do_call(nix)
 				else:		# チェック可能な場合
