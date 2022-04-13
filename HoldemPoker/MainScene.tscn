@@ -12,7 +12,7 @@
 [ext_resource path="res://images/chip16.png" type="Texture" id=10]
 
 [sub_resource type="DynamicFont" id=2]
-size = 30
+size = 26
 font_data = ExtResource( 9 )
 
 [sub_resource type="DynamicFont" id=3]

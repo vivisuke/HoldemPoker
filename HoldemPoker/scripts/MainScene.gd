@@ -341,6 +341,7 @@ func next_round():
 	update_title_text()
 	if state >= FLOP:
 		nix = (dealer_ix + 1) % N_PLAYERS		# 次の手番
+		bet_chips = 0
 	update_next_player()
 func hide_act_panels():
 	for i in range(N_PLAYERS):
