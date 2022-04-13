@@ -402,9 +402,10 @@ func do_call(pix):
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
 func _process(delta):
-	sum_delta += delta
-	if sum_delta < 1.0: return
-	sum_delta -= 1.0
+	if nix != USER_IX:
+		sum_delta += delta
+		if sum_delta < 1.0: return
+		sum_delta -= 1.0
 	print("state = ", state)
 	if state == INIT || state == SHOW_DOWN: return
 	print("sub_state = ", sub_state)
