@@ -34,6 +34,11 @@ enum {
 	BB,
 }
 enum {
+	BG_WAIT = 0,
+	BG_PLY,			# 手番
+	BG_FOLDED,
+}
+enum {
 	READY = 0,
 	CARD_MOVING,
 	CARD_OPENING,
@@ -91,6 +96,7 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card1 = []		#
 var players_card2 = []		#
 var act_panels = []			# プレイヤーアクション表示パネル
+var is_folded = []			# 各プレイヤーが Fold 済みか？
 var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
 #var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
 #var bet_chips_total = []	# 各プレイヤー現ラウンドのトータルベットチップ数
@@ -112,6 +118,7 @@ func _ready():
 	#
 	
 	deck_pos = $Table/CardDeck.get_position()
+	is_folded.resize(N_PLAYERS)
 	players = []
 	for i in range(N_PLAYERS):
 		var pb = get_node("Table/PlayerBG%d" % (i+1))		# プレイヤーパネル
@@ -119,6 +126,7 @@ func _ready():
 		pb.set_hand("")
 		pb.set_chips(200)
 		players.push_back(pb)
+		is_folded[i] = false
 	print("width = ", players[0].texture.get_width())
 	#for i in range(N_COMU_CARS):
 	#	var cd = get_node("Table/CardBF%d" % (i+1))
@@ -128,7 +136,7 @@ func _ready():
 	#players[0].set_BG(1)
 	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
 	print("dealer_ix = ", dealer_ix)
-	#
+	# 行動ボタン
 	act_buttons.resize(N_ACT_BUTTONS)
 	act_buttons[CHECK] = $CheckButton
 	act_buttons[CALL] = $CallButton
@@ -179,7 +187,10 @@ func update_d_SB_BB():
 	print("nix = ", nix)
 func update_next_player():
 	for i in range(N_PLAYERS):
-		players[i].set_BG(1 if state != INIT && i == nix else 0)
+		if is_folded[i]:
+			players[i].set_BG(BG_FOLDED)
+		else:
+			players[i].set_BG(BG_PLY if state != INIT && i == nix else BG_WAIT)
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
 func shuffle_cards():
@@ -335,6 +346,7 @@ func next_round():
 			players_card2[i].queue_free()
 			players[i].set_hand("")
 			act_panels[i].queue_free()
+			is_folded[i] = false
 		for i in range(comu_cards.size()):
 			comu_cards[i].queue_free()
 	hide_act_panels()
@@ -390,7 +402,8 @@ func open_finished():
 		elif state == SHOW_DOWN:
 			show_hand()
 func do_fold(pix):
-	players[pix].set_BG(2)
+	is_folded[pix] = true
+	#players[pix].set_BG(2)
 	players_card1[pix].hide()
 	players_card2[pix].hide()
 func do_check(pix):
