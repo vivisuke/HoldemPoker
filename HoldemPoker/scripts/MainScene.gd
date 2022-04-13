@@ -552,7 +552,9 @@ func disable_act_buttons():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
 func next_player():
-	nix = (nix + 1) % N_PLAYERS
+	while true:
+		nix = (nix + 1) % N_PLAYERS
+		if !is_folded[nix]: break
 	update_next_player()
 func _on_CheckButton_pressed():
 	next_player()
