@@ -123,7 +123,7 @@ margin_top = 750.0
 margin_right = 400.0
 margin_bottom = 780.0
 custom_fonts/font = SubResource( 1 )
-text = "Raise"
+text = "Raise 2"
 
 [node name="AllInButton" type="Button" parent="."]
 margin_left = 400.0
@@ -142,3 +142,4 @@ text = "AllIn"
 [connection signal="pressed" from="CheckButton" to="." method="_on_CheckButton_pressed"]
 [connection signal="pressed" from="CallButton" to="." method="_on_CallButton_pressed"]
 [connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
+[connection signal="pressed" from="RaiseButton" to="." method="_on_RaiseButton_pressed"]

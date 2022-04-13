@@ -415,6 +415,13 @@ func do_call(pix):
 	players[pix].set_bet_chips(bet_chips)
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
+func do_raise(pix, c):
+	act_panels[pix].set_text("raised")
+	act_panels[pix].show()
+	bet_chips += c
+	players[pix].set_bet_chips(bet_chips)
+	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
+	bet_chips_plyr[pix] = bet_chips
 func _process(delta):
 	if nix != USER_IX:
 		sum_delta += delta
@@ -565,4 +572,6 @@ func _on_CallButton_pressed():
 func _on_FoldButton_pressed():
 	do_fold(USER_IX)
 	next_player()
-	pass # Replace with function body.
+func _on_RaiseButton_pressed():
+	do_raise(USER_IX, BB_CHIPS)
+	next_player()
