@@ -388,6 +388,10 @@ func open_finished():
 			show_user_hand(5)
 		elif state == SHOW_DOWN:
 			show_hand()
+func do_fold(pix):
+	players[pix].set_BG(2)
+	players_card1[pix].hide()
+	players_card2[pix].hide()
 func do_check(pix):
 	act_panels[pix].set_text("checked")
 	act_panels[pix].show()
@@ -541,3 +545,7 @@ func _on_CheckButton_pressed():
 func _on_CallButton_pressed():
 	do_call(USER_IX)
 	next_player()
+func _on_FoldButton_pressed():
+	do_fold(USER_IX)
+	next_player()
+	pass # Replace with function body.
