@@ -37,15 +37,13 @@ color = Color( 0.180392, 0.309804, 0.309804, 1 )
 script = ExtResource( 4 )
 
 [node name="BackButton" type="TextureButton" parent="TitleBar"]
+visible = false
 margin_left = 1.0
 margin_top = 1.0
 margin_right = 49.0
 margin_bottom = 49.0
 texture_normal = ExtResource( 6 )
 texture_pressed = ExtResource( 5 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="Label" type="Label" parent="TitleBar"]
 margin_right = 500.0

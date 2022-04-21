@@ -121,7 +121,8 @@ func _ready():
 		randomize()
 		rng.randomize()
 	else:
-		var sd = 2
+		#var sd = 0		# SPR#111
+		var sd = 6
 		seed(sd)
 		rng.set_seed(sd)
 	#
@@ -163,7 +164,7 @@ func _ready():
 func update_title_text():
 	var txt = "6P Ring Game"
 	if state != INIT:
-		txt += " " + stateText[state]
+		txt += " - " + stateText[state] + " -"
 	$TitleBar/Label.text = txt
 func update_d_SB_BB():
 	bet_chips = BB_CHIPS
@@ -436,18 +437,20 @@ func do_raise(pix, c):
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
 func _process(delta):
-	if nix != USER_IX:
+	if state == SHOW_DOWN: return
+	if nix != USER_IX || state == INIT:
 		sum_delta += delta
 		if sum_delta < WAIT_SEC: return
 		sum_delta -= WAIT_SEC
 	#print("state = ", state)
-	if state == INIT || state == SHOW_DOWN: return
 	#print("sub_state = ", sub_state)
 	if sub_state != 0:
 		#print("sub_state != 0")
 		return
 	#print("nix = ", nix)
-	if state >= PRE_FLOP && nix >= 0:
+	if state == INIT:
+		next_round()		# 次のラウンドに遷移
+	elif state >= PRE_FLOP && nix >= 0:
 		if( act_panels[nix].get_text() != "" &&		# 行動済み
 			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
 				next_round()
