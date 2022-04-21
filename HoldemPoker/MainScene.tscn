@@ -123,7 +123,7 @@ margin_top = 750.0
 margin_right = 400.0
 margin_bottom = 780.0
 custom_fonts/font = SubResource( 1 )
-text = "Raise 2"
+text = "Raise"
 
 [node name="AllInButton" type="Button" parent="."]
 margin_left = 400.0

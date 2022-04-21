@@ -87,7 +87,10 @@ var sub_state = READY	# サブ状態
 var bet_chips = 0		# ベットされたチップ数（1プレイヤー分合計）
 var pot_chips = 0		# ポットチップ数
 var nix = -1			# 次の手番
-var dealer_ix = 0
+var dealer_ix = 0		# ディーラプレイヤーインデックス
+var high_card = 0		# ハイカード
+var high_card2 = 0		# ハイカードその２、for ２ペア等
+var high_card3 = 0		# ハイカードその３、for ２ペア等
 var deck_ix = 0			# デッキトップインデックス
 var deck = []			# 要素：(suit << 4) | rank
 var comu_cards = []		# コミュニティカード
@@ -97,6 +100,7 @@ var players_card1 = []		#
 var players_card2 = []		#
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
+var players_hand = []		# 各プレイヤーの手役
 var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
 #var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
 #var bet_chips_total = []	# 各プレイヤー現ラウンドのトータルベットチップ数
@@ -118,6 +122,7 @@ func _ready():
 	#
 	
 	deck_pos = $Table/CardDeck.get_position()
+	players_hand.resize(N_PLAYERS)
 	is_folded.resize(N_PLAYERS)
 	players = []
 	for i in range(N_PLAYERS):
@@ -145,6 +150,7 @@ func _ready():
 	act_buttons[ALL_IN] = $AllInButton
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
+	$RaiseButton.text = "Raise 2"
 	#
 	update_d_SB_BB()	# D, SB, BB マーク設置
 	update_title_text()
@@ -333,9 +339,10 @@ func next_round():
 			act_panels[i].hide()
 		n_opening = (N_PLAYERS - 1)*2
 		sub_state = CARD_OPENING
-		for i in range(1, N_PLAYERS):
-			players_card1[i].do_open()
-			players_card2[i].do_open()
+		for i in range(1, N_PLAYERS):	# 全プレイヤーのカードをオープン
+			if !is_folded[i]:
+				players_card1[i].do_open()
+				players_card2[i].do_open()
 		pass
 	elif state == SHOW_DOWN:
 		state = INIT
@@ -427,11 +434,11 @@ func _process(delta):
 		sum_delta += delta
 		if sum_delta < 1.0: return
 		sum_delta -= 1.0
-	print("state = ", state)
+	#print("state = ", state)
 	if state == INIT || state == SHOW_DOWN: return
-	print("sub_state = ", sub_state)
+	#print("sub_state = ", sub_state)
 	if sub_state != 0:
-		print("sub_state != 0")
+		#print("sub_state != 0")
 		return
 	print("nix = ", nix)
 	if state >= PRE_FLOP && nix >= 0:
@@ -530,7 +537,9 @@ func show_user_hand(n):
 	#print("i = ", i, ", v = ", v)
 	#print("hand = ", handName[check_hand(v)])
 	players[0].set_hand(handName[check_hand(v)])
-func show_hand():
+func show_hand():		# ShowDown時の処理
+	var max_hand = -1
+	var winners = []
 	for i in range(N_PLAYERS):
 		var v = []
 		v.push_back(players_card1[i].get_sr())
@@ -538,7 +547,14 @@ func show_hand():
 		for k in range(5): v.push_back(comu_cards[k].get_sr())
 		#print("i = ", i, ", v = ", v)
 		#print("hand = ", handName[check_hand(v)])
-		players[i].set_hand(handName[check_hand(v)])
+		players_hand[i] = check_hand(v)
+		players[i].set_hand(handName[players_hand[i]])
+		if players_hand[i] > max_hand:
+			max_hand = players_hand[i]
+			winners = [i]
+		elif players_hand[i] == max_hand:
+			winners.push_back(i)
+	print("winners = ", winners)
 func _on_PlayerBG_open_finished():
 	if n_opening != 0:
 		n_opening -= 1
