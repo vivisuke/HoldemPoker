@@ -117,9 +117,13 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	randomize()
-	rng.randomize()
-	#seed(0)
+	if false:
+		randomize()
+		rng.randomize()
+	else:
+		var sd = 2
+		seed(sd)
+		rng.set_seed(sd)
 	#
 	
 	deck_pos = $Table/CardDeck.get_position()
@@ -226,8 +230,8 @@ func deal_cards():
 	players_card2 = []
 	for i in range(N_PLAYERS):
 		players_card2.push_back(deck[ix])
-		var st : int = deck[ix] >> N_RANK_BITS
-		var rank : int = deck[ix] & RANK_MASK
+		var st : int = card_to_suit(deck[ix])
+		var rank : int = card_to_rank(deck[ix])
 		ix += 1
 		players[i].set_card2(st, rank)
 	#
@@ -469,10 +473,10 @@ func _process(delta):
 func check_hand(v : Array) -> Array:
 	var rcnt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 	var scnt = [0, 0, 0, 0]
-	for i in range(v.size()):
-		rcnt[v[i] & RANK_MASK] += 1
-		scnt[v[i] >> N_RANK_BITS] += 1
-	var s = -1
+	for i in range(v.size()):			# 手札のランク、スートの数を数える
+		rcnt[card_to_rank(v[i])] += 1
+		scnt[card_to_suit(v[i])] += 1
+	var s = -1		# フラッシュの場合のスート
 	if scnt[CLUBS] >= 5: s = CLUBS
 	elif scnt[DIAMONDS] >= 5: s = DIAMONDS
 	elif scnt[HEARTS] >= 5: s = HEARTS
@@ -480,8 +484,8 @@ func check_hand(v : Array) -> Array:
 	if s >= CLUBS:		# フラッシュ確定
 		var bitmap = 0
 		for i in v.size():
-			if( (v[i] >> N_RANK_BITS) == s ):
-				bitmap |= 1 << (v[i] & RANK_MASK)
+			if( card_to_suit(v[i]) == s ):		# 同一スートの場合
+				bitmap |= 1 << card_to_rank(v[i])
 		var mask = 0x1f00		# AKQJT
 		for i in range(9):
 			if( (bitmap & mask) == mask ):
@@ -489,8 +493,8 @@ func check_hand(v : Array) -> Array:
 			mask >>= 1
 		if( bitmap == 0x100f ):		# 1 0000 00000 1111 = A5432
 			return [STRAIGHT_FLUSH]
-	else:
-		s = -1
+	#else:
+	#	s = -1
 	#
 	var threeOfAKindIX = -1
 	var threeOfAKindIX2 = -1
@@ -511,7 +515,16 @@ func check_hand(v : Array) -> Array:
 	if( threeOfAKindIX >= 0 && (pairIX1 >= 0 || threeOfAKindIX2 >= 0) ):
 		return [FULL_HOUSE]
 	if( s >= 0 ):
-		return [FLUSH]
+		var rnk = []
+		for i in range(v.size()):
+			if( card_to_suit(v[i]) == s ):		# 同一スートの場合
+				rnk.push_back(card_to_rank(v[i]))
+		rnk.sort()		# 昇順ソート
+		var t = [FLUSH]
+		for i in range(rnk.size()):
+			t.push_back(rnk[-1-i])		# ランクを降順に格納
+		print("flush: ", t)
+		return t
 	#
 	var bitmap = 0
 	var mask = 1
@@ -546,6 +559,9 @@ func show_user_hand(n):
 # return: -1 for hand1 < hand2, +1 for hand1 > hand2
 func compare(hand1 : Array, hand2 : Array):
 	if hand1[0] == hand2[0]:
+		for i in range(1, hand1.size()):
+			if hand1[i] < hand2[i]: return -1
+			elif hand1[i] > hand2[i]: return 1
 		return 0
 	elif hand1[0] < hand2[0]:
 		return -1
