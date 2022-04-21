@@ -63,7 +63,8 @@ const N_FLOP_CARDS = 3
 const N_PLAYERS = 6
 const BB_CHIPS = 2
 const SB_CHIPS = BB_CHIPS / 2
-const USER_IX = 0					# プレイヤー： players[USER_IX]
+const USER_IX = 0				# プレイヤー： players[USER_IX]
+const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
 const stateText = [
 	"",		# for INIT
 	"PreFlop", "Flop", "Turn", "River", "ShowDown",
@@ -190,7 +191,7 @@ func update_d_SB_BB():
 			players[i].set_bet_chips(bet_chips_plyr[i])
 			players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
 	update_next_player()
-	print("nix = ", nix)
+	#print("nix = ", nix)
 func update_next_player():
 	for i in range(N_PLAYERS):
 		if is_folded[i]:
@@ -433,15 +434,15 @@ func do_raise(pix, c):
 func _process(delta):
 	if nix != USER_IX:
 		sum_delta += delta
-		if sum_delta < 1.0: return
-		sum_delta -= 1.0
+		if sum_delta < WAIT_SEC: return
+		sum_delta -= WAIT_SEC
 	#print("state = ", state)
 	if state == INIT || state == SHOW_DOWN: return
 	#print("sub_state = ", sub_state)
 	if sub_state != 0:
 		#print("sub_state != 0")
 		return
-	print("nix = ", nix)
+	#print("nix = ", nix)
 	if state >= PRE_FLOP && nix >= 0:
 		if( act_panels[nix].get_text() != "" &&		# 行動済み
 			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
@@ -463,7 +464,9 @@ func _process(delta):
 				next_player()
 	pass
 
-func check_hand(v : Array):
+# 手役判定
+# return: [手役, ランク１，ランク２,...]
+func check_hand(v : Array) -> Array:
 	var rcnt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 	var scnt = [0, 0, 0, 0]
 	for i in range(v.size()):
@@ -475,61 +478,61 @@ func check_hand(v : Array):
 	elif scnt[HEARTS] >= 5: s = HEARTS
 	elif scnt[SPADES] >= 5: s = SPADES
 	if s >= CLUBS:		# フラッシュ確定
-		var bitmap = 0;
+		var bitmap = 0
 		for i in v.size():
 			if( (v[i] >> N_RANK_BITS) == s ):
-				bitmap |= 1 << (v[i] & RANK_MASK);
-		var mask = 0x1f00;		# AKQJT
+				bitmap |= 1 << (v[i] & RANK_MASK)
+		var mask = 0x1f00		# AKQJT
 		for i in range(9):
 			if( (bitmap & mask) == mask ):
-				return STRAIGHT_FLUSH;
+				return [STRAIGHT_FLUSH]
 			mask >>= 1
 		if( bitmap == 0x100f ):		# 1 0000 00000 1111 = A5432
-			return STRAIGHT_FLUSH;
+			return [STRAIGHT_FLUSH]
 	else:
-		s = -1;
+		s = -1
 	#
-	var threeOfAKindIX = -1;
-	var threeOfAKindIX2 = -1;
-	var pairIX1 = -1;
-	var pairIX2 = -1;
+	var threeOfAKindIX = -1
+	var threeOfAKindIX2 = -1
+	var pairIX1 = -1
+	var pairIX2 = -1
 	for i in range(13):
 		if( rcnt[i] == 4):
-			return FOUR_OF_A_KIND;
+			return [FOUR_OF_A_KIND]
 		if( rcnt[i] == 3):
 			if( threeOfAKindIX < 0 ):
-				threeOfAKindIX = i;
+				threeOfAKindIX = i
 			else:
-				threeOfAKindIX2 = i;
+				threeOfAKindIX2 = i
 		elif( rcnt[i] == 2):
-			pairIX2 = pairIX1;
-			pairIX1 = i;
+			pairIX2 = pairIX1
+			pairIX1 = i
 	# 3カード*2 もフルハウス
 	if( threeOfAKindIX >= 0 && (pairIX1 >= 0 || threeOfAKindIX2 >= 0) ):
-		return FULL_HOUSE;
+		return [FULL_HOUSE]
 	if( s >= 0 ):
-		return FLUSH;
+		return [FLUSH]
 	#
-	var bitmap = 0;
-	var mask = 1;
+	var bitmap = 0
+	var mask = 1
 	for i in range(13):
 		if( rcnt[i] != 0 ):
-			bitmap |= mask;
+			bitmap |= mask
 		mask <<= 1
-	mask = 0x1f00;		#	AKQJT
+	mask = 0x1f00		#	AKQJT
 	for i in range(9):
 		if( (bitmap & mask) == mask ):
-			return STRAIGHT;
+			return [STRAIGHT]
 		mask >>= 1
 	if( (bitmap & 0x100f) == 0x100f ):		#	5432A
-		return STRAIGHT;
+		return [STRAIGHT]
 	if( threeOfAKindIX >= 0 ):
-		return THREE_OF_A_KIND;
+		return [THREE_OF_A_KIND]
 	if( pairIX2 >= 0 ):
-		return TWO_PAIR;
+		return [TWO_PAIR]
 	if( pairIX1 >= 0 ):
-		return ONE_PAIR;
-	return HIGH_CARD
+		return [ONE_PAIR]
+	return [HIGH_CARD]
 func show_user_hand(n):
 	if is_folded[USER_IX]: return
 	var v = []
@@ -538,9 +541,18 @@ func show_user_hand(n):
 	for k in range(n): v.push_back(comu_cards[k].get_sr())
 	#print("i = ", i, ", v = ", v)
 	#print("hand = ", handName[check_hand(v)])
-	players[0].set_hand(handName[check_hand(v)])
+	players[0].set_hand(handName[check_hand(v)[0]])
+# ランクも考慮した手役比較
+# return: -1 for hand1 < hand2, +1 for hand1 > hand2
+func compare(hand1 : Array, hand2 : Array):
+	if hand1[0] == hand2[0]:
+		return 0
+	elif hand1[0] < hand2[0]:
+		return -1
+	else:
+		return 1
 func show_hand():		# ShowDown時の処理
-	var max_hand = -1
+	var max_hand = [-1]
 	var winners = []
 	for i in range(N_PLAYERS):
 		if !is_folded[i]:
@@ -551,11 +563,12 @@ func show_hand():		# ShowDown時の処理
 			#print("i = ", i, ", v = ", v)
 			#print("hand = ", handName[check_hand(v)])
 			players_hand[i] = check_hand(v)
-			players[i].set_hand(handName[players_hand[i]])
-			if players_hand[i] > max_hand:
+			players[i].set_hand(handName[players_hand[i][0]])
+			var r = compare(players_hand[i], max_hand)
+			if r > 0:
 				max_hand = players_hand[i]
 				winners = [i]
-			elif players_hand[i] == max_hand:
+			elif r ==  0:
 				winners.push_back(i)
 	print("winners = ", winners)
 func _on_PlayerBG_open_finished():
@@ -571,8 +584,8 @@ func _on_PlayerBG_open_finished():
 					v.push_back(players_card2[i])
 					for k in range(5): v.push_back(comu_cards[k].get_sr())
 					print("v = ", v)
-					print("hand = ", handName[check_hand(v)])
-					players[i].set_hand(handName[check_hand(v)])
+					print("hand = ", handName[check_hand(v)[0]])
+					players[i].set_hand(handName[check_hand(v)[0]])
 	pass
 
 func disable_act_buttons():
