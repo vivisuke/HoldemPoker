@@ -541,19 +541,20 @@ func show_hand():		# ShowDown時の処理
 	var max_hand = -1
 	var winners = []
 	for i in range(N_PLAYERS):
-		var v = []
-		v.push_back(players_card1[i].get_sr())
-		v.push_back(players_card2[i].get_sr())
-		for k in range(5): v.push_back(comu_cards[k].get_sr())
-		#print("i = ", i, ", v = ", v)
-		#print("hand = ", handName[check_hand(v)])
-		players_hand[i] = check_hand(v)
-		players[i].set_hand(handName[players_hand[i]])
-		if players_hand[i] > max_hand:
-			max_hand = players_hand[i]
-			winners = [i]
-		elif players_hand[i] == max_hand:
-			winners.push_back(i)
+		if !is_folded[i]:
+			var v = []
+			v.push_back(players_card1[i].get_sr())
+			v.push_back(players_card2[i].get_sr())
+			for k in range(5): v.push_back(comu_cards[k].get_sr())
+			#print("i = ", i, ", v = ", v)
+			#print("hand = ", handName[check_hand(v)])
+			players_hand[i] = check_hand(v)
+			players[i].set_hand(handName[players_hand[i]])
+			if players_hand[i] > max_hand:
+				max_hand = players_hand[i]
+				winners = [i]
+			elif players_hand[i] == max_hand:
+				winners.push_back(i)
 	print("winners = ", winners)
 func _on_PlayerBG_open_finished():
 	if n_opening != 0:
