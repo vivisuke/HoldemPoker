@@ -413,6 +413,7 @@ func do_fold(pix):
 	#players[pix].set_BG(2)
 	players_card1[pix].hide()
 	players_card2[pix].hide()
+	players[pix].set_hand("")			# 手役表示クリア
 func do_check(pix):
 	act_panels[pix].set_text("checked")
 	act_panels[pix].show()
@@ -530,6 +531,7 @@ func check_hand(v : Array):
 		return ONE_PAIR;
 	return HIGH_CARD
 func show_user_hand(n):
+	if is_folded[USER_IX]: return
 	var v = []
 	v.push_back(players_card1[0].get_sr())
 	v.push_back(players_card2[0].get_sr())
@@ -563,13 +565,14 @@ func _on_PlayerBG_open_finished():
 			print("finished opening")
 			sub_state = READY
 			for i in range(N_PLAYERS):
-				var v = []
-				v.push_back(players_card1[i])
-				v.push_back(players_card2[i])
-				for k in range(5): v.push_back(comu_cards[k].get_sr())
-				print("v = ", v)
-				print("hand = ", handName[check_hand(v)])
-				players[i].set_hand(handName[check_hand(v)])
+				if !is_folded[i]:
+					var v = []
+					v.push_back(players_card1[i])
+					v.push_back(players_card2[i])
+					for k in range(5): v.push_back(comu_cards[k].get_sr())
+					print("v = ", v)
+					print("hand = ", handName[check_hand(v)])
+					players[i].set_hand(handName[check_hand(v)])
 	pass
 
 func disable_act_buttons():
