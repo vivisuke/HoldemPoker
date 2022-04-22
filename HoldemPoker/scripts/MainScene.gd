@@ -156,7 +156,8 @@ func _ready():
 	act_buttons[ALL_IN] = $AllInButton
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
-	$RaiseButton.text = "Raise 2"
+	$RaiseSpinBox.set_value(2)
+	#$RaiseButton.text = "Raise 2"
 	#
 	update_d_SB_BB()	# D, SB, BB マーク設置
 	update_title_text()
@@ -642,5 +643,5 @@ func _on_FoldButton_pressed():
 	do_fold(USER_IX)
 	next_player()
 func _on_RaiseButton_pressed():
-	do_raise(USER_IX, BB_CHIPS)
+	do_raise(USER_IX, $RaiseSpinBox.get_value())
 	next_player()

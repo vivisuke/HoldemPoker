@@ -132,7 +132,7 @@ custom_fonts/font = SubResource( 1 )
 text = "AllIn"
 
 [node name="RaiseSpinBox" type="SpinBox" parent="."]
-margin_left = 313.0
+margin_left = 326.0
 margin_top = 780.0
 margin_right = 400.0
 margin_bottom = 804.0
