@@ -121,8 +121,8 @@ func _ready():
 		randomize()
 		rng.randomize()
 	else:
-		#var sd = 0		# SPR#111
-		var sd = 6
+		var sd = 0		# SPR#111
+		#var sd = 7
 		seed(sd)
 		rng.set_seed(sd)
 	#
@@ -471,6 +471,25 @@ func _process(delta):
 				next_player()
 	pass
 
+func add_rank(v, s, hand):
+	var rnk = []
+	for i in range(v.size()):
+		if( card_to_suit(v[i]) == s ):		# 同一スートの場合
+			rnk.push_back(card_to_rank(v[i]))
+	rnk.sort()		# 昇順ソート
+	var t = [hand]
+	for i in range(rnk.size()):
+		t.push_back(rnk[-1-i])		# ランクを降順に格納
+	print("flush: ", t)
+	return t
+func get_ranks(v, exr1, exr2):			# exr1, exr2 以外のランクリスト（昇順ソート済み）を取得
+	var lst = []
+	for i in range(v.size()):
+		var r = card_to_rank(v[i])
+		if r != exr1 && r != exr2:
+			lst.push_back(r)
+	lst.sort()		# 昇順ソート
+	return lst
 # 手役判定
 # return: [手役, ランク１，ランク２,...]
 func check_hand(v : Array) -> Array:
@@ -492,10 +511,10 @@ func check_hand(v : Array) -> Array:
 		var mask = 0x1f00		# AKQJT
 		for i in range(9):
 			if( (bitmap & mask) == mask ):
-				return [STRAIGHT_FLUSH]
+				return [STRAIGHT_FLUSH, mask]
 			mask >>= 1
-		if( bitmap == 0x100f ):		# 1 0000 00000 1111 = A5432
-			return [STRAIGHT_FLUSH]
+		if( bitmap == 0x100f ):		# 1 0000 00000 1111 = 5432A
+			return [STRAIGHT_FLUSH, 0x0f]		# 5432A よりも 65432 の方が強い
 	#else:
 	#	s = -1
 	#
@@ -505,7 +524,7 @@ func check_hand(v : Array) -> Array:
 	var pairIX2 = -1
 	for i in range(13):
 		if( rcnt[i] == 4):
-			return [FOUR_OF_A_KIND]
+			return [FOUR_OF_A_KIND, i]		# 4 of a kind は他のプレイヤーと同じ数字になることはない
 		if( rcnt[i] == 3):
 			if( threeOfAKindIX < 0 ):
 				threeOfAKindIX = i
@@ -516,18 +535,9 @@ func check_hand(v : Array) -> Array:
 			pairIX1 = i
 	# 3カード*2 もフルハウス
 	if( threeOfAKindIX >= 0 && (pairIX1 >= 0 || threeOfAKindIX2 >= 0) ):
-		return [FULL_HOUSE]
+		return [FULL_HOUSE, threeOfAKindIX]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
 	if( s >= 0 ):
-		var rnk = []
-		for i in range(v.size()):
-			if( card_to_suit(v[i]) == s ):		# 同一スートの場合
-				rnk.push_back(card_to_rank(v[i]))
-		rnk.sort()		# 昇順ソート
-		var t = [FLUSH]
-		for i in range(rnk.size()):
-			t.push_back(rnk[-1-i])		# ランクを降順に格納
-		print("flush: ", t)
-		return t
+		return add_rank(v, s, FLUSH)
 	#
 	var bitmap = 0
 	var mask = 1
@@ -538,16 +548,22 @@ func check_hand(v : Array) -> Array:
 	mask = 0x1f00		#	AKQJT
 	for i in range(9):
 		if( (bitmap & mask) == mask ):
-			return [STRAIGHT]
+			return [STRAIGHT, mask]
 		mask >>= 1
 	if( (bitmap & 0x100f) == 0x100f ):		#	5432A
-		return [STRAIGHT]
+		return [STRAIGHT, 0x0f]				# 5432A より 65432 の方が強い
 	if( threeOfAKindIX >= 0 ):
-		return [THREE_OF_A_KIND]
+		return [THREE_OF_A_KIND, threeOfAKindIX]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
 	if( pairIX2 >= 0 ):
 		return [TWO_PAIR]
 	if( pairIX1 >= 0 ):
 		return [ONE_PAIR]
+		var r = card_to_rank(v[pairIX1])	# ペアのランク
+		var t = [ONE_PAIR, r]
+		var lst = []
+		for i in range(v.size()):
+			if card_to_rank(v[i]) != r:
+				lst.push_back(card_to_rank(v[i]))
 	return [HIGH_CARD]
 func show_user_hand(n):
 	if is_folded[USER_IX]: return
@@ -616,6 +632,7 @@ func next_player():
 		if !is_folded[nix]: break
 	update_next_player()
 func _on_CheckButton_pressed():
+	do_check(USER_IX)
 	next_player()
 	pass # Replace with function body.
 func _on_CallButton_pressed():
