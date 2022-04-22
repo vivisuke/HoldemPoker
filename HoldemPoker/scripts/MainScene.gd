@@ -342,6 +342,7 @@ func next_round():
 		cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
 	elif state == RIVER:
 		state = SHOW_DOWN
+		disable_act_buttons()			# コマンドボタンディセーブル
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].hide()
 		n_opening = (N_PLAYERS - 1)*2
@@ -433,7 +434,7 @@ func do_call(pix):
 func do_raise(pix, c):
 	act_panels[pix].set_text("raised")
 	act_panels[pix].show()
-	bet_chips += c
+	bet_chips += c			# コール分＋レイズ分 が実際に場に出される
 	players[pix].set_bet_chips(bet_chips)
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
