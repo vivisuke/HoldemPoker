@@ -131,6 +131,14 @@ margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "Call"
 
+[node name="RaiseSpinBox" type="SpinBox" parent="."]
+margin_left = 222.0
+margin_top = 780.0
+margin_right = 296.0
+margin_bottom = 810.0
+max_value = 200.0
+align = 2
+
 [node name="RaiseButton" type="Button" parent="."]
 margin_left = 300.0
 margin_top = 780.0
@@ -147,14 +155,6 @@ margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "AllIn"
 
-[node name="RaiseSpinBox" type="SpinBox" parent="."]
-margin_left = 222.0
-margin_top = 780.0
-margin_right = 296.0
-margin_bottom = 810.0
-max_value = 200.0
-align = 2
-
 [connection signal="open_finished" from="Table/PlayerBG1" to="." method="_on_PlayerBG_open_finished"]
 [connection signal="open_finished" from="Table/PlayerBG2" to="." method="_on_PlayerBG_open_finished"]
 [connection signal="open_finished" from="Table/PlayerBG3" to="." method="_on_PlayerBG_open_finished"]
@@ -165,3 +165,4 @@ align = 2
 [connection signal="pressed" from="CheckCallButton" to="." method="_on_CheckCallButton_pressed"]
 [connection signal="pressed" from="CallButton" to="." method="_on_CallButton_pressed"]
 [connection signal="pressed" from="RaiseButton" to="." method="_on_RaiseButton_pressed"]
+[connection signal="pressed" from="AllInButton" to="." method="_on_AllInButton_pressed"]
