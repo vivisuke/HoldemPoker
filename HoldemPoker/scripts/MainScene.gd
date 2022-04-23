@@ -44,8 +44,8 @@ enum {
 	CARD_OPENING,
 }
 enum {		# アクションボタン
-	CHECK = 0,
-	CALL,
+	CHECK_CALL = 0,
+	#CALL,
 	FOLD,
 	RAISE,
 	ALL_IN,
@@ -121,7 +121,10 @@ func _ready():
 		randomize()
 		rng.randomize()
 	else:
-		var sd = 0		# SPR#111
+		rng.randomize()
+		var sd = rng.randi_range(0, 9999)
+		print("seed = ", sd)
+		#var sd = 0		# SPR#111
 		#var sd = 7
 		seed(sd)
 		rng.set_seed(sd)
@@ -149,8 +152,8 @@ func _ready():
 	print("dealer_ix = ", dealer_ix)
 	# 行動ボタン
 	act_buttons.resize(N_ACT_BUTTONS)
-	act_buttons[CHECK] = $CheckButton
-	act_buttons[CALL] = $CallButton
+	act_buttons[CHECK_CALL] = $CheckCallButton
+	#act_buttons[CALL] = $CallButton
 	act_buttons[FOLD] = $FoldButton
 	act_buttons[RAISE] = $RaiseButton
 	act_buttons[ALL_IN] = $AllInButton
@@ -458,9 +461,13 @@ func _process(delta):
 				next_round()
 		else:
 			if nix == USER_IX:
-				act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chips
-				act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chips
-				for i in range(FOLD, N_ACT_BUTTONS):
+				if bet_chips_plyr[USER_IX] < bet_chips:
+					act_buttons[CHECK_CALL].text = "Call"
+				else:
+					act_buttons[CHECK_CALL].text = "Check"
+				#act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chips
+				#act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chips
+				for i in range(N_ACT_BUTTONS):
 					act_buttons[i].disabled = false
 			else:
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
@@ -633,16 +640,25 @@ func next_player():
 		nix = (nix + 1) % N_PLAYERS
 		if !is_folded[nix]: break
 	update_next_player()
-func _on_CheckButton_pressed():
-	do_check(USER_IX)
-	next_player()
-	pass # Replace with function body.
-func _on_CallButton_pressed():
-	do_call(USER_IX)
-	next_player()
+#func _on_CheckButton_pressed():
+#	do_check(USER_IX)
+#	next_player()
+#	pass # Replace with function body.
+#func _on_CallButton_pressed():
+#	do_call(USER_IX)
+#	next_player()
 func _on_FoldButton_pressed():
 	do_fold(USER_IX)
 	next_player()
 func _on_RaiseButton_pressed():
 	do_raise(USER_IX, $RaiseSpinBox.get_value())
 	next_player()
+
+
+func _on_CheckCallButton_pressed():
+	if bet_chips_plyr[USER_IX] < bet_chips:
+		do_call(USER_IX)
+	else:
+		do_check(USER_IX)
+	next_player()
+	pass # Replace with function body.

@@ -92,50 +92,51 @@ custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 3 )
 text = "0"
 
-[node name="CheckButton" type="Button" parent="."]
-margin_top = 750.0
+[node name="CheckCallButton" type="Button" parent="."]
+margin_top = 780.0
 margin_right = 100.0
-margin_bottom = 780.0
+margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "Check"
 
 [node name="CallButton" type="Button" parent="."]
+visible = false
 margin_left = 100.0
-margin_top = 750.0
+margin_top = 780.0
 margin_right = 200.0
-margin_bottom = 780.0
+margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "Call"
 
 [node name="FoldButton" type="Button" parent="."]
-margin_left = 200.0
-margin_top = 750.0
-margin_right = 300.0
-margin_bottom = 780.0
+margin_left = 100.0
+margin_top = 780.0
+margin_right = 200.0
+margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "Fold"
 
 [node name="RaiseButton" type="Button" parent="."]
 margin_left = 300.0
-margin_top = 750.0
+margin_top = 780.0
 margin_right = 400.0
-margin_bottom = 780.0
+margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "Raise"
 
 [node name="AllInButton" type="Button" parent="."]
 margin_left = 400.0
-margin_top = 750.0
+margin_top = 780.0
 margin_right = 500.0
-margin_bottom = 780.0
+margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "AllIn"
 
 [node name="RaiseSpinBox" type="SpinBox" parent="."]
-margin_left = 326.0
+margin_left = 222.0
 margin_top = 780.0
-margin_right = 400.0
-margin_bottom = 804.0
+margin_right = 296.0
+margin_bottom = 810.0
 max_value = 200.0
 align = 2
 
@@ -145,7 +146,7 @@ align = 2
 [connection signal="open_finished" from="Table/PlayerBG4" to="." method="_on_PlayerBG_open_finished"]
 [connection signal="open_finished" from="Table/PlayerBG5" to="." method="_on_PlayerBG_open_finished"]
 [connection signal="open_finished" from="Table/PlayerBG6" to="." method="_on_PlayerBG_open_finished"]
-[connection signal="pressed" from="CheckButton" to="." method="_on_CheckButton_pressed"]
+[connection signal="pressed" from="CheckCallButton" to="." method="_on_CheckCallButton_pressed"]
 [connection signal="pressed" from="CallButton" to="." method="_on_CallButton_pressed"]
 [connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
 [connection signal="pressed" from="RaiseButton" to="." method="_on_RaiseButton_pressed"]
