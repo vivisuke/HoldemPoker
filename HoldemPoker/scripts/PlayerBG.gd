@@ -31,9 +31,13 @@ func get_chips(): return chips
 func set_chips(c : int):
 	chips = c
 	$ChipsLabel.text = String(chips)
-func sub_chips(c : int):
-	chips -= c
+func add_chips(c : int):
+	chips += c
 	$ChipsLabel.text = String(chips)
+func sub_chips(c : int):
+	add_chips(-c)
+	#chips -= c
+	#$ChipsLabel.text = String(chips)
 func open_cards():
 	pass
 func show_bet_chips(sw : bool):

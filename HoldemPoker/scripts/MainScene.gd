@@ -618,6 +618,13 @@ func show_hand():		# ShowDown時の処理
 			elif r ==  0:
 				winners.push_back(i)
 	print("winners = ", winners)
+	if winners.size() == 1:		# 一人勝ちの場合
+		var wi = winners[0]
+		players[wi].add_chips(pot_chips)
+		pot_chips = 0
+		$Table/Chips/PotLabel.text = String(pot_chips)
+	else:
+		assert(false)		# 未実装
 func _on_PlayerBG_open_finished():
 	if n_opening != 0:
 		n_opening -= 1
