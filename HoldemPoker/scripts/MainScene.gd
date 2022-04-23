@@ -652,16 +652,17 @@ func next_player():
 #	next_player()
 func _on_FoldButton_pressed():
 	do_fold(USER_IX)
+	disable_act_buttons()
 	next_player()
-func _on_RaiseButton_pressed():
-	do_raise(USER_IX, $RaiseSpinBox.get_value())
-	next_player()
-
-
 func _on_CheckCallButton_pressed():
 	if bet_chips_plyr[USER_IX] < bet_chips:
 		do_call(USER_IX)
 	else:
 		do_check(USER_IX)
+	disable_act_buttons()
 	next_player()
 	pass # Replace with function body.
+func _on_RaiseButton_pressed():
+	do_raise(USER_IX, $RaiseSpinBox.get_value())
+	disable_act_buttons()
+	next_player()
