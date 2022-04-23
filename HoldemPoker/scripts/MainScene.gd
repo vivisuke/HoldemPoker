@@ -163,8 +163,11 @@ func _ready():
 	#$RaiseButton.text = "Raise 2"
 	#
 	update_d_SB_BB()	# D, SB, BB マーク設置
-	update_title_text()
+	#update_title_text()
+	update_roundLabel()
 	pass
+func update_roundLabel():
+	$RoundLabel.text = stateText[state]
 func update_title_text():
 	var txt = "6P Ring Game"
 	if state != INIT:
@@ -368,7 +371,7 @@ func next_round():
 		for i in range(comu_cards.size()):
 			comu_cards[i].queue_free()
 	hide_act_panels()
-	update_title_text()
+	update_roundLabel()
 	if state >= FLOP:
 		nix = (dealer_ix + 1) % N_PLAYERS		# 次の手番
 		bet_chips = 0

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://scripts/MainScene.gd" type="Script" id=1]
 [ext_resource path="res://images/BG.png" type="Texture" id=2]
@@ -10,10 +10,15 @@
 [ext_resource path="res://PlayerBG.tscn" type="PackedScene" id=8]
 [ext_resource path="res://fonts/arial.ttf" type="DynamicFontData" id=9]
 [ext_resource path="res://images/chip16.png" type="Texture" id=10]
+[ext_resource path="res://fonts/FlopDesignFONT.otf" type="DynamicFontData" id=11]
 
 [sub_resource type="DynamicFont" id=2]
 size = 26
 font_data = ExtResource( 9 )
+
+[sub_resource type="DynamicFont" id=4]
+size = 20
+font_data = ExtResource( 11 )
 
 [sub_resource type="DynamicFont" id=3]
 size = 12
@@ -50,6 +55,16 @@ margin_right = 500.0
 margin_bottom = 50.0
 custom_fonts/font = SubResource( 2 )
 text = "6P Ring Game"
+align = 1
+valign = 1
+
+[node name="RoundLabel" type="Label" parent="."]
+margin_left = 1.0
+margin_top = 64.0
+margin_right = 500.0
+margin_bottom = 78.0
+custom_fonts/font = SubResource( 4 )
+text = "Round"
 align = 1
 valign = 1
 
@@ -92,9 +107,17 @@ custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 3 )
 text = "0"
 
-[node name="CheckCallButton" type="Button" parent="."]
+[node name="FoldButton" type="Button" parent="."]
 margin_top = 780.0
 margin_right = 100.0
+margin_bottom = 810.0
+custom_fonts/font = SubResource( 1 )
+text = "Fold"
+
+[node name="CheckCallButton" type="Button" parent="."]
+margin_left = 100.0
+margin_top = 780.0
+margin_right = 200.0
 margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "Check"
@@ -107,14 +130,6 @@ margin_right = 200.0
 margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "Call"
-
-[node name="FoldButton" type="Button" parent="."]
-margin_left = 100.0
-margin_top = 780.0
-margin_right = 200.0
-margin_bottom = 810.0
-custom_fonts/font = SubResource( 1 )
-text = "Fold"
 
 [node name="RaiseButton" type="Button" parent="."]
 margin_left = 300.0
@@ -146,7 +161,7 @@ align = 2
 [connection signal="open_finished" from="Table/PlayerBG4" to="." method="_on_PlayerBG_open_finished"]
 [connection signal="open_finished" from="Table/PlayerBG5" to="." method="_on_PlayerBG_open_finished"]
 [connection signal="open_finished" from="Table/PlayerBG6" to="." method="_on_PlayerBG_open_finished"]
+[connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
 [connection signal="pressed" from="CheckCallButton" to="." method="_on_CheckCallButton_pressed"]
 [connection signal="pressed" from="CallButton" to="." method="_on_CallButton_pressed"]
-[connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
 [connection signal="pressed" from="RaiseButton" to="." method="_on_RaiseButton_pressed"]
