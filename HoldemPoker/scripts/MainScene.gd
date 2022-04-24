@@ -159,7 +159,7 @@ func _ready():
 	act_buttons[ALL_IN] = $AllInButton
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
-	$RaiseSpinBox.set_value(2)
+	$RaiseSpinBox.set_value(BB_CHIPS)
 	#$RaiseButton.text = "Raise 2"
 	#
 	update_d_SB_BB()	# D, SB, BB マーク設置
@@ -672,6 +672,7 @@ func _on_CheckCallButton_pressed():
 func _on_RaiseButton_pressed():
 	do_raise(USER_IX, $RaiseSpinBox.get_value())
 	disable_act_buttons()
+	$RaiseSpinBox.set_value(BB_CHIPS)
 	next_player()
 func _on_AllInButton_pressed():
 	var tc = bet_chips - bet_chips_plyr[USER_IX]	# コールに必要なチップ数
