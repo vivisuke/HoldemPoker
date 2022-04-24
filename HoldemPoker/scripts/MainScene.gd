@@ -56,7 +56,7 @@ enum {		# アクションボタン
 const N_CARDS = N_RANK*N_SUIT
 const N_COMU_CARS = 5			# 共通カード枚数
 const RANK_MASK = 0x0f
-const N_RANK_BITS = 4
+const N_RANK_BITS = 4			# カード：(suit << N_RANK_BITS) | rank
 const CARD_WIDTH = 50
 const COMU_CARD_PY = 80
 const N_FLOP_CARDS = 3
@@ -93,7 +93,7 @@ var high_card = 0		# ハイカード
 var high_card2 = 0		# ハイカードその２、for ２ペア等
 var high_card3 = 0		# ハイカードその３、for ２ペア等
 var deck_ix = 0			# デッキトップインデックス
-var deck = []			# 要素：(suit << 4) | rank
+var deck = []			# 要素：(suit << 4) | rank （※ rank:0～12 の数値、0 for 2,... 11 for King, 12 for Ace）
 var comu_cards = []		# コミュニティカード
 var players = []		# プレイヤーパネル配列、[0] for Human
 #var players_cards = []		# プレイヤーカード、[0], [1] for Player-1, ...
@@ -485,15 +485,30 @@ func _process(delta):
 						do_check(nix)
 				next_player()
 	pass
-
-func add_rank(v, s, hand):
+func add_rank_pair(v, p1, p2, hand):	# ペアの場合に、ペア以外の数字を大きい順に結果配列に追加
+	var rnk = []
+	for i in range(v.size()):
+		var r = card_to_suit(v[i])
+		if r != p1 && r != p2:		# ペアの数字でない場合
+			rnk.push_back(r)
+	rnk.sort()		# 昇順ソート
+	var t = [hand]
+	var n = 5		# 配列に追加する枚数
+	if p1 < 0:
+		n = 1		# 2ペアの場合
+	elif p2 < 0:
+		n = 3		# 1ペアの場合
+	for i in range(n):
+		t.push_back(rnk[-1-i])		# ランクを降順に格納
+	return t
+func add_rank(v, s, hand):		# フラッシュの場合に、そのスートの数字を大きい順に結果配列に追加
 	var rnk = []
 	for i in range(v.size()):
 		if( card_to_suit(v[i]) == s ):		# 同一スートの場合
 			rnk.push_back(card_to_rank(v[i]))
 	rnk.sort()		# 昇順ソート
 	var t = [hand]
-	for i in range(rnk.size()):
+	for i in range(5):				# 大きいランクから５枚を配列に追加
 		t.push_back(rnk[-1-i])		# ランクを降順に格納
 	print("flush: ", t)
 	return t
@@ -519,7 +534,7 @@ func check_hand(v : Array) -> Array:
 	elif scnt[HEARTS] >= 5: s = HEARTS
 	elif scnt[SPADES] >= 5: s = SPADES
 	if s >= CLUBS:		# フラッシュ確定
-		var bitmap = 0
+		var bitmap = 0		# ランクをビット値に変換したものの合計
 		for i in v.size():
 			if( card_to_suit(v[i]) == s ):		# 同一スートの場合
 				bitmap |= 1 << card_to_rank(v[i])
@@ -533,24 +548,24 @@ func check_hand(v : Array) -> Array:
 	#else:
 	#	s = -1
 	#
-	var threeOfAKindIX = -1
-	var threeOfAKindIX2 = -1
-	var pairIX1 = -1
-	var pairIX2 = -1
+	var threeOfAKindRank = -1		# 3 of a Kind の rcnt インデックス
+	var threeOfAKindRank2 = -1	# 3 of a Kind の rcnt インデックス その２
+	var pairRank1 = -1			# ペアの場合の rcnt インデックス
+	var pairRank2 = -1			# ペアの場合の rcnt インデックス その２
 	for i in range(13):
 		if( rcnt[i] == 4):
 			return [FOUR_OF_A_KIND, i]		# 4 of a kind は他のプレイヤーと同じ数字になることはない
 		if( rcnt[i] == 3):
-			if( threeOfAKindIX < 0 ):
-				threeOfAKindIX = i
+			if( threeOfAKindRank < 0 ):
+				threeOfAKindRank = i
 			else:
-				threeOfAKindIX2 = i
+				threeOfAKindRank2 = i
 		elif( rcnt[i] == 2):
-			pairIX2 = pairIX1
-			pairIX1 = i
+			pairRank2 = pairRank1
+			pairRank1 = i
 	# 3カード*2 もフルハウス
-	if( threeOfAKindIX >= 0 && (pairIX1 >= 0 || threeOfAKindIX2 >= 0) ):
-		return [FULL_HOUSE, threeOfAKindIX]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
+	if( threeOfAKindRank >= 0 && (pairRank1 >= 0 || threeOfAKindRank2 >= 0) ):
+		return [FULL_HOUSE, threeOfAKindRank]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
 	if( s >= 0 ):
 		return add_rank(v, s, FLUSH)
 	#
@@ -567,19 +582,16 @@ func check_hand(v : Array) -> Array:
 		mask >>= 1
 	if( (bitmap & 0x100f) == 0x100f ):		#	5432A
 		return [STRAIGHT, 0x0f]				# 5432A より 65432 の方が強い
-	if( threeOfAKindIX >= 0 ):
-		return [THREE_OF_A_KIND, threeOfAKindIX]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
-	if( pairIX2 >= 0 ):
-		return [TWO_PAIR]
-	if( pairIX1 >= 0 ):
-		return [ONE_PAIR]
-		var r = card_to_rank(v[pairIX1])	# ペアのランク
-		var t = [ONE_PAIR, r]
-		var lst = []
-		for i in range(v.size()):
-			if card_to_rank(v[i]) != r:
-				lst.push_back(card_to_rank(v[i]))
-	return [HIGH_CARD]
+	if( threeOfAKindRank >= 0 ):
+		return [THREE_OF_A_KIND, threeOfAKindRank]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
+	if( pairRank2 >= 0 ):
+		#return [TWO_PAIR]
+	if( pairRank1 >= 0 ):
+		var r = card_to_rank(v[pairRank1])	# ペアのランク
+		return add_rank_pair(v, r, -1, ONE_PAIR)
+		#return [ONE_PAIR]
+	return add_rank_pair(v, -1, -1, HIGH_CARD)
+	#return [HIGH_CARD]
 func show_user_hand(n):
 	if is_folded[USER_IX]: return
 	var v = []
