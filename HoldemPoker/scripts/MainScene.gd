@@ -160,6 +160,7 @@ func _ready():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
 	$RaiseSpinBox.set_value(BB_CHIPS)
+	$RaiseSpinBox.editable = false
 	#$RaiseButton.text = "Raise 2"
 	#
 	update_d_SB_BB()	# D, SB, BB マーク設置
@@ -470,8 +471,10 @@ func _process(delta):
 					act_buttons[CHECK_CALL].text = "Check"
 				#act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chips
 				#act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chips
+				# コマンドボタン・スピンボックスをイネーブル
 				for i in range(N_ACT_BUTTONS):
 					act_buttons[i].disabled = false
+				$RaiseSpinBox.editable = true
 			else:
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 				if bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
@@ -645,6 +648,7 @@ func _on_PlayerBG_open_finished():
 func disable_act_buttons():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
+	$RaiseSpinBox.editable = false
 func next_player():
 	while true:
 		nix = (nix + 1) % N_PLAYERS
