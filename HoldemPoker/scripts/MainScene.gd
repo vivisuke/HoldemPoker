@@ -488,18 +488,19 @@ func _process(delta):
 func add_rank_pair(v, p1, p2, hand):	# ペアの場合に、ペア以外の数字を大きい順に結果配列に追加
 	var rnk = []
 	for i in range(v.size()):
-		var r = card_to_suit(v[i])
+		var r = card_to_rank(v[i])
 		if r != p1 && r != p2:		# ペアの数字でない場合
 			rnk.push_back(r)
 	rnk.sort()		# 昇順ソート
 	var t = [hand]
 	var n = 5		# 配列に追加する枚数
-	if p1 < 0:
+	if p2 >= 0:
 		n = 1		# 2ペアの場合
-	elif p2 < 0:
+	elif p1 >= 0:
 		n = 3		# 1ペアの場合
+	n = min(rnk.size(), n)
 	for i in range(n):
-		t.push_back(rnk[-1-i])		# ランクを降順に格納
+		t.push_back(rnk[rnk.size()-1-i])		# ランクを降順に格納
 	return t
 func add_rank(v, s, hand):		# フラッシュの場合に、そのスートの数字を大きい順に結果配列に追加
 	var rnk = []
@@ -563,13 +564,13 @@ func check_hand(v : Array) -> Array:
 		elif( rcnt[r] == 2):
 			if pairRank1 < 0:
 				pairRank1 = r
-			else if pairRank2 < 0:
+			elif pairRank2 < 0:
 				if pairRank1 > r:
 					pairRank2 = r
 				else:
 					pairRank2 = pairRank1
 					pairRank1 = r
-			else
+			else:
 				if r > pairRank1:
 					pairRank2 = pairRank1
 					pairRank1 = r
@@ -598,7 +599,7 @@ func check_hand(v : Array) -> Array:
 		return [THREE_OF_A_KIND, threeOfAKindRank]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
 	if( pairRank2 >= 0 ):
 		#return [TWO_PAIR]
-		return add_rank_pair(v, pairRank1, -1, ONE_PAIR)
+		return add_rank_pair(v, pairRank1, pairRank2, TWO_PAIR)
 	if( pairRank1 >= 0 ):
 		return add_rank_pair(v, pairRank1, -1, ONE_PAIR)
 		#return [ONE_PAIR]
@@ -645,6 +646,8 @@ func show_hand():		# ShowDown時の処理
 			elif r ==  0:
 				winners.push_back(i)
 	print("winners = ", winners)
+	for i in range(N_PLAYERS):
+		players[i].set_BG(BG_PLY if winners.find(i) >= 0 else BG_WAIT)
 	if winners.size() == 1:		# 一人勝ちの場合
 		var wi = winners[0]
 		players[wi].add_chips(pot_chips)
