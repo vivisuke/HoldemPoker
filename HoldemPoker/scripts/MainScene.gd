@@ -7,6 +7,7 @@ enum {
 	RANK_7, RANK_8, RANK_9, RANK_10,
 	RANK_J, RANK_Q, RANK_K, RANK_A, N_RANK,
 }
+const RANK_STR = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 enum {
 	HIGH_CARD = 0,
 	ONE_PAIR,
@@ -122,10 +123,11 @@ func _ready():
 		rng.randomize()
 	else:
 		rng.randomize()
-		var sd = rng.randi_range(0, 9999)
-		print("seed = ", sd)
+		#var sd = rng.randi_range(0, 9999)
+		#print("seed = ", sd)
 		#var sd = 0		# SPR#111
 		#var sd = 7
+		var sd = 3852
 		seed(sd)
 		rng.set_seed(sd)
 	#
@@ -251,6 +253,9 @@ func deal_cards():
 	#	ix += 1
 	#	comu_cards[i].set_sr(st, rank)
 	#
+func next_game():
+	state = INIT
+	update_roundLabel()
 func next_round():
 	if state >= PRE_FLOP && state <= RIVER:
 		var sum = 0
@@ -385,8 +390,10 @@ func _input(event):
 	if event is InputEventMouseButton && event.is_pressed():
 		if n_moving != 0: return;			# カード移動中
 		if event.position.y >= 700: return
-		if state == INIT:
+		if state == INIT || state == SHOW_DOWN:
 			next_round()		# 次のラウンドに遷移
+		#elif state == SHOW_DOWN:
+		#	next_game()
 func move_finished():
 	n_moving -= 1
 	if n_moving == 0:
@@ -494,10 +501,13 @@ func add_rank_pair(v, p1, p2, hand):	# ペアの場合に、ペア以外の数�
 	rnk.sort()		# 昇順ソート
 	var t = [hand]
 	var n = 5		# 配列に追加する枚数
-	if p2 >= 0:
-		n = 1		# 2ペアの場合
-	elif p1 >= 0:
-		n = 3		# 1ペアの場合
+	if p2 >= 0:		# 2ペアの場合
+		t.push_back(p1)
+		t.push_back(p2)
+		n = 1
+	elif p1 >= 0:		# 1ペアの場合
+		t.push_back(p1)
+		n = 3
 	n = min(rnk.size(), n)
 	for i in range(n):
 		t.push_back(rnk[rnk.size()-1-i])		# ランクを降順に格納
@@ -521,6 +531,11 @@ func get_ranks(v, exr1, exr2):			# exr1, exr2 以外のランクリスト（昇�
 			lst.push_back(r)
 	lst.sort()		# 昇順ソート
 	return lst
+func print_hand(h):
+	var txt = String(h[0]) + " "
+	for i in range(1, h.size()):
+		txt += RANK_STR[h[i]] + " "
+	print("check_hand(): ", txt)
 # 手役判定
 # return: [手役, ランク１，ランク２,...]
 func check_hand(v : Array) -> Array:
@@ -638,6 +653,8 @@ func show_hand():		# ShowDown時の処理
 			#print("i = ", i, ", v = ", v)
 			#print("hand = ", handName[check_hand(v)])
 			players_hand[i] = check_hand(v)
+			if players_hand[i][0] == TWO_PAIR:
+				print_hand(players_hand[i])
 			players[i].set_hand(handName[players_hand[i][0]])
 			var r = compare(players_hand[i], max_hand)
 			if r > 0:
@@ -654,7 +671,8 @@ func show_hand():		# ShowDown時の処理
 		pot_chips = 0
 		$Table/Chips/PotLabel.text = String(pot_chips)
 	else:
-		assert(false)		# 未実装
+		#assert(false)		# 未実装
+		pass
 func _on_PlayerBG_open_finished():
 	if n_opening != 0:
 		n_opening -= 1
