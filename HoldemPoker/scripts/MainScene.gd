@@ -551,18 +551,30 @@ func check_hand(v : Array) -> Array:
 	var threeOfAKindRank = -1		# 3 of a Kind の rcnt インデックス
 	var threeOfAKindRank2 = -1	# 3 of a Kind の rcnt インデックス その２
 	var pairRank1 = -1			# ペアの場合の rcnt インデックス
-	var pairRank2 = -1			# ペアの場合の rcnt インデックス その２
-	for i in range(13):
-		if( rcnt[i] == 4):
-			return [FOUR_OF_A_KIND, i]		# 4 of a kind は他のプレイヤーと同じ数字になることはない
-		if( rcnt[i] == 3):
+	var pairRank2 = -1			# ペアの場合の rcnt インデックス その２、pairRank1 > pairRank2 とする
+	for r in range(13):
+		if( rcnt[r] == 4):
+			return [FOUR_OF_A_KIND, r]		# 4 of a kind は他のプレイヤーと同じ数字になることはない
+		if( rcnt[r] == 3):
 			if( threeOfAKindRank < 0 ):
-				threeOfAKindRank = i
+				threeOfAKindRank = r
 			else:
-				threeOfAKindRank2 = i
-		elif( rcnt[i] == 2):
-			pairRank2 = pairRank1
-			pairRank1 = i
+				threeOfAKindRank2 = r
+		elif( rcnt[r] == 2):
+			if pairRank1 < 0:
+				pairRank1 = r
+			else if pairRank2 < 0:
+				if pairRank1 > r:
+					pairRank2 = r
+				else:
+					pairRank2 = pairRank1
+					pairRank1 = r
+			else
+				if r > pairRank1:
+					pairRank2 = pairRank1
+					pairRank1 = r
+				if r > pairRank2:
+					pairRank2 = r
 	# 3カード*2 もフルハウス
 	if( threeOfAKindRank >= 0 && (pairRank1 >= 0 || threeOfAKindRank2 >= 0) ):
 		return [FULL_HOUSE, threeOfAKindRank]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
@@ -586,9 +598,9 @@ func check_hand(v : Array) -> Array:
 		return [THREE_OF_A_KIND, threeOfAKindRank]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
 	if( pairRank2 >= 0 ):
 		#return [TWO_PAIR]
+		return add_rank_pair(v, pairRank1, -1, ONE_PAIR)
 	if( pairRank1 >= 0 ):
-		var r = card_to_rank(v[pairRank1])	# ペアのランク
-		return add_rank_pair(v, r, -1, ONE_PAIR)
+		return add_rank_pair(v, pairRank1, -1, ONE_PAIR)
 		#return [ONE_PAIR]
 	return add_rank_pair(v, -1, -1, HIGH_CARD)
 	#return [HIGH_CARD]
