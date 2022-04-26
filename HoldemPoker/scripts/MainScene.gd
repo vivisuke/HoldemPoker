@@ -123,11 +123,12 @@ func _ready():
 		rng.randomize()
 	else:
 		rng.randomize()
-		#var sd = rng.randi_range(0, 9999)
-		#print("seed = ", sd)
+		var sd = rng.randi_range(0, 9999)
+		print("seed = ", sd)
 		#var sd = 0		# SPR#111
 		#var sd = 7
-		var sd = 3852
+		#var sd = 3852
+		#var sd = 9830		# 引き分けあり
 		seed(sd)
 		rng.set_seed(sd)
 	#
@@ -158,7 +159,7 @@ func _ready():
 	#act_buttons[CALL] = $CallButton
 	act_buttons[FOLD] = $FoldButton
 	act_buttons[RAISE] = $RaiseButton
-	act_buttons[ALL_IN] = $AllInButton
+	act_buttons[ALL_IN] = $AllInNextButton
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
 	$RaiseSpinBox.set_value(BB_CHIPS)
@@ -665,14 +666,25 @@ func show_hand():		# ShowDown時の処理
 	print("winners = ", winners)
 	for i in range(N_PLAYERS):
 		players[i].set_BG(BG_PLY if winners.find(i) >= 0 else BG_WAIT)
+	# ポットのチップを勝者で分配
 	if winners.size() == 1:		# 一人勝ちの場合
-		var wi = winners[0]
-		players[wi].add_chips(pot_chips)
-		pot_chips = 0
-		$Table/Chips/PotLabel.text = String(pot_chips)
-	else:
+		players[winners[0]].add_chips(pot_chips)
+	else:		# 勝ちが複数いる場合（チョップ）
 		#assert(false)		# 未実装
-		pass
+		var c : int = pot_chips / winners.size()	# 取り分
+		var m : int = pot_chips % winners.size()	# 余り
+		for i in range(N_PLAYERS):
+			if winners.find(i) >= 0:
+				players[i].add_chips(c)
+		if m != 0:		# 余りがある場合
+			for i in range(N_PLAYERS):
+				var ix = (dealer_ix + 1 + i) % N_PLAYERS	# SB から
+				if winners.find(ix) >= 0:
+					players[ix].add_chips(1)
+					m -= 1
+					if m == 0: break		# 余りを分配終了
+	pot_chips = 0
+	$Table/Chips/PotLabel.text = String(pot_chips)
 func _on_PlayerBG_open_finished():
 	if n_opening != 0:
 		n_opening -= 1
@@ -723,7 +735,7 @@ func _on_RaiseButton_pressed():
 	disable_act_buttons()
 	$RaiseSpinBox.set_value(BB_CHIPS)
 	next_player()
-func _on_AllInButton_pressed():
+func _on_AllInNextButton_pressed():
 	var tc = bet_chips - bet_chips_plyr[USER_IX]	# コールに必要なチップ数
 	var rc = players[USER_IX].get_chips() - tc		# レイズチップ数
 	if rc == 0:		# レイズ不可、コール可能
