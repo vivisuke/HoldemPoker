@@ -254,9 +254,9 @@ func deal_cards():
 	#	ix += 1
 	#	comu_cards[i].set_sr(st, rank)
 	#
-func next_game():
-	state = INIT
-	update_roundLabel()
+#func next_game():
+#	state = INIT
+#	update_roundLabel()
 func next_round():
 	if state >= PRE_FLOP && state <= RIVER:
 		var sum = 0
@@ -269,6 +269,8 @@ func next_round():
 		$Table/Chips/PotLabel.text = String(pot_chips)
 	if state == INIT:
 		state = PRE_FLOP
+		#$AllInNextButton.text = "AllIn"
+		#$AllInNextButton.disabled = true
 		shuffle_cards()
 		n_moving = N_PLAYERS * 2		# 各プレイヤーにカードを２枚配布
 		sub_state = CARD_MOVING
@@ -685,6 +687,9 @@ func show_hand():		# ShowDown時の処理
 					if m == 0: break		# 余りを分配終了
 	pot_chips = 0
 	$Table/Chips/PotLabel.text = String(pot_chips)
+	#
+	$AllInNextButton.text = "Next"
+	$AllInNextButton.disabled = false
 func _on_PlayerBG_open_finished():
 	if n_opening != 0:
 		n_opening -= 1
@@ -736,10 +741,15 @@ func _on_RaiseButton_pressed():
 	$RaiseSpinBox.set_value(BB_CHIPS)
 	next_player()
 func _on_AllInNextButton_pressed():
-	var tc = bet_chips - bet_chips_plyr[USER_IX]	# コールに必要なチップ数
-	var rc = players[USER_IX].get_chips() - tc		# レイズチップ数
-	if rc == 0:		# レイズ不可、コール可能
-		do_call(USER_IX)
-	elif rc > 0:	# レイズ可能
-		do_raise(USER_IX, rc)
+	if state == SHOW_DOWN:
+		$AllInNextButton.text = "AllIn"
+		$AllInNextButton.disabled = true
+		next_round()
+	else:
+		var tc = bet_chips - bet_chips_plyr[USER_IX]	# コールに必要なチップ数
+		var rc = players[USER_IX].get_chips() - tc		# レイズチップ数
+		if rc == 0:		# レイズ不可、コール可能
+			do_call(USER_IX)
+		elif rc > 0:	# レイズ可能
+			do_raise(USER_IX, rc)
 	pass # Replace with function body.
