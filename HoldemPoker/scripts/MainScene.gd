@@ -122,10 +122,10 @@ func _ready():
 		randomize()
 		rng.randomize()
 	else:
-		rng.randomize()
-		var sd = rng.randi_range(0, 9999)
-		print("seed = ", sd)
-		#var sd = 0		# SPR#111
+		#rng.randomize()
+		#var sd = rng.randi_range(0, 9999)
+		#print("seed = ", sd)
+		var sd = 0		# SPR#111
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -178,6 +178,9 @@ func update_title_text():
 		txt += " - " + stateText[state] + " -"
 	$TitleBar/Label.text = txt
 func update_d_SB_BB():
+	for i in range(N_PLAYERS):
+		players[i].copy_to_prev_chips()
+		players[i].show_diff_chips(false)
 	bet_chips = BB_CHIPS
 	bet_chips_plyr.resize(N_PLAYERS)
 	for i in range(N_PLAYERS):
@@ -685,6 +688,8 @@ func show_hand():		# ShowDown時の処理
 					players[ix].add_chips(1)
 					m -= 1
 					if m == 0: break		# 余りを分配終了
+	for i in range(N_PLAYERS):
+		players[i].show_diff_chips(true)
 	pot_chips = 0
 	$Table/Chips/PotLabel.text = String(pot_chips)
 	#

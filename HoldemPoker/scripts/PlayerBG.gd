@@ -3,14 +3,15 @@ extends Sprite
 signal open_finished
 
 const OPENING_NONE = 0
-const OPENING_FH = 1	# 前半
-const OPENING_SH = 2	# 後半
+const OPENING_FH = 1	# 蜑榊濠
+const OPENING_SH = 2	# 蠕悟濠
 const TH_SCALE = 1.5
 
 #var opening : bool = false
 var opening : int = 0
 var theta = 0.0
 var chips = 0
+var prev_chips = 0		# 各ゲーム開始時チップ数
 
 func _ready():
 	pass # Replace with function body.
@@ -46,5 +47,15 @@ func show_bet_chips(sw : bool):
 func set_bet_chips(ch : int):
 	show_bet_chips(true)
 	$Chips/BetLabel.text = String(ch)
+func copy_to_prev_chips():		# 各ゲーム開始時チップ数保存
+	prev_chips = chips
+func show_diff_chips(b : bool):		# b: true for チップ増減を表示
+	var txt = String(chips)
+	if b:
+		txt += " ("
+		if chips > prev_chips: txt += "+"
+		txt += String(chips - prev_chips) + ")"
+	$ChipsLabel.text = txt
+	pass
 func _process(delta):
 	pass
