@@ -43,6 +43,7 @@ enum {
 	READY = 0,
 	CARD_MOVING,
 	CARD_OPENING,
+	INITIALIZED,
 }
 enum {		# アクションボタン
 	CHECK_CALL = 0,
@@ -66,6 +67,7 @@ const BB_CHIPS = 2
 const SB_CHIPS = BB_CHIPS / 2
 const USER_IX = 0				# プレイヤー： players[USER_IX]
 const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
+const N_TRAIALS = 10			# 期待勝率計算 モンテカルロ法試行回数
 const stateText = [
 	"",		# for INIT
 	"PreFlop", "Flop", "Turn", "River", "ShowDown",
@@ -488,6 +490,8 @@ func _process(delta):
 				for i in range(N_ACT_BUTTONS):
 					act_buttons[i].disabled = false
 				$RaiseSpinBox.editable = true
+				sub_state = INITIALIZED
+				print(calc_win_rate(USER_IX, 5))	# 5: 暫定
 			else:
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 				if bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
@@ -498,6 +502,51 @@ func _process(delta):
 						do_check(nix)
 				next_player()
 	pass
+func get_unused_card(dk):	# 未使用カードをひとつゲット、そのカードは使用済みに
+	var ix
+	while true:
+		ix = rng.randi_range(0, N_CARDS-1)
+		if dk[ix] >= 0: break
+	var cd = dk[ix]
+	dk[ix] = -1
+	return cd
+# モンテカルロ法による期待勝率計算、return [0.0, 1.0]
+func calc_win_rate(pix : int, nEnemy : int) -> float:
+	var v = []		# v[0], v[1]：手札、v[2]～ コミュニティカード（無い場合もあり）
+	v.push_back(players_card1[pix].get_sr())
+	v.push_back(players_card2[pix].get_sr())
+	for k in range(comu_cards.size()):
+		v.push_back(comu_cards[k].get_sr())
+	var wsum = 0.0
+	var dk = []				# デッキ用配列
+	dk.resize(N_CARDS)
+	for nt in range(N_TRAIALS):
+		for i in range(N_CARDS):		# デッキ初期化
+			var st : int = i / N_RANK
+			var rank : int = i % N_RANK
+			dk[i] = (st<<N_RANK_BITS) | rank
+		for i in range(v.size()):
+			var ix = card_to_suit(v[i]) * 13 + card_to_rank(v[i])
+			dk[ix] = -1			# 使用済みフラグON
+		# 自分の手札
+		var u = v.duplicate()
+		while u.size() < 7:
+			u.push_back(get_unused_card(dk))
+		var oh = check_hand(v)
+		var nw = 1		# 勝者数
+		var win = true
+		for e in range(nEnemy):
+			u[0] = get_unused_card(dk)
+			u[1] = get_unused_card(dk)
+			var eh = check_hand(v)
+			var r = compare(oh, eh)
+			if r < 0:
+				win = false
+				break		# 負けの場合
+			if r == 0:			# 引き分けの場合
+				nw += 1
+		if win: wsum += 1.0 / nw
+	return wsum / N_TRAIALS
 func add_rank_pair(v, p1, p2, hand):	# ペアの場合に、ペア以外の数字を大きい順に結果配列に追加
 	var rnk = []
 	for i in range(v.size()):
@@ -717,6 +766,7 @@ func disable_act_buttons():
 		act_buttons[i].disabled = true
 	$RaiseSpinBox.editable = false
 func next_player():
+	sub_state = READY
 	while true:
 		nix = (nix + 1) % N_PLAYERS
 		if !is_folded[nix]: break
