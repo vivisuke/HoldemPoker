@@ -467,10 +467,10 @@ func do_raise(pix, c):
 	bet_chips_plyr[pix] = bet_chips
 func _process(delta):
 	if state == SHOW_DOWN: return
-	if nix != USER_IX || state == INIT:
-		sum_delta += delta
-		if sum_delta < WAIT_SEC: return
-		sum_delta -= WAIT_SEC
+	#if nix != USER_IX || state == INIT:
+	#	sum_delta += delta
+	#	if sum_delta < WAIT_SEC: return
+	#	sum_delta -= WAIT_SEC
 	#print("state = ", state)
 	#print("sub_state = ", sub_state)
 	if sub_state != 0:
