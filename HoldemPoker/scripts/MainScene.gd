@@ -67,7 +67,7 @@ const BB_CHIPS = 2
 const SB_CHIPS = BB_CHIPS / 2
 const USER_IX = 0				# プレイヤー： players[USER_IX]
 const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
-const N_TRAIALS = 10			# 期待勝率計算 モンテカルロ法試行回数
+const N_TRAIALS = 10000			# 期待勝率計算 モンテカルロ法試行回数
 const stateText = [
 	"",		# for INIT
 	"PreFlop", "Flop", "Turn", "River", "ShowDown",
@@ -124,10 +124,10 @@ func _ready():
 		randomize()
 		rng.randomize()
 	else:
-		#rng.randomize()
-		#var sd = rng.randi_range(0, 9999)
-		#print("seed = ", sd)
-		var sd = 0		# SPR#111
+		rng.randomize()
+		var sd = rng.randi_range(0, 9999)
+		print("seed = ", sd)
+		#var sd = 0		# SPR#111
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -274,6 +274,7 @@ func next_round():
 		$Table/Chips/PotLabel.text = String(pot_chips)
 	if state == INIT:
 		state = PRE_FLOP
+		comu_cards = []
 		#$AllInNextButton.text = "AllIn"
 		#$AllInNextButton.disabled = true
 		shuffle_cards()
@@ -321,7 +322,7 @@ func next_round():
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].set_text("called")
 			act_panels[i].show()
-		comu_cards = []
+		#comu_cards = []
 		n_moving = N_FLOP_CARDS		# 3 for FLOP
 		sub_state = CARD_MOVING
 		for i in range(n_moving):
@@ -491,7 +492,7 @@ func _process(delta):
 					act_buttons[i].disabled = false
 				$RaiseSpinBox.editable = true
 				sub_state = INITIALIZED
-				print(calc_win_rate(USER_IX, 5))	# 5: 暫定
+				print("win rate = ", calc_win_rate(USER_IX, 5))	# 5: 暫定
 			else:
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 				if bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
@@ -508,7 +509,7 @@ func get_unused_card(dk):	# 未使用カードをひとつゲット、そのカ�
 		ix = rng.randi_range(0, N_CARDS-1)
 		if dk[ix] >= 0: break
 	var cd = dk[ix]
-	dk[ix] = -1
+	dk[ix] = -1	# 使用済みフラグON
 	return cd
 # モンテカルロ法による期待勝率計算、return [0.0, 1.0]
 func calc_win_rate(pix : int, nEnemy : int) -> float:
@@ -532,13 +533,13 @@ func calc_win_rate(pix : int, nEnemy : int) -> float:
 		var u = v.duplicate()
 		while u.size() < 7:
 			u.push_back(get_unused_card(dk))
-		var oh = check_hand(v)
+		var oh = check_hand(u)
 		var nw = 1		# 勝者数
 		var win = true
 		for e in range(nEnemy):
 			u[0] = get_unused_card(dk)
 			u[1] = get_unused_card(dk)
-			var eh = check_hand(v)
+			var eh = check_hand(u)
 			var r = compare(oh, eh)
 			if r < 0:
 				win = false
@@ -576,7 +577,7 @@ func add_rank(v, s, hand):		# フラッシュの場合に、そのスートの�
 	var t = [hand]
 	for i in range(5):				# 大きいランクから５枚を配列に追加
 		t.push_back(rnk[-1-i])		# ランクを降順に格納
-	print("flush: ", t)
+	#print("flush: ", t)
 	return t
 func get_ranks(v, exr1, exr2):			# exr1, exr2 以外のランクリスト（昇順ソート済み）を取得
 	var lst = []
