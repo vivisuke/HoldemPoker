@@ -112,6 +112,7 @@ var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチッ�
 var act_buttons = []
 var n_moving = 0
 var n_opening = 0
+var nActPlayer = N_PLAYERS		# 非フォールドプレイヤー数
 var deck_pos
 
 var CardBF = load("res://CardBF.tscn")		# カード裏面
@@ -263,6 +264,7 @@ func deal_cards():
 #	state = INIT
 #	update_roundLabel()
 func next_round():
+	print("nActPlayer = ", nActPlayer)
 	if state >= PRE_FLOP && state <= RIVER:
 		var sum = 0
 		for i in range(N_PLAYERS):
@@ -375,6 +377,7 @@ func next_round():
 		pass
 	elif state == SHOW_DOWN:
 		state = INIT
+		nActPlayer = N_PLAYERS
 		dealer_ix = (dealer_ix + 1) % N_PLAYERS
 		update_d_SB_BB()
 		for i in range(N_PLAYERS):
@@ -440,6 +443,7 @@ func open_finished():
 		elif state == SHOW_DOWN:
 			show_hand()
 func do_fold(pix):
+	nActPlayer -= 1
 	is_folded[pix] = true
 	#players[pix].set_BG(2)
 	players_card1[pix].hide()
@@ -480,6 +484,7 @@ func _process(delta):
 			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
 				next_round()
 		else:
+			print("win rate[", nix, "] = ", calc_win_rate(nix, nActPlayer - 1))	# 5: 暫定
 			if nix == USER_IX:
 				if bet_chips_plyr[USER_IX] < bet_chips:
 					act_buttons[CHECK_CALL].text = "Call"
@@ -492,8 +497,9 @@ func _process(delta):
 					act_buttons[i].disabled = false
 				$RaiseSpinBox.editable = true
 				sub_state = INITIALIZED
-				print("win rate = ", calc_win_rate(USER_IX, 5))	# 5: 暫定
+				#print("win rate = ", calc_win_rate(USER_IX, nActPlayer - 1))	# 5: 暫定
 			else:
+				#print("win rate = ", calc_win_rate(nix, nActPlayer - 1))	# 5: 暫定
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 				if bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
 					print("called")
