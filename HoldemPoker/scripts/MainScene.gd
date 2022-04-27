@@ -89,7 +89,8 @@ var sum_delta = 0.0
 var state = INIT		# 状態
 var sub_state = READY	# サブ状態
 var bet_chips = 0		# ベットされたチップ数（1プレイヤー分合計）
-var pot_chips = 0		# ポットチップ数
+var pot_chips = 0		# （中央）ポットチップ数
+var cur_sum_bet = 0		# 現ラウンドでのベット・コールチップ合計（中央ポットに未移動分）
 var nix = -1			# 次の手番
 var dealer_ix = 0		# ディーラプレイヤーインデックス
 var high_card = 0		# ハイカード
@@ -181,6 +182,7 @@ func update_title_text():
 		txt += " - " + stateText[state] + " -"
 	$TitleBar/Label.text = txt
 func update_d_SB_BB():
+	cur_sum_bet = 0
 	for i in range(N_PLAYERS):
 		players[i].copy_to_prev_chips()
 		players[i].show_diff_chips(false)
@@ -197,9 +199,11 @@ func update_d_SB_BB():
 		elif (dealer_ix + 1) % N_PLAYERS == i:
 			mk.frame = SB
 			bet_chips_plyr[i] = SB_CHIPS
+			cur_sum_bet += SB_CHIPS
 		elif (dealer_ix + 2) % N_PLAYERS == i:
 			mk.frame = BB
 			bet_chips_plyr[i] = BB_CHIPS
+			cur_sum_bet += BB_CHIPS
 			#next_player()
 			if state < FLOP:
 				nix = (i + 1) % N_PLAYERS		# 次の手番
@@ -265,6 +269,7 @@ func deal_cards():
 #	update_roundLabel()
 func next_round():
 	print("nActPlayer = ", nActPlayer)
+	cur_sum_bet = 0
 	if state >= PRE_FLOP && state <= RIVER:
 		var sum = 0
 		for i in range(N_PLAYERS):
@@ -449,6 +454,8 @@ func do_fold(pix):
 	players_card1[pix].hide()
 	players_card2[pix].hide()
 	players[pix].set_hand("")			# 手役表示クリア
+	act_panels[pix].set_text("folded")
+	act_panels[pix].show()
 func do_check(pix):
 	act_panels[pix].set_text("checked")
 	act_panels[pix].show()
@@ -456,6 +463,7 @@ func do_call(pix):
 	act_panels[pix].set_text("called")
 	act_panels[pix].show()
 	players[pix].set_bet_chips(bet_chips)
+	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
 func do_raise(pix, c):
@@ -463,6 +471,7 @@ func do_raise(pix, c):
 	act_panels[pix].show()
 	bet_chips += c			# コール分＋レイズ分 が実際に場に出される
 	players[pix].set_bet_chips(bet_chips)
+	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
 func _process(delta):
@@ -484,7 +493,9 @@ func _process(delta):
 			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
 				next_round()
 		else:
-			print("win rate[", nix, "] = ", calc_win_rate(nix, nActPlayer - 1))	# 5: 暫定
+			var wrt = calc_win_rate(nix, nActPlayer - 1)		# 期待勝率計算
+			print("win rate[", nix, "] = ", wrt)
+			#print("wrt = ", wrt)
 			if nix == USER_IX:
 				if bet_chips_plyr[USER_IX] < bet_chips:
 					act_buttons[CHECK_CALL].text = "Call"
@@ -501,9 +512,19 @@ func _process(delta):
 			else:
 				#print("win rate = ", calc_win_rate(nix, nActPlayer - 1))	# 5: 暫定
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
-				if bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
-					print("called")
-					do_call(nix)
+				if wrt >= 1.0 / nActPlayer * 1.5:				# 期待勝率が1/人数の1.5倍以上の場合
+					var bc = max(BB_CHIPS, pot_chips / 4)
+					do_raise(nix, bc)
+				elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
+					# undone: Fold 判定
+					var cc = bet_chips -  bet_chips_plyr[nix]
+					var odds = float(pot_chips + cur_sum_bet + cc) / cc
+					print("total pot = ", (pot_chips + cur_sum_bet), " odds = ", odds)
+					if state == PRE_FLOP || wrt >= 1.0 / odds:
+						print("called")
+						do_call(nix)
+					else:
+						do_fold(nix)
 				else:		# チェック可能な場合
 					if act_panels[nix].get_text() == "":	# 未行動の場合
 						do_check(nix)
