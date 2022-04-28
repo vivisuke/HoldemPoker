@@ -373,9 +373,12 @@ func next_round():
 	elif state == RIVER:
 		state = SHOW_DOWN
 		disable_act_buttons()			# コマンドボタンディセーブル
+		n_opening = N_PLAYERS
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].hide()
-		n_opening = (N_PLAYERS - 1)*2
+			if is_folded[i]: n_opening -= 1
+		if !is_folded[USER_IX]: n_opening -= 1		# ユーザプレイヤーのカードはすでにオープンされている
+		n_opening *= 2
 		sub_state = CARD_OPENING
 		for i in range(1, N_PLAYERS):	# 全プレイヤーのカードをオープン
 			if !is_folded[i]:
