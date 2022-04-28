@@ -127,9 +127,9 @@ func _ready():
 		rng.randomize()
 	else:
 		rng.randomize()
-		var sd = rng.randi_range(0, 9999)
-		print("seed = ", sd)
-		#var sd = 0		# SPR#111
+		#var sd = rng.randi_range(0, 9999)
+		#print("seed = ", sd)
+		var sd = 0		# SPR#111
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -224,6 +224,8 @@ func update_next_player():
 			players[i].set_BG(BG_FOLDED)
 		else:
 			players[i].set_BG(BG_PLY if state != INIT && i == nix else BG_WAIT)
+	if nix < act_panels.size():
+		act_panels[nix].hide()
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
 func shuffle_cards():
