@@ -494,8 +494,9 @@ func _process(delta):
 		#print("sub_state != 0")
 		return
 	#print("nix = ", nix)
-	if state == INIT:
-		next_round()		# 次のラウンドに遷移
+	if( nix == USER_IX && is_folded[nix] ||		# ユーザプレイヤー手番 && Folded の場合
+		state == INIT):
+			next_round()		# 次のラウンドに遷移
 	elif state >= PRE_FLOP && nix >= 0:
 		if( act_panels[nix].get_text() != "" &&		# 行動済み
 			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
@@ -523,7 +524,7 @@ func _process(delta):
 				#print("win rate = ", calc_win_rate(nix, nActPlayer - 1))	# 5: 暫定
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 				if max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5:				# 期待勝率が1/人数の1.5倍以上の場合
-					var bc = min(max_raise, max(BB_CHIPS, pot_chips / 4))
+					var bc = min(max_raise, max(BB_CHIPS, (pot_chips + cur_sum_bet) / 4))
 					do_raise(nix, bc)
 				elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
 					# undone: Fold 判定
