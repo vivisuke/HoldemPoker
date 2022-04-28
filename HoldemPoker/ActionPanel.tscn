@@ -13,6 +13,11 @@ margin_bottom = 20.0
 color = Color( 0.878431, 0.878431, 0.878431, 1 )
 script = ExtResource( 2 )
 
+[node name="PinkPanel" type="ColorRect" parent="."]
+margin_right = 80.0
+margin_bottom = 20.0
+color = Color( 1, 0.752941, 0.796078, 1 )
+
 [node name="Label" type="Label" parent="."]
 margin_right = 80.0
 margin_bottom = 20.0

@@ -457,12 +457,15 @@ func do_fold(pix):
 	players_card2[pix].hide()
 	players[pix].set_hand("")			# 手役表示クリア
 	act_panels[pix].set_text("folded")
+	act_panels[pix].get_node("PinkPanel").hide()
 	act_panels[pix].show()
 func do_check(pix):
 	act_panels[pix].set_text("checked")
+	act_panels[pix].get_node("PinkPanel").hide()
 	act_panels[pix].show()
 func do_call(pix):
 	act_panels[pix].set_text("called")
+	act_panels[pix].get_node("PinkPanel").hide()
 	act_panels[pix].show()
 	players[pix].set_bet_chips(bet_chips)
 	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
@@ -470,12 +473,15 @@ func do_call(pix):
 	bet_chips_plyr[pix] = bet_chips
 func do_raise(pix, c):
 	act_panels[pix].set_text("raised")
+	act_panels[pix].get_node("PinkPanel").show()
 	act_panels[pix].show()
 	bet_chips += c			# コール分＋レイズ分 が実際に場に出される
 	players[pix].set_bet_chips(bet_chips)
 	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
+func max_raise_chips(pix):		# 可能最大レイズ額
+	return max(0, players[pix].get_chips() - (bet_chips - bet_chips_plyr[pix]))
 func _process(delta):
 	if state == SHOW_DOWN: return
 	#if nix != USER_IX || state == INIT:
@@ -495,6 +501,7 @@ func _process(delta):
 			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
 				next_round()
 		else:
+			var max_raise = max_raise_chips(nix)
 			var wrt = calc_win_rate(nix, nActPlayer - 1)		# 期待勝率計算
 			print("win rate[", nix, "] = ", wrt)
 			#print("wrt = ", wrt)
@@ -508,14 +515,15 @@ func _process(delta):
 				# コマンドボタン・スピンボックスをイネーブル
 				for i in range(N_ACT_BUTTONS):
 					act_buttons[i].disabled = false
+				$RaiseSpinBox.max_value = max_raise
 				$RaiseSpinBox.editable = true
 				sub_state = INITIALIZED
 				#print("win rate = ", calc_win_rate(USER_IX, nActPlayer - 1))	# 5: 暫定
 			else:
 				#print("win rate = ", calc_win_rate(nix, nActPlayer - 1))	# 5: 暫定
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
-				if wrt >= 1.0 / nActPlayer * 1.5:				# 期待勝率が1/人数の1.5倍以上の場合
-					var bc = max(BB_CHIPS, pot_chips / 4)
+				if max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5:				# 期待勝率が1/人数の1.5倍以上の場合
+					var bc = min(max_raise, max(BB_CHIPS, pot_chips / 4))
 					do_raise(nix, bc)
 				elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
 					# undone: Fold 判定
