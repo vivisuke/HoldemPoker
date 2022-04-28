@@ -55,6 +55,7 @@ enum {		# アクションボタン
 }
 #const N_SUIT = 4
 #const N_RANK = 13
+const INIT_CHIPS = 200
 const N_CARDS = N_RANK*N_SUIT
 const N_COMU_CARS = 5			# 共通カード枚数
 const RANK_MASK = 0x0f
@@ -145,7 +146,7 @@ func _ready():
 		var pb = get_node("Table/PlayerBG%d" % (i+1))		# プレイヤーパネル
 		#pb.get_node("ResultLabel").z_index = 2
 		pb.set_hand("")
-		pb.set_chips(200)
+		pb.set_chips(INIT_CHIPS)
 		players.push_back(pb)
 		is_folded[i] = false
 	print("width = ", players[0].texture.get_width())
@@ -389,6 +390,10 @@ func next_round():
 		state = INIT
 		nActPlayer = N_PLAYERS
 		dealer_ix = (dealer_ix + 1) % N_PLAYERS
+		for i in range(N_PLAYERS):
+			#print("chils[", i, "] = ", players[i].get_chips())
+			if players[i].get_chips() == 0:		# バーストした場合
+				players[i].set_chips(INIT_CHIPS/2)		# 初期チップの半分を与える
 		update_d_SB_BB()
 		for i in range(N_PLAYERS):
 			players_card1[i].queue_free()
@@ -849,4 +854,5 @@ func _on_AllInNextButton_pressed():
 			do_call(USER_IX)
 		elif rc > 0:	# レイズ可能
 			do_raise(USER_IX, rc)
+		next_player()
 	pass # Replace with function body.
