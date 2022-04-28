@@ -516,7 +516,7 @@ func _process(delta):
 			#print("wrt = ", wrt)
 			if nix == USER_IX:
 				if bet_chips_plyr[USER_IX] < bet_chips:
-					act_buttons[CHECK_CALL].text = "Call"
+					act_buttons[CHECK_CALL].text = "Call %d" % (bet_chips - bet_chips_plyr[USER_IX])
 				else:
 					act_buttons[CHECK_CALL].text = "Check"
 				#act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chips
