@@ -336,6 +336,7 @@ func next_round():
 		state = FLOP
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].set_text("called")
+			act_panels[i].get_node("PinkPanel").hide()
 			act_panels[i].show()
 		#comu_cards = []
 		n_moving = N_FLOP_CARDS		# 3 for FLOP
@@ -522,6 +523,7 @@ func _process(delta):
 			if !is_folded[nix]:
 				if players[nix].get_chips() == 0:		# 所持チップ０の場合
 					act_panels[nix].set_text("skipped")
+					act_panels[nix].get_node("PinkPanel").hide()
 					act_panels[nix].show()
 				else:
 					var max_raise = max_raise_chips(nix)
