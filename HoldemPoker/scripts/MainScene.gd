@@ -125,15 +125,15 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if true:
+	if false:
 		randomize()
 		rng.randomize()
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
 		#print("seed = ", sd)
-		#var sd = 0		# SPR#111
-		var sd = 1
+		var sd = 0		# SPR#111
+		#var sd = 1
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -508,9 +508,11 @@ func _process(delta):
 		#print("sub_state != 0")
 		return
 	#print("nix = ", nix)
-	if( nix == USER_IX && is_folded[nix] ||		# ユーザプレイヤー手番 && Folded の場合
-		state == INIT):
-			next_round()		# 次のラウンドに遷移
+	if nix == USER_IX && is_folded[nix]:		# ユーザプレイヤー手番 && Folded の場合
+		next_player()
+	elif state == INIT:
+		# undone: 一定時間ウェイト？
+		next_round()		# 次のラウンドに遷移
 	elif state >= PRE_FLOP && nix >= 0:
 		if( act_panels[nix].get_text() != "" &&		# 行動済み
 			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
