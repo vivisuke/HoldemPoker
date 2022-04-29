@@ -481,8 +481,9 @@ func do_call(pix):
 	act_panels[pix].get_node("PinkPanel").hide()
 	act_panels[pix].show()
 	players[pix].set_bet_chips(bet_chips)
-	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
-	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
+	var cc = min(players[pix].get_chips(), bet_chips - bet_chips_plyr[pix])
+	cur_sum_bet += cc
+	players[pix].sub_chips(cc)
 	bet_chips_plyr[pix] = bet_chips
 func do_raise(pix, c):
 	act_panels[pix].set_text("raised")
