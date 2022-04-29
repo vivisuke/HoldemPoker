@@ -69,6 +69,7 @@ const SB_CHIPS = BB_CHIPS / 2
 const USER_IX = 0				# プレイヤー： players[USER_IX]
 const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
 const N_TRAIALS = 10000			# 期待勝率計算 モンテカルロ法試行回数
+const MAX_N_RAISE = 3			# 現ラウンドにおける各プレイヤーの最大レイズ回数
 const stateText = [
 	"",		# for INIT
 	"PreFlop", "Flop", "Turn", "River", "ShowDown",
@@ -106,6 +107,7 @@ var players_card1 = []		#
 var players_card2 = []		#
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
+var n_raised = []			# 各プレイヤーの現ラウンドにおけるレイズ回数
 var players_hand = []		# 各プレイヤーの手役
 var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
 #var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
@@ -123,14 +125,15 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if false:
+	if true:
 		randomize()
 		rng.randomize()
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
 		#print("seed = ", sd)
-		var sd = 0		# SPR#111
+		#var sd = 0		# SPR#111
+		var sd = 1
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -141,6 +144,7 @@ func _ready():
 	deck_pos = $Table/CardDeck.get_position()
 	players_hand.resize(N_PLAYERS)
 	is_folded.resize(N_PLAYERS)
+	n_raised.resize(N_PLAYERS)
 	players = []
 	for i in range(N_PLAYERS):
 		var pb = get_node("Table/PlayerBG%d" % (i+1))		# プレイヤーパネル
@@ -273,6 +277,7 @@ func deal_cards():
 func next_round():
 	print("nActPlayer = ", nActPlayer)
 	cur_sum_bet = 0
+	for i in range(N_PLAYERS): n_raised[i] = 0
 	if state >= PRE_FLOP && state <= RIVER:
 		var sum = 0
 		for i in range(N_PLAYERS):
@@ -488,6 +493,7 @@ func do_raise(pix, c):
 	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
+	n_raised[pix] += 1
 func max_raise_chips(pix):		# 可能最大レイズ額
 	return max(0, players[pix].get_chips() - (bet_chips - bet_chips_plyr[pix]))
 func _process(delta):
@@ -531,9 +537,10 @@ func _process(delta):
 			else:
 				#print("win rate = ", calc_win_rate(nix, nActPlayer - 1))	# 5: 暫定
 				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
-				if max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5:				# 期待勝率が1/人数の1.5倍以上の場合
-					var bc = min(max_raise, max(BB_CHIPS, (pot_chips + cur_sum_bet) / 4))
-					do_raise(nix, bc)
+				if( max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5 &&		# 期待勝率が1/人数の1.5倍以上の場合
+					n_raised[nix] < MAX_N_RAISE ):							# 最大レイズ回数に達していない場合
+						var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
+						do_raise(nix, bc)
 				elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
 					# undone: Fold 判定
 					var cc = bet_chips -  bet_chips_plyr[nix]
