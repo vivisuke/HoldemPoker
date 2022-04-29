@@ -125,7 +125,7 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if false:
+	if true:
 		randomize()
 		rng.randomize()
 	else:
@@ -397,7 +397,7 @@ func next_round():
 		dealer_ix = (dealer_ix + 1) % N_PLAYERS
 		for i in range(N_PLAYERS):
 			#print("chils[", i, "] = ", players[i].get_chips())
-			if players[i].get_chips() == 0:		# バーストした場合
+			if players[i].get_chips() <= 0:		# バーストした場合
 				players[i].set_chips(INIT_CHIPS/2)		# 初期チップの半分を与える
 		update_d_SB_BB()
 		for i in range(N_PLAYERS):
