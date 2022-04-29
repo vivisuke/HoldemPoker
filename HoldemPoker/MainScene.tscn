@@ -136,7 +136,9 @@ margin_left = 222.0
 margin_top = 780.0
 margin_right = 296.0
 margin_bottom = 810.0
+min_value = 1.0
 max_value = 200.0
+value = 1.0
 align = 2
 
 [node name="RaiseButton" type="Button" parent="."]

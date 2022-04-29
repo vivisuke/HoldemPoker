@@ -518,45 +518,46 @@ func _process(delta):
 			bet_chips_plyr[nix] == bet_chips ):		# チェック可能
 				next_round()
 		else:
-			var max_raise = max_raise_chips(nix)
-			var wrt = calc_win_rate(nix, nActPlayer - 1)		# 期待勝率計算
-			print("win rate[", nix, "] = ", wrt)
-			#print("wrt = ", wrt)
-			if nix == USER_IX:
-				if bet_chips_plyr[USER_IX] < bet_chips:
-					act_buttons[CHECK_CALL].text = "Call %d" % (bet_chips - bet_chips_plyr[USER_IX])
-				else:
-					act_buttons[CHECK_CALL].text = "Check"
-				#act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chips
-				#act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chips
-				# コマンドボタン・スピンボックスをイネーブル
-				for i in range(N_ACT_BUTTONS):
-					act_buttons[i].disabled = false
-				$RaiseSpinBox.max_value = max_raise
-				$RaiseSpinBox.editable = true
-				sub_state = INITIALIZED
-				#print("win rate = ", calc_win_rate(USER_IX, nActPlayer - 1))	# 5: 暫定
-			else:
-				#print("win rate = ", calc_win_rate(nix, nActPlayer - 1))	# 5: 暫定
-				print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
-				if( max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5 &&		# 期待勝率が1/人数の1.5倍以上の場合
-					n_raised[nix] < MAX_N_RAISE ):							# 最大レイズ回数に達していない場合
-						var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
-						do_raise(nix, bc)
-				elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
-					# undone: Fold 判定
-					var cc = bet_chips -  bet_chips_plyr[nix]
-					var odds = float(pot_chips + cur_sum_bet + cc) / cc
-					print("total pot = ", (pot_chips + cur_sum_bet), " odds = ", odds)
-					if state == PRE_FLOP || wrt >= 1.0 / odds:
-						print("called")
-						do_call(nix)
+			if !is_folded[nix]:
+				var max_raise = max_raise_chips(nix)
+				if nix == USER_IX:
+					if bet_chips_plyr[USER_IX] < bet_chips:
+						act_buttons[CHECK_CALL].text = "Call %d" % (bet_chips - bet_chips_plyr[USER_IX])
 					else:
-						do_fold(nix)
-				else:		# チェック可能な場合
-					if act_panels[nix].get_text() == "":	# 未行動の場合
-						do_check(nix)
-				next_player()
+						act_buttons[CHECK_CALL].text = "Check"
+					#act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chips
+					#act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chips
+					# コマンドボタン・スピンボックスをイネーブル
+					for i in range(N_ACT_BUTTONS):
+						act_buttons[i].disabled = false
+					$RaiseSpinBox.max_value = max_raise
+					$RaiseSpinBox.editable = true
+					sub_state = INITIALIZED
+					#print("win rate = ", calc_win_rate(USER_IX, nActPlayer - 1))	# 5: 暫定
+					return		# 次のプレイヤーに遷移しないように
+				else:
+					var wrt = calc_win_rate(nix, nActPlayer - 1)		# 期待勝率計算
+					print("win rate[", nix, "] = ", wrt)
+					#print("wrt = ", wrt)
+					print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
+					if( max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5 &&		# 期待勝率が1/人数の1.5倍以上の場合
+						n_raised[nix] < MAX_N_RAISE ):							# 最大レイズ回数に達していない場合
+							var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
+							do_raise(nix, bc)
+					elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
+						# undone: Fold 判定
+						var cc = bet_chips -  bet_chips_plyr[nix]
+						var odds = float(pot_chips + cur_sum_bet + cc) / cc
+						print("total pot = ", (pot_chips + cur_sum_bet), " odds = ", odds)
+						if state == PRE_FLOP || wrt >= 1.0 / odds:
+							print("called")
+							do_call(nix)
+						else:
+							do_fold(nix)
+					else:		# チェック可能な場合
+						if act_panels[nix].get_text() == "":	# 未行動の場合
+							do_check(nix)
+			next_player()		# 次のプレイヤーに遷移
 	pass
 func get_unused_card(dk):	# 未使用カードをひとつゲット、そのカードは使用済みに
 	var ix
