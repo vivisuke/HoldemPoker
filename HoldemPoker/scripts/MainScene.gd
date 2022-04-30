@@ -68,8 +68,8 @@ const BB_CHIPS = 2
 const SB_CHIPS = BB_CHIPS / 2
 const USER_IX = 0				# プレイヤー： players[USER_IX]
 const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
-const N_TRAIALS = 10000			# 期待勝率計算 モンテカルロ法試行回数
-const MAX_N_RAISE = 3			# 現ラウンドにおける各プレイヤーの最大レイズ回数
+const N_TRAIALS = 1000			# 期待勝率計算 モンテカルロ法試行回数
+const MAX_N_RAISE = 4			# 現ラウンドにおける最大レイズ回数
 const stateText = [
 	"",		# for INIT
 	"PreFlop", "Flop", "Turn", "River", "ShowDown",
@@ -93,6 +93,7 @@ var sub_state = READY	# サブ状態
 var bet_chips = 0		# ベットされたチップ数（1プレイヤー分合計）
 var pot_chips = 0		# （中央）ポットチップ数
 var cur_sum_bet = 0		# 現ラウンドでのベット・コールチップ合計（中央ポットに未移動分）
+var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISE 以下）
 var nix = -1			# 次の手番
 var dealer_ix = 0		# ディーラプレイヤーインデックス
 var high_card = 0		# ハイカード
@@ -107,7 +108,7 @@ var players_card1 = []		#
 var players_card2 = []		#
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
-var n_raised = []			# 各プレイヤーの現ラウンドにおけるレイズ回数
+#var n_raised = []			# 各プレイヤーの現ラウンドにおけるレイズ回数
 var players_hand = []		# 各プレイヤーの手役
 var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
 #var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
@@ -144,7 +145,7 @@ func _ready():
 	deck_pos = $Table/CardDeck.get_position()
 	players_hand.resize(N_PLAYERS)
 	is_folded.resize(N_PLAYERS)
-	n_raised.resize(N_PLAYERS)
+	#n_raised.resize(N_PLAYERS)
 	players = []
 	for i in range(N_PLAYERS):
 		var pb = get_node("Table/PlayerBG%d" % (i+1))		# プレイヤーパネル
@@ -277,7 +278,8 @@ func deal_cards():
 func next_round():
 	print("nActPlayer = ", nActPlayer)
 	cur_sum_bet = 0
-	for i in range(N_PLAYERS): n_raised[i] = 0
+	#for i in range(N_PLAYERS): n_raised[i] = 0
+	n_raised = 0
 	if state >= PRE_FLOP && state <= RIVER:
 		var sum = 0
 		for i in range(N_PLAYERS):
@@ -415,6 +417,10 @@ func next_round():
 		nix = (dealer_ix + 1) % N_PLAYERS		# 次の手番
 		bet_chips = 0
 	update_next_player()
+func set_act_panel_text(i, txt):
+	act_panels[i].set_text(txt)
+	act_panels[i].get_node("PinkPanel").hide()
+	act_panels[i].show()
 func hide_act_panels():
 	for i in range(N_PLAYERS):
 		act_panels[i].hide()
@@ -470,32 +476,37 @@ func do_fold(pix):
 	players_card1[pix].hide()
 	players_card2[pix].hide()
 	players[pix].set_hand("")			# 手役表示クリア
-	act_panels[pix].set_text("folded")
-	act_panels[pix].get_node("PinkPanel").hide()
-	act_panels[pix].show()
+	set_act_panel_text(pix, "folded")
+	#act_panels[pix].set_text("folded")
+	#act_panels[pix].get_node("PinkPanel").hide()
+	#act_panels[pix].show()
 func do_check(pix):
-	act_panels[pix].set_text("checked")
-	act_panels[pix].get_node("PinkPanel").hide()
-	act_panels[pix].show()
+	set_act_panel_text(pix, "checked")
+	#act_panels[pix].set_text("checked")
+	#act_panels[pix].get_node("PinkPanel").hide()
+	#act_panels[pix].show()
 func do_call(pix):
-	act_panels[pix].set_text("called")
-	act_panels[pix].get_node("PinkPanel").hide()
-	act_panels[pix].show()
+	set_act_panel_text(pix, "called")
+	#act_panels[pix].set_text("called")
+	#act_panels[pix].get_node("PinkPanel").hide()
+	#act_panels[pix].show()
 	players[pix].set_bet_chips(bet_chips)
 	var cc = min(players[pix].get_chips(), bet_chips - bet_chips_plyr[pix])
 	cur_sum_bet += cc
 	players[pix].sub_chips(cc)
 	bet_chips_plyr[pix] = bet_chips
 func do_raise(pix, c):
-	act_panels[pix].set_text("raised")
+	set_act_panel_text(pix, "raised")
 	act_panels[pix].get_node("PinkPanel").show()
-	act_panels[pix].show()
+	#act_panels[pix].set_text("raised")
+	#act_panels[pix].show()
 	bet_chips += c			# コール分＋レイズ分 が実際に場に出される
 	players[pix].set_bet_chips(bet_chips)
 	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
-	n_raised[pix] += 1
+	#n_raised[pix] += 1
+	n_raised += 1
 func max_raise_chips(pix):		# 可能最大レイズ額
 	return max(0, players[pix].get_chips() - (bet_chips - bet_chips_plyr[pix]))
 func _process(delta):
@@ -522,9 +533,10 @@ func _process(delta):
 		else:
 			if !is_folded[nix]:
 				if players[nix].get_chips() == 0:		# 所持チップ０の場合
-					act_panels[nix].set_text("skipped")
-					act_panels[nix].get_node("PinkPanel").hide()
-					act_panels[nix].show()
+					set_act_panel_text(nix, "skipped")
+					#act_panels[nix].set_text("skipped")
+					#act_panels[nix].get_node("PinkPanel").hide()
+					#act_panels[nix].show()
 				else:
 					var max_raise = max_raise_chips(nix)
 					if nix == USER_IX:
@@ -548,7 +560,7 @@ func _process(delta):
 						#print("wrt = ", wrt)
 						print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 						if( max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5 &&		# 期待勝率が1/人数の1.5倍以上の場合
-							n_raised[nix] < MAX_N_RAISE ):							# 最大レイズ回数に達していない場合
+							n_raised < MAX_N_RAISE ):							# 最大レイズ回数に達していない場合
 								var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
 								do_raise(nix, bc)
 						elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
