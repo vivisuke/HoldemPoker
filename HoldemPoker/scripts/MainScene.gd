@@ -965,6 +965,7 @@ func next_player():
 		nix = (nix + 1) % N_PLAYERS
 		if !is_folded[nix]: break
 	update_next_player()
+	$RaiseSpinBox.set_value(BB_CHIPS)
 #func _on_CheckButton_pressed():
 #	do_check(USER_IX)
 #	next_player()
@@ -987,7 +988,6 @@ func _on_CheckCallButton_pressed():
 func _on_RaiseButton_pressed():
 	do_raise(USER_IX, $RaiseSpinBox.get_value())
 	disable_act_buttons()
-	$RaiseSpinBox.set_value(BB_CHIPS)
 	next_player()
 func _on_AllInNextButton_pressed():
 	if state == SHOW_DOWN:
