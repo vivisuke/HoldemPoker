@@ -841,6 +841,8 @@ func show_hand():		# ShowDown時の処理
 			elif r ==  0:
 				winners.push_back(pix)
 		var d_chips = (pd[1] - bc0) * lst.size()		# 分配するチップ
+		for i in range(N_PLAYERS):
+			if is_folded[i]: d_chips += round_bet_chips_plyr[i]		# 降りたプレイヤーの賭けた分
 		pot_chips -= d_chips
 		# ポットのチップを勝者で分配
 		if winners.size() == 1:		# 一人勝ちの場合
