@@ -987,3 +987,14 @@ func _on_AllInNextButton_pressed():
 			do_raise(USER_IX, rc)
 		next_player()
 	pass # Replace with function body.
+
+func set_raise_chips(rc):
+	$RaiseSpinBox.set_value(rc)
+func _on_BB2Button_pressed():
+	set_raise_chips(BB_CHIPS*2)
+func _on_BB3Button_pressed():
+	set_raise_chips(BB_CHIPS*3)
+func _on_BB4Button_pressed():
+	set_raise_chips(BB_CHIPS*4)
+func _on_BB5Button_pressed():
+	set_raise_chips(BB_CHIPS*5)

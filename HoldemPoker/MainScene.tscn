@@ -163,6 +163,38 @@ margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "Raise"
 
+[node name="BB2Button" type="Button" parent="."]
+margin_left = 300.0
+margin_top = 820.0
+margin_right = 350.0
+margin_bottom = 850.0
+custom_fonts/font = SubResource( 1 )
+text = "2BB"
+
+[node name="BB3Button" type="Button" parent="."]
+margin_left = 350.0
+margin_top = 820.0
+margin_right = 400.0
+margin_bottom = 850.0
+custom_fonts/font = SubResource( 1 )
+text = "3BB"
+
+[node name="BB4Button" type="Button" parent="."]
+margin_left = 400.0
+margin_top = 820.0
+margin_right = 450.0
+margin_bottom = 850.0
+custom_fonts/font = SubResource( 1 )
+text = "4BB"
+
+[node name="BB5Button" type="Button" parent="."]
+margin_left = 450.0
+margin_top = 820.0
+margin_right = 500.0
+margin_bottom = 850.0
+custom_fonts/font = SubResource( 1 )
+text = "5BB"
+
 [node name="AllInNextButton" type="Button" parent="."]
 margin_left = 400.0
 margin_top = 780.0
@@ -181,4 +213,8 @@ text = "AllIn"
 [connection signal="pressed" from="CheckCallButton" to="." method="_on_CheckCallButton_pressed"]
 [connection signal="pressed" from="CallButton" to="." method="_on_CallButton_pressed"]
 [connection signal="pressed" from="RaiseButton" to="." method="_on_RaiseButton_pressed"]
+[connection signal="pressed" from="BB2Button" to="." method="_on_BB2Button_pressed"]
+[connection signal="pressed" from="BB3Button" to="." method="_on_BB3Button_pressed"]
+[connection signal="pressed" from="BB4Button" to="." method="_on_BB4Button_pressed"]
+[connection signal="pressed" from="BB5Button" to="." method="_on_BB5Button_pressed"]
 [connection signal="pressed" from="AllInNextButton" to="." method="_on_AllInNextButton_pressed"]
