@@ -306,6 +306,10 @@ func next_round():
 		$Table/Chips/PotLabel.text = String(pot_chips)
 	if state == INIT:
 		state = PRE_FLOP
+		$BB2Button.text = "2BB"
+		$BB3Button.text = "3BB"
+		$BB4Button.text = "4BB"
+		$BB5Button.text = "5BB"
 		comu_cards = []
 		#$AllInNextButton.text = "AllIn"
 		#$AllInNextButton.disabled = true
@@ -351,6 +355,10 @@ func next_round():
 	elif state == PRE_FLOP:
 		#deal_cards()
 		state = FLOP
+		$BB2Button.text = "p/4"
+		$BB3Button.text = "p/2"
+		$BB4Button.text = "3p/4"
+		$BB5Button.text = "pot"
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].set_text("called")
 			act_panels[i].get_node("PinkPanel").hide()
@@ -999,10 +1007,10 @@ func _on_AllInNextButton_pressed():
 func set_raise_chips(rc):
 	$RaiseSpinBox.set_value(rc)
 func _on_BB2Button_pressed():
-	set_raise_chips(BB_CHIPS*2)
+	set_raise_chips(BB_CHIPS*2 if state == PRE_FLOP else int(pot_chips/4))
 func _on_BB3Button_pressed():
-	set_raise_chips(BB_CHIPS*3)
+	set_raise_chips(BB_CHIPS*3 if state == PRE_FLOP else int(pot_chips/2))
 func _on_BB4Button_pressed():
-	set_raise_chips(BB_CHIPS*4)
+	set_raise_chips(BB_CHIPS*4 if state == PRE_FLOP else int(pot_chips*3/4))
 func _on_BB5Button_pressed():
-	set_raise_chips(BB_CHIPS*5)
+	set_raise_chips(BB_CHIPS*5 if state == PRE_FLOP else int(pot_chips))
