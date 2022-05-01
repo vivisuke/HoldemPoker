@@ -51,6 +51,10 @@ enum {		# アクションボタン
 	FOLD,
 	RAISE,
 	ALL_IN,
+	BB2,
+	BB3,
+	BB4,
+	BB5,
 	N_ACT_BUTTONS,
 }
 #const N_SUIT = 4
@@ -171,6 +175,10 @@ func _ready():
 	act_buttons[FOLD] = $FoldButton
 	act_buttons[RAISE] = $RaiseButton
 	act_buttons[ALL_IN] = $AllInNextButton
+	act_buttons[BB2] = $BB2Button
+	act_buttons[BB3] = $BB3Button
+	act_buttons[BB4] = $BB4Button
+	act_buttons[BB5] = $BB5Button
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
 	$RaiseSpinBox.set_value(BB_CHIPS)
