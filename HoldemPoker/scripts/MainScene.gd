@@ -286,6 +286,7 @@ func next_round():
 	cur_sum_bet = 0
 	#for i in range(N_PLAYERS): n_raised[i] = 0
 	n_raised = 0
+	$NRaisedLabel.text = "# raised: 0"
 	if state >= PRE_FLOP && state <= RIVER:
 		var sum = 0
 		for i in range(N_PLAYERS):
@@ -518,6 +519,7 @@ func do_raise(pix, rc):
 	print("round_bet_chips_plyr[", pix, "] = ", round_bet_chips_plyr[pix])
 	#n_raised[pix] += 1
 	n_raised += 1
+	$NRaisedLabel.text = "# raised: %d" % n_raised
 func max_raise_chips(pix):		# 可能最大レイズ額
 	return max(0, players[pix].get_chips() - (bet_chips - bet_chips_plyr[pix]))
 func _process(delta):

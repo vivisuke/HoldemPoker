@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://scripts/MainScene.gd" type="Script" id=1]
 [ext_resource path="res://images/BG.png" type="Texture" id=2]
@@ -23,6 +23,10 @@ font_data = ExtResource( 11 )
 [sub_resource type="DynamicFont" id=3]
 size = 12
 font_data = ExtResource( 9 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 18
+font_data = ExtResource( 11 )
 
 [sub_resource type="DynamicFont" id=1]
 font_data = ExtResource( 9 )
@@ -106,6 +110,16 @@ margin_bottom = 6.0
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 3 )
 text = "0"
+
+[node name="NRaisedLabel" type="Label" parent="."]
+margin_left = 348.0
+margin_top = 752.0
+margin_right = 490.0
+margin_bottom = 773.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 5 )
+text = "#raised: 0"
+align = 2
 
 [node name="FoldButton" type="Button" parent="."]
 margin_top = 780.0
