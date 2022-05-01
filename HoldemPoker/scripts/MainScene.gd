@@ -69,7 +69,7 @@ const SB_CHIPS = BB_CHIPS / 2
 const USER_IX = 0				# プレイヤー： players[USER_IX]
 const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
 const N_TRAIALS = 5000			# 期待勝率計算 モンテカルロ法試行回数
-const MAX_N_RAISE = 4			# 現ラウンドにおける最大レイズ回数
+const MAX_N_RAISES = 4			# 現ラウンドにおける最大レイズ回数
 const stateText = [
 	"",		# for INIT
 	"PreFlop", "Flop", "Turn", "River", "ShowDown",
@@ -93,7 +93,7 @@ var sub_state = READY	# サブ状態
 var bet_chips = 0		# ベットされたチップ数（1プレイヤー分合計）
 var pot_chips = 0		# （中央）ポットチップ数
 var cur_sum_bet = 0		# 現ラウンドでのベット・コールチップ合計（中央ポットに未移動分）
-var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISE 以下）
+var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISES 以下）
 var nix = -1			# 次の手番
 var dealer_ix = 0		# ディーラプレイヤーインデックス
 var high_card = 0		# ハイカード
@@ -562,6 +562,9 @@ func _process(delta):
 						# コマンドボタン・スピンボックスをイネーブル
 						for i in range(N_ACT_BUTTONS):
 							act_buttons[i].disabled = false
+						if n_raised >= MAX_N_RAISES:		# レイズ最大回数に達している場合
+							act_buttons[RAISE].disabled = true
+							act_buttons[ALL_IN].disabled = true
 						$RaiseSpinBox.max_value = max_raise
 						$RaiseSpinBox.editable = true
 						sub_state = INITIALIZED
@@ -573,7 +576,7 @@ func _process(delta):
 						#print("wrt = ", wrt)
 						print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
 						if( max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5 &&		# 期待勝率が1/人数の1.5倍以上の場合
-							n_raised < MAX_N_RAISE ):							# 最大レイズ回数に達していない場合
+							n_raised < MAX_N_RAISES ):							# 最大レイズ回数に達していない場合
 								var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
 								do_raise(nix, bc)
 						elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
@@ -842,7 +845,7 @@ func show_hand():		# ShowDown時の処理
 				winners = [pix]
 			elif r ==  0:
 				winners.push_back(pix)
-		var d_chips = (pd[1] - bc0) * lst.size()		# 分配するチップ
+		var d_chips : int = (pd[1] - bc0) * lst.size()		# 分配するチップ
 		for i in range(N_PLAYERS):
 			if is_folded[i]: d_chips += round_bet_chips_plyr[i]		# 降りたプレイヤーの賭けた分
 		pot_chips -= d_chips
