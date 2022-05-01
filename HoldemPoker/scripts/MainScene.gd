@@ -111,6 +111,7 @@ var is_folded = []			# 各プレイヤーが Fold 済みか？
 #var n_raised = []			# 各プレイヤーの現ラウンドにおけるレイズ回数
 var players_hand = []		# 各プレイヤーの手役
 var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
+var round_bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数合計
 #var bet_chips = []			# 各プレイヤー現ラウンドのベットチップ数
 #var bet_chips_total = []	# 各プレイヤー現ラウンドのトータルベットチップ数
 #var nPlayers = N_PLAYERS		# 6 players
@@ -126,7 +127,7 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if true:
+	if false:
 		randomize()
 		rng.randomize()
 	else:
@@ -194,21 +195,25 @@ func update_d_SB_BB():
 		players[i].show_diff_chips(false)
 	bet_chips = BB_CHIPS
 	bet_chips_plyr.resize(N_PLAYERS)
+	round_bet_chips_plyr.resize(N_PLAYERS)
 	for i in range(N_PLAYERS):
 		var mk = players[i].get_node("Mark")
 		mk.show()
 		if dealer_ix == i:
 			mk.frame = DEALER
 			bet_chips_plyr[i] = 0
+			round_bet_chips_plyr[i] = 0
 			if state >= FLOP:
 				nix = (i + 1) % N_PLAYERS		# 次の手番
 		elif (dealer_ix + 1) % N_PLAYERS == i:
 			mk.frame = SB
 			bet_chips_plyr[i] = SB_CHIPS
+			round_bet_chips_plyr[i] = SB_CHIPS
 			cur_sum_bet += SB_CHIPS
 		elif (dealer_ix + 2) % N_PLAYERS == i:
 			mk.frame = BB
 			bet_chips_plyr[i] = BB_CHIPS
+			round_bet_chips_plyr[i] = BB_CHIPS
 			cur_sum_bet += BB_CHIPS
 			#next_player()
 			if state < FLOP:
@@ -216,6 +221,7 @@ func update_d_SB_BB():
 		else:
 			mk.hide()
 			bet_chips_plyr[i] = 0
+			round_bet_chips_plyr[i] = 0
 		if bet_chips_plyr[i] == 0:
 			players[i].show_bet_chips(false)
 		else:
@@ -492,15 +498,17 @@ func do_call(pix):
 	#act_panels[pix].show()
 	players[pix].set_bet_chips(bet_chips)
 	var cc = min(players[pix].get_chips(), bet_chips - bet_chips_plyr[pix])
+	round_bet_chips_plyr[pix] += cc
 	cur_sum_bet += cc
 	players[pix].sub_chips(cc)
 	bet_chips_plyr[pix] = bet_chips
-func do_raise(pix, c):
+func do_raise(pix, rc):
 	set_act_panel_text(pix, "raised")
 	act_panels[pix].get_node("PinkPanel").show()
 	#act_panels[pix].set_text("raised")
 	#act_panels[pix].show()
-	bet_chips += c			# コール分＋レイズ分 が実際に場に出される
+	bet_chips += rc			# コール分＋レイズ分 が実際に場に出される
+	cur_sum_bet += rc
 	players[pix].set_bet_chips(bet_chips)
 	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
@@ -772,7 +780,91 @@ func compare(hand1 : Array, hand2 : Array):
 		return -1
 	else:
 		return 1
+# bc0 を超えてベットしたプレイヤーリスト、ベット最小額を返す
+func players_to_div(bc0):
+	#var n = 0
+	var lst = []
+	var min_bc = 0
+	for i in range(N_PLAYERS):
+		if round_bet_chips_plyr[i] > bc0:
+			#n += 1
+			lst.push_back(i)
+			if min_bc == 0 || round_bet_chips_plyr[i] < min_bc:
+				min_bc = round_bet_chips_plyr[i]
+	return [lst, min_bc]
+# bc 以上ベットしたプレイヤーでチップを勝者に分ける
+# 各プイれやーの手役はすでに計算され、players_hand[] に格納されている
+# 未分配のポットは pot_chips に格納されていて、分配分にチップが減算される
+func div_chips(bc):
+	var max_hand = [-1]
+	var winners = []
+	var np = 0			# サイドポット対象人数
+	for i in range(N_PLAYERS):
+		if !is_folded[i] && round_bet_chips_plyr[i] >= bc:
+			np += 1
+			var r = compare(players_hand[i], max_hand)
+			if r > 0:
+				max_hand = players_hand[i]
+				winners = [i]
+			elif r ==  0:
+				winners.push_back(i)
 func show_hand():		# ShowDown時の処理
+	# 各プレイヤーの手役を計算し、players_hand[] に格納
+	for i in range(N_PLAYERS):
+		if !is_folded[i]:
+			var v = []
+			v.push_back(players_card1[i].get_sr())
+			v.push_back(players_card2[i].get_sr())
+			for k in range(5): v.push_back(comu_cards[k].get_sr())
+			players_hand[i] = check_hand(v)
+			players[i].set_hand(handName[players_hand[i][0]])
+	#
+	var bc0 = 0		# ベット最小額
+	while pot_chips > 0:		# 未分配ポットチップが残っている場合
+		var pd = players_to_div(bc0)		# bc0 を超えてベットしたプレイヤーリスト、ベット最小額
+		var lst = pd[0]
+		if lst.empty(): break		# 全チップを分配済みの場合
+		if lst.size() == 1:			# 一人勝ちの場合
+			players[lst[0]].add_chips(pot_chips)
+			break
+		var max_hand = [-1]
+		var winners = []
+		for i in range(lst.size()):
+			var pix = lst[i]
+			var r = compare(players_hand[pix], max_hand)
+			if r > 0:
+				max_hand = players_hand[pix]
+				winners = [pix]
+			elif r ==  0:
+				winners.push_back(pix)
+		var d_chips = (pd[1] - bc0) * lst.size()		# 分配するチップ
+		pot_chips -= d_chips
+		# ポットのチップを勝者で分配
+		if winners.size() == 1:		# 一人勝ちの場合
+			players[winners[0]].add_chips(d_chips)
+		else:		# 勝ちが複数いる場合（チョップ）
+			var c : int = d_chips / winners.size()	# 取り分
+			var m : int = d_chips % winners.size()	# 余り
+			for i in range(N_PLAYERS):
+				if winners.find(i) >= 0:
+					players[i].add_chips(c)
+			if m != 0:		# 余りがある場合
+				for i in range(N_PLAYERS):
+					var ix = (dealer_ix + 1 + i) % N_PLAYERS	# SB から
+					if winners.find(ix) >= 0:
+						players[ix].add_chips(1)
+						m -= 1
+						if m == 0: break		# 余りを分配終了
+		bc0 = pd[1]
+	for i in range(N_PLAYERS):
+		players[i].show_diff_chips(true)
+	pot_chips = 0
+	$Table/Chips/PotLabel.text = String(pot_chips)
+	#
+	$AllInNextButton.text = "Next"
+	$AllInNextButton.disabled = false
+
+func show_hand_old():		# ShowDown時の処理
 	var max_hand = [-1]
 	var winners = []
 	for i in range(N_PLAYERS):
@@ -784,8 +876,8 @@ func show_hand():		# ShowDown時の処理
 			#print("i = ", i, ", v = ", v)
 			#print("hand = ", handName[check_hand(v)])
 			players_hand[i] = check_hand(v)
-			if players_hand[i][0] == TWO_PAIR:
-				print_hand(players_hand[i])
+			#if players_hand[i][0] == TWO_PAIR:
+			#	print_hand(players_hand[i])
 			players[i].set_hand(handName[players_hand[i][0]])
 			var r = compare(players_hand[i], max_hand)
 			if r > 0:
