@@ -2,6 +2,11 @@ extends Sprite
 
 signal open_finished
 
+enum {
+	BG_WAIT = 0,
+	BG_PLY,			# 手番
+	BG_FOLDED,
+}
 const OPENING_NONE = 0
 const OPENING_FH = 1	# 蜑榊濠
 const OPENING_SH = 2	# 蠕悟濠
@@ -53,7 +58,11 @@ func show_diff_chips(b : bool):		# b: true for チップ増減を表示
 	var txt = String(chips)
 	if b:
 		txt += " ("
-		if chips > prev_chips: txt += "+"
+		if chips > prev_chips:
+			txt += "+"
+			set_BG(BG_PLY)		# 黄色
+		else:
+			set_BG(BG_WAIT)		# グレイ
 		txt += String(chips - prev_chips) + ")"
 	$ChipsLabel.text = txt
 	pass

@@ -513,6 +513,7 @@ func do_raise(pix, rc):
 	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
+	round_bet_chips_plyr[pix] = bet_chips
 	#n_raised[pix] += 1
 	n_raised += 1
 func max_raise_chips(pix):		# 可能最大レイズ額
@@ -824,7 +825,7 @@ func show_hand():		# ShowDown時の処理
 		var pd = players_to_div(bc0)		# bc0 を超えてベットしたプレイヤーリスト、ベット最小額
 		var lst = pd[0]
 		if lst.empty(): break		# 全チップを分配済みの場合
-		if lst.size() == 1:			# 一人勝ちの場合
+		if lst.size() == 1:			# 一人参加・勝ちの場合
 			players[lst[0]].add_chips(pot_chips)
 			break
 		var max_hand = [-1]
