@@ -68,7 +68,7 @@ const BB_CHIPS = 2
 const SB_CHIPS = BB_CHIPS / 2
 const USER_IX = 0				# プレイヤー： players[USER_IX]
 const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
-const N_TRAIALS = 1000			# 期待勝率計算 モンテカルロ法試行回数
+const N_TRAIALS = 5000			# 期待勝率計算 モンテカルロ法試行回数
 const MAX_N_RAISE = 4			# 現ラウンドにおける最大レイズ回数
 const stateText = [
 	"",		# for INIT
@@ -127,15 +127,15 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if true:
+	if false:
 		randomize()
 		rng.randomize()
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
 		#print("seed = ", sd)
-		var sd = 0		# SPR#111
-		#var sd = 1
+		#var sd = 0		# SPR#111
+		var sd = 1
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -499,6 +499,7 @@ func do_call(pix):
 	players[pix].set_bet_chips(bet_chips)
 	var cc = min(players[pix].get_chips(), bet_chips - bet_chips_plyr[pix])
 	round_bet_chips_plyr[pix] += cc
+	print("round_bet_chips_plyr[", pix, "] = ", round_bet_chips_plyr[pix])
 	cur_sum_bet += cc
 	players[pix].sub_chips(cc)
 	bet_chips_plyr[pix] = bet_chips
@@ -513,7 +514,8 @@ func do_raise(pix, rc):
 	cur_sum_bet += bet_chips - bet_chips_plyr[pix]
 	players[pix].sub_chips(bet_chips - bet_chips_plyr[pix])
 	bet_chips_plyr[pix] = bet_chips
-	round_bet_chips_plyr[pix] = bet_chips
+	round_bet_chips_plyr[pix] += bet_chips
+	print("round_bet_chips_plyr[", pix, "] = ", round_bet_chips_plyr[pix])
 	#n_raised[pix] += 1
 	n_raised += 1
 func max_raise_chips(pix):		# 可能最大レイズ額
