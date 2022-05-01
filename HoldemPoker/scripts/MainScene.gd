@@ -127,7 +127,7 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if false:
+	if true:
 		randomize()
 		rng.randomize()
 	else:
@@ -787,7 +787,7 @@ func players_to_div(bc0):
 	var lst = []
 	var min_bc = 0
 	for i in range(N_PLAYERS):
-		if round_bet_chips_plyr[i] > bc0:
+		if !is_folded[i] && round_bet_chips_plyr[i] > bc0:
 			#n += 1
 			lst.push_back(i)
 			if min_bc == 0 || round_bet_chips_plyr[i] < min_bc:
