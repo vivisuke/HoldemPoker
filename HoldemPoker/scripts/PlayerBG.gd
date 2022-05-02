@@ -33,6 +33,8 @@ func set_card2(st, rank):
 	pass
 func set_hand(txt):
 	$HandLabel.text = txt
+func get_chip_pos():	# 下部チップ位置（グローバル座標系）を返す
+	return $Chips.get_global_position()
 func get_chips(): return chips
 func set_chips(c : int):
 	chips = c

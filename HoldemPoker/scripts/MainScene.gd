@@ -196,6 +196,9 @@ func _ready():
 	update_roundLabel()
 	#
 	$Chip.move_to(Vector2(10, 10), 2.0)		# Test
+	#
+	print("chip pos = ", players[USER_IX].get_chip_pos())
+	print("chip pos = ", players[USER_IX+1].get_chip_pos())
 	pass
 func update_roundLabel():
 	$RoundLabel.text = stateText[state]
