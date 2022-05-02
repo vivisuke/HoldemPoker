@@ -10,11 +10,11 @@ enum {
 const OPENING_NONE = 0
 const OPENING_FH = 1	# 蜑榊濠
 const OPENING_SH = 2	# 蠕悟濠
-const TH_SCALE = 1.5
+const TH_SCALE = 5.0
 
 #var opening : bool = false
-var opening : int = 0
-var theta = 0.0
+#var opening : int = 0
+var theta = -1.0
 var chips = 0
 var prev_chips = 0		# 各ゲーム開始時チップ数
 
@@ -68,5 +68,16 @@ func show_diff_chips(b : bool):		# b: true for チップ増減を表示
 		txt += String(chips - prev_chips) + ")"
 	$ChipsLabel.text = txt
 	pass
+func start_scale_up_down():
+	theta = 0.0
 func _process(delta):
+	if theta >= 0.0:	# 拡大縮小中
+		theta += delta * TH_SCALE
+		theta = min(theta, PI)
+		if theta >= PI:
+			theta = -1.0
+			set_scale(Vector2(1.0, 1.0))
+		else:
+			var sc = 1.0+sin(theta)*0.25
+			set_scale(Vector2(sc, sc))
 	pass

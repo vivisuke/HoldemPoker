@@ -599,6 +599,7 @@ func _process(delta):
 					var max_raise = max_raise_chips(nix)
 					if nix == USER_IX:
 						#players[USER_IX].set_scale(Vector2(2.0, 2.0))
+						players[USER_IX].start_scale_up_down()
 						if bet_chips_plyr[USER_IX] < bet_chips:
 							act_buttons[CHECK_CALL].text = "Call %d" % (bet_chips - bet_chips_plyr[USER_IX])
 						else:
