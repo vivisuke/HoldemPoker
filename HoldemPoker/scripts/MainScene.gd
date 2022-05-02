@@ -125,6 +125,8 @@ var n_moving = 0
 var n_opening = 0
 var nActPlayer = N_PLAYERS		# 非フォールドプレイヤー数
 var deck_pos
+
+var balanece = INIT_CHIPS		# 暫定
 onready var g = get_node("/root/Global")
 
 var CardBF = load("res://CardBF.tscn")		# カード裏面
@@ -161,7 +163,9 @@ func _ready():
 		pb.set_chips(INIT_CHIPS)
 		players.push_back(pb)
 		is_folded[i] = false
-	print("width = ", players[0].texture.get_width())
+	balanece -= INIT_CHIPS
+	$Table/BalanceLabel.text = "balance: %d" % balanece
+	#print("width = ", players[0].texture.get_width())
 	#for i in range(N_COMU_CARS):
 	#	var cd = get_node("Table/CardBF%d" % (i+1))
 	#	comu_cards.push_back(cd)
@@ -427,6 +431,9 @@ func next_round():
 			#print("chils[", i, "] = ", players[i].get_chips())
 			if players[i].get_chips() <= 0:		# バーストした場合
 				players[i].set_chips(INIT_CHIPS/2)		# 初期チップの半分を与える
+				if i == USER_IX:
+					balanece -= INIT_CHIPS/2
+					$Table/BalanceLabel.text = "balance: %d" % balanece
 		update_d_SB_BB()
 		for i in range(N_PLAYERS):
 			players_card1[i].queue_free()
