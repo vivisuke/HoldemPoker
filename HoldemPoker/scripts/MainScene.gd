@@ -361,9 +361,9 @@ func next_round():
 	elif state == PRE_FLOP:
 		#deal_cards()
 		state = FLOP
-		$BB2Button.text = "p/4"
-		$BB3Button.text = "p/2"
-		$BB4Button.text = "3p/4"
+		$BB2Button.text = "25%"		#"p/4"
+		$BB3Button.text = "50%"		#"p/2"
+		$BB4Button.text = "75%"		#"3p/4"
 		$BB5Button.text = "pot"
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].set_text("called")
@@ -578,6 +578,7 @@ func _process(delta):
 				else:
 					var max_raise = max_raise_chips(nix)
 					if nix == USER_IX:
+						players[USER_IX].set_scale(Vector2(2.0, 2.0))
 						if bet_chips_plyr[USER_IX] < bet_chips:
 							act_buttons[CHECK_CALL].text = "Call %d" % (bet_chips - bet_chips_plyr[USER_IX])
 						else:
@@ -596,6 +597,7 @@ func _process(delta):
 						#print("win rate = ", calc_win_rate(USER_IX, nActPlayer - 1))	# 5: 暫定
 						return		# 次のプレイヤーに遷移しないように
 					else:
+						players[USER_IX].set_scale(Vector2(1.0, 1.0))
 						var wrt = calc_win_rate(nix, nActPlayer - 1)		# 期待勝率計算
 						print("win rate[", nix, "] = ", wrt)
 						#print("wrt = ", wrt)

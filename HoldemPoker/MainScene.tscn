@@ -61,7 +61,7 @@ texture_pressed = ExtResource( 5 )
 margin_right = 500.0
 margin_bottom = 50.0
 custom_fonts/font = SubResource( 2 )
-text = "6P Ring Game"
+text = "6P Ring Game BB:2"
 align = 1
 valign = 1
 
