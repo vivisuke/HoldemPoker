@@ -130,8 +130,8 @@ var balanece = INIT_CHIPS		# 暫定
 onready var g = get_node("/root/Global")
 
 var CardBF = load("res://CardBF.tscn")		# カード裏面
+var Chip = load("res://Chip.tscn")			# 移動可能チップ
 var ActionPanel = load("res://ActionPanel.tscn")
-var Chip
 
 var rng = RandomNumberGenerator.new()
 
@@ -309,9 +309,13 @@ func next_round():
 	$NRaisedLabel.text = "# raised: 0/%d" % MAX_N_RAISES
 	if state >= PRE_FLOP && state <= RIVER:
 		var sum = 0		# 全プレイヤーのベット合計
+		var dst = $Table/Chips.get_global_position()
 		for i in range(N_PLAYERS):
 			if bet_chips_plyr[i] != 0:		# ベットしている場合
-				
+				var ch = Chip.instance()
+				ch.set_position(players[i].get_chip_pos())
+				add_child(ch)
+				ch.move_to(dst, 0.6)
 			sum += bet_chips_plyr[i]
 			bet_chips_plyr[i] = 0
 			players[i].set_bet_chips(0)
