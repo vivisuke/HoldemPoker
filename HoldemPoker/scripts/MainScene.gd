@@ -92,6 +92,7 @@ const handName = [
 ]
 
 var sum_delta = 0.0
+var human_balance = 0	# 人間のチップ残高（テーブル持ち込み以外のチップ数）
 var state = INIT		# 状態
 var sub_state = READY	# サブ状態
 var bet_chips = 0		# ベットされたチップ数（1プレイヤー分合計）
@@ -124,6 +125,7 @@ var n_moving = 0
 var n_opening = 0
 var nActPlayer = N_PLAYERS		# 非フォールドプレイヤー数
 var deck_pos
+onready var g = get_node("/root/Global")
 
 var CardBF = load("res://CardBF.tscn")		# カード裏面
 var ActionPanel = load("res://ActionPanel.tscn")
