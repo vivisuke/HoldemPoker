@@ -472,8 +472,8 @@ func move_finished():
 		sub_state = CARD_OPENING
 		if state == PRE_FLOP:
 			n_opening = 2
-			players_card1[0].do_open()
-			players_card2[0].do_open()
+			players_card1[USER_IX].do_open()
+			players_card2[USER_IX].do_open()
 		elif state == FLOP:
 			n_opening = N_FLOP_CARDS
 			for i in range(N_FLOP_CARDS):		# 3 for FLOP
@@ -493,6 +493,8 @@ func open_finished():
 		sub_state = READY
 		if state == PRE_FLOP:
 			show_user_hand(0)
+			players[USER_IX].add_child(players_card1[USER_IX])
+			players[USER_IX].add_child(players_card2[USER_IX])
 		elif state == FLOP:
 			show_user_hand(3)
 		elif state == TURN:

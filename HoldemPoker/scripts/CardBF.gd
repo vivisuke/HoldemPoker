@@ -60,14 +60,14 @@ func _process(delta):
 	if waiting_time > 0.0:
 		waiting_time -= delta
 		return
-	if moving:
-		move_elapsed += delta
-		move_elapsed = min(move_elapsed, move_dur)
-		var r = move_elapsed / move_dur
-		set_position(src_pos * (1.0 - r) + dst_pos * r)
-		if move_elapsed == move_dur:
+	if moving:		# 移動処理中
+		move_elapsed += delta	# 経過時間
+		move_elapsed = min(move_elapsed, move_dur)	# 行き過ぎ防止
+		var r = move_elapsed / move_dur				# 位置割合
+		set_position(src_pos * (1.0 - r) + dst_pos * r)		# 位置更新
+		if move_elapsed == move_dur:		# 移動終了の場合
 			moving = false
-			emit_signal("move_finished")
+			emit_signal("move_finished")	# 移動終了シグナル発行
 	if opening == OPENING_FH:
 		theta += delta * TH_SCALE
 		if theta < PI/2:
