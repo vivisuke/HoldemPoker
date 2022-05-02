@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://scripts/MainScene.gd" type="Script" id=1]
 [ext_resource path="res://images/BG.png" type="Texture" id=2]
@@ -11,7 +11,6 @@
 [ext_resource path="res://fonts/arial.ttf" type="DynamicFontData" id=9]
 [ext_resource path="res://images/chip16.png" type="Texture" id=10]
 [ext_resource path="res://fonts/FlopDesignFONT.otf" type="DynamicFontData" id=11]
-[ext_resource path="res://Chip.tscn" type="PackedScene" id=12]
 
 [sub_resource type="DynamicFont" id=2]
 size = 26
@@ -214,9 +213,6 @@ margin_right = 500.0
 margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
 text = "AllIn"
-
-[node name="Chip" parent="." instance=ExtResource( 12 )]
-position = Vector2( 200, 427 )
 
 [connection signal="open_finished" from="Table/PlayerBG1" to="." method="_on_PlayerBG_open_finished"]
 [connection signal="open_finished" from="Table/PlayerBG2" to="." method="_on_PlayerBG_open_finished"]

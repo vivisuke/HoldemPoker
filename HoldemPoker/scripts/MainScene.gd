@@ -131,6 +131,7 @@ onready var g = get_node("/root/Global")
 
 var CardBF = load("res://CardBF.tscn")		# カード裏面
 var ActionPanel = load("res://ActionPanel.tscn")
+var Chip
 
 var rng = RandomNumberGenerator.new()
 
@@ -195,10 +196,10 @@ func _ready():
 	#update_title_text()
 	update_roundLabel()
 	#
-	$Chip.move_to(Vector2(10, 10), 2.0)		# Test
+	#$Chip.move_to(Vector2(10, 10), 2.0)		# Test
 	#
-	print("chip pos = ", players[USER_IX].get_chip_pos())
-	print("chip pos = ", players[USER_IX+1].get_chip_pos())
+	#print("chip pos = ", players[USER_IX].get_chip_pos())		# Test
+	#print("chip pos = ", players[USER_IX+1].get_chip_pos())
 	pass
 func update_roundLabel():
 	$RoundLabel.text = stateText[state]
@@ -307,8 +308,10 @@ func next_round():
 	n_raised = 0
 	$NRaisedLabel.text = "# raised: 0/%d" % MAX_N_RAISES
 	if state >= PRE_FLOP && state <= RIVER:
-		var sum = 0
+		var sum = 0		# 全プレイヤーのベット合計
 		for i in range(N_PLAYERS):
+			if bet_chips_plyr[i] != 0:		# ベットしている場合
+				
 			sum += bet_chips_plyr[i]
 			bet_chips_plyr[i] = 0
 			players[i].set_bet_chips(0)
