@@ -301,6 +301,11 @@ func deal_cards():
 #func next_game():
 #	state = INIT
 #	update_roundLabel()
+func on_chip_move_finished(node):
+	print("on_chip_move_finished():")
+	#print(node)
+	node.queue_free()		# チップオブジェクト消去
+	pass
 func next_round():
 	print("nActPlayer = ", nActPlayer)
 	cur_sum_bet = 0
@@ -316,6 +321,7 @@ func next_round():
 				ch.set_position(players[i].get_chip_pos())
 				add_child(ch)
 				ch.move_to(dst, 0.6)
+				ch.connect("move_finished", self, "on_chip_move_finished", [ch])
 			sum += bet_chips_plyr[i]
 			bet_chips_plyr[i] = 0
 			players[i].set_bet_chips(0)
