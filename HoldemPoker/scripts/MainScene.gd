@@ -618,30 +618,59 @@ func _process(delta):
 						#print("win rate = ", calc_win_rate(USER_IX, nActPlayer - 1))	# 5: 暫定
 						return		# 次のプレイヤーに遷移しないように
 					else:
-						players[USER_IX].set_scale(Vector2(1.0, 1.0))
-						var wrt = calc_win_rate(nix, nActPlayer - 1)		# 期待勝率計算
-						print("win rate[", nix, "] = ", wrt)
-						#print("wrt = ", wrt)
-						print("bet_chips_plyr[", nix, "] = ", bet_chips_plyr[nix])
-						if( max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5 &&		# 期待勝率が1/人数の1.5倍以上の場合
-							n_raised < MAX_N_RAISES ):							# 最大レイズ回数に達していない場合
-								var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
-								do_raise(nix, bc)
-						elif bet_chips_plyr[nix] < bet_chips:		# チェック出来ない場合
-							# undone: Fold 判定
-							var cc = bet_chips -  bet_chips_plyr[nix]
-							var odds = float(pot_chips + cur_sum_bet + cc) / cc
-							print("total pot = ", (pot_chips + cur_sum_bet), " odds = ", odds)
-							if state == PRE_FLOP || wrt >= 1.0 / odds:
-								print("called")
-								do_call(nix)
-							else:
-								do_fold(nix)
-						else:		# チェック可能な場合
-							if act_panels[nix].get_text() == "":	# 未行動の場合
-								do_check(nix)
+						#players[USER_IX].set_scale(Vector2(1.0, 1.0))
+						do_AI_action(nix, max_raise)
 			next_player()		# 次のプレイヤーに遷移
 	pass
+func do_AI_action(pix, max_raise):
+	var wrt : float = calc_win_rate(pix, nActPlayer - 1)		# 期待勝率計算
+	print("win rate[", pix, "] = ", wrt)
+	#print("wrt = ", wrt)
+	print("bet_chips_plyr[", pix, "] = ", bet_chips_plyr[pix])
+	var wrtnap = wrt * nActPlayer		# 期待勝率 * アクティブプレイヤー数
+	#var act = CHECK_CALL
+	var pr_check_call = 0.0
+	var pr_raise = 0.0
+	if max_raise > 0 && n_raised < MAX_N_RAISES:
+		if wrtnap >= 1.5:
+			pr_raise = 0.9			# レイズ確率
+			pr_check_call = 0.1
+		elif wrtnap >= 1.0:
+			pr_raise = 0.2 + (wrtnap - 1.0) / 0.5 * 0.7		# レイズ確率：[0.2, 0.9]
+			pr_check_call = 1.0 - pr_raise
+		elif wrtnap >= 0.5
+			var t = (wrtnap - 0.5) / 0.5
+			pr_raise = t * 0.2
+			pr_check_call = t * 0.8 
+	var pr_fold = 1.0 - pr_raise - pr_check_call
+	var r = rng.randf_range(0, 1.0)
+	if r <= pr_raise:
+		var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
+		do_raise(pix, bc)
+	elif bet_chips_plyr[pix] < bet_chips:		# チェック出来ない場合
+		if r <=
+func do_AI_action_honest(pix, max_raise):
+	var wrt = calc_win_rate(pix, nActPlayer - 1)		# 期待勝率計算
+	print("win rate[", pix, "] = ", wrt)
+	#print("wrt = ", wrt)
+	print("bet_chips_plyr[", pix, "] = ", bet_chips_plyr[pix])
+	if( max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5 &&		# 期待勝率が1/人数の1.5倍以上の場合
+		n_raised < MAX_N_RAISES ):							# 最大レイズ回数に達していない場合
+			var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
+			do_raise(pix, bc)
+	elif bet_chips_plyr[pix] < bet_chips:		# チェック出来ない場合
+		# undone: Fold 判定
+		var cc = bet_chips -  bet_chips_plyr[pix]
+		var odds = float(pot_chips + cur_sum_bet + cc) / cc
+		print("total pot = ", (pot_chips + cur_sum_bet), " odds = ", odds)
+		if state == PRE_FLOP || wrt >= 1.0 / odds:
+			print("called")
+			do_call(pix)
+		else:
+			do_fold(pix)
+	else:		# チェック可能な場合
+		if act_panels[pix].get_text() == "":	# 未行動の場合
+			do_check(pix)
 func get_unused_card(dk):	# 未使用カードをひとつゲット、そのカードは使用済みに
 	var ix
 	while true:
