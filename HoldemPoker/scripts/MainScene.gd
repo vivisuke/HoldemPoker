@@ -1075,3 +1075,8 @@ func _on_BB4Button_pressed():
 	set_raise_chips(BB_CHIPS*4 if state == PRE_FLOP else int(pot_chips*3/4))
 func _on_BB5Button_pressed():
 	set_raise_chips(BB_CHIPS*5 if state == PRE_FLOP else int(pot_chips))
+
+
+func _on_BackButton_pressed():
+	get_tree().change_scene("res://TopScene.tscn")
+	pass # Replace with function body.
