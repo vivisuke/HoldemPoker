@@ -48,7 +48,7 @@ margin_right = 50.0
 margin_bottom = 61.0
 custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 2 )
-text = "cihps"
+text = "chips"
 align = 1
 
 [node name="Mark" type="Sprite" parent="."]
