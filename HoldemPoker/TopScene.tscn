@@ -65,7 +65,18 @@ margin_bottom = 488.0
 rect_pivot_offset = Vector2( 386, 392 )
 custom_fonts/font = SubResource( 2 )
 custom_styles/normal = SubResource( 3 )
-text = "6P RingGame BB:2 honest AI"
+text = "RingGame BB:2 honest AI"
+icon = ExtResource( 5 )
+
+[node name="Button1" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 512.0
+margin_right = 479.0
+margin_bottom = 566.0
+rect_pivot_offset = Vector2( 386, 392 )
+custom_fonts/font = SubResource( 2 )
+custom_styles/normal = SubResource( 3 )
+text = "RingGame BB:2 small bluff AI"
 icon = ExtResource( 5 )
 
 [node name="NameLabel" type="Label" parent="."]
@@ -82,9 +93,10 @@ align = 2
 [node name="LineEdit" type="LineEdit" parent="."]
 margin_left = 240.0
 margin_top = 804.0
-margin_right = 479.0
+margin_right = 394.0
 margin_bottom = 839.0
 theme = SubResource( 5 )
 custom_fonts/font = SubResource( 6 )
 
 [connection signal="pressed" from="Button0" to="." method="_on_Button0_pressed"]
+[connection signal="pressed" from="Button1" to="." method="_on_Button1_pressed"]
