@@ -619,7 +619,7 @@ func _process(delta):
 						return		# 次のプレイヤーに遷移しないように
 					else:
 						#players[USER_IX].set_scale(Vector2(1.0, 1.0))
-						do_AI_action(nix, max_raise)
+						do_AI_action_honest(nix, max_raise)
 			next_player()		# 次のプレイヤーに遷移
 	pass
 func do_AI_action(pix, max_raise):
@@ -638,7 +638,7 @@ func do_AI_action(pix, max_raise):
 		elif wrtnap >= 1.0:
 			pr_raise = 0.2 + (wrtnap - 1.0) / 0.5 * 0.7		# レイズ確率：[0.2, 0.9]
 			pr_check_call = 1.0 - pr_raise
-		elif wrtnap >= 0.5
+		elif wrtnap >= 0.5:
 			var t = (wrtnap - 0.5) / 0.5
 			pr_raise = t * 0.2
 			pr_check_call = t * 0.8 
@@ -647,8 +647,8 @@ func do_AI_action(pix, max_raise):
 	if r <= pr_raise:
 		var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
 		do_raise(pix, bc)
-	elif bet_chips_plyr[pix] < bet_chips:		# チェック出来ない場合
-		if r <=
+	#elif bet_chips_plyr[pix] < bet_chips:		# チェック出来ない場合
+	#	if r <=
 func do_AI_action_honest(pix, max_raise):
 	var wrt = calc_win_rate(pix, nActPlayer - 1)		# 期待勝率計算
 	print("win rate[", pix, "] = ", wrt)

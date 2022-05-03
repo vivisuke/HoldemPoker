@@ -5,4 +5,5 @@ func _ready():
 
 
 func _on_Button0_pressed():
+	get_tree().change_scene("res://MainScene.tscn")
 	pass # Replace with function body.
