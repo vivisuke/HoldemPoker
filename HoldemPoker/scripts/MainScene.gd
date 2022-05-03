@@ -127,6 +127,7 @@ var nActPlayer = N_PLAYERS		# 非フォールドプレイヤー数
 var deck_pos
 
 var balanece = INIT_CHIPS		# 暫定
+
 onready var g = get_node("/root/Global")
 
 var CardBF = load("res://CardBF.tscn")		# カード裏面
@@ -171,7 +172,7 @@ func _ready():
 	#	var cd = get_node("Table/CardBF%d" % (i+1))
 	#	comu_cards.push_back(cd)
 	#
-	players[0].set_name("Human")
+	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
 	#players[0].set_BG(1)
 	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
 	print("dealer_ix = ", dealer_ix)

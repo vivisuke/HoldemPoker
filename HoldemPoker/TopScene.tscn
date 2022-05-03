@@ -90,7 +90,7 @@ custom_fonts/font = SubResource( 4 )
 text = "Name:"
 align = 2
 
-[node name="LineEdit" type="LineEdit" parent="."]
+[node name="UserNameEdit" type="LineEdit" parent="."]
 margin_left = 240.0
 margin_top = 804.0
 margin_right = 394.0
@@ -100,3 +100,4 @@ custom_fonts/font = SubResource( 6 )
 
 [connection signal="pressed" from="Button0" to="." method="_on_Button0_pressed"]
 [connection signal="pressed" from="Button1" to="." method="_on_Button1_pressed"]
+[connection signal="text_changed" from="UserNameEdit" to="." method="_on_UserNameEdit_text_changed"]

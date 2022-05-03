@@ -3,6 +3,7 @@ extends Node2D
 const INIT_BALANCE = 200
 
 const KEY_LOGIN_DATE = "LoginDate"
+const KEY_USER_NAME = "user_name"
 
 var saved_data = {}			# 自動保存データ辞書
 
@@ -26,8 +27,9 @@ func auto_load():
 		file.close()
 	#
 	if !saved_data.has("balance"): saved_data["balance"] = INIT_BALANCE
+	if !saved_data.has(KEY_USER_NAME): saved_data[KEY_USER_NAME] = "Human"
 	return saved_data
-func auto_save(solving : bool, board : Array):
+func auto_save():
 	saved_data["today"] = today_string()
 	var file = File.new()
 	file.open(AutoSaveFileName, File.WRITE)
