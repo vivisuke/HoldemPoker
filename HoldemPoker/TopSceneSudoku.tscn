@@ -1,0 +1,487 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://fonts/Hokjesgeest-PDGB.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://fonts/FlopDesignFONT.otf" type="DynamicFontData" id=2]
+[ext_resource path="res://fonts/arial.ttf" type="DynamicFontData" id=3]
+
+[sub_resource type="DynamicFont" id=1]
+size = 40
+font_data = ExtResource( 1 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 18
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=5]
+size = 24
+font_data = ExtResource( 2 )
+
+[sub_resource type="Theme" id=10]
+
+[sub_resource type="DynamicFont" id=3]
+size = 24
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=7]
+size = 24
+font_data = ExtResource( 2 )
+
+[sub_resource type="StyleBoxFlat" id=8]
+bg_color = Color( 0.180392, 0.309804, 0.309804, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0, 1, 0, 1 )
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+shadow_size = 8
+shadow_offset = Vector2( 4, 4 )
+
+[sub_resource type="DynamicFont" id=9]
+size = 12
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=11]
+size = 12
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=12]
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=13]
+font_data = ExtResource( 2 )
+
+[node name="TopScene" type="Node2D"]
+
+[node name="BG" type="ColorRect" parent="."]
+margin_right = 500.0
+margin_bottom = 900.0
+rect_pivot_offset = Vector2( 176, 822 )
+color = Color( 0.501961, 0.752941, 0.501961, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TitleLabel" type="Label" parent="."]
+margin_top = 20.0
+margin_right = 500.0
+margin_bottom = 109.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
+custom_constants/shadow_offset_x = 2
+custom_constants/shadow_offset_y = 2
+custom_fonts/font = SubResource( 1 )
+text = "SakuSaku
+NumberPlace"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VersionLabel" type="Label" parent="."]
+margin_top = 120.0
+margin_right = 500.0
+margin_bottom = 141.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "version 0.101"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SeedLabel" type="Label" parent="."]
+margin_left = 24.0
+margin_top = 165.0
+margin_right = 222.0
+margin_bottom = 190.0
+rect_rotation = -0.0329332
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 5 )
+text = "問題名（空欄可）:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit" type="LineEdit" parent="."]
+margin_left = 241.0
+margin_top = 160.0
+margin_right = 480.0
+margin_bottom = 195.0
+theme = SubResource( 10 )
+custom_fonts/font = SubResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button0" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 209.0
+margin_right = 479.0
+margin_bottom = 263.0
+custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+text = "入門問題を生成　　　  　   "
+
+[node name="NSolvedLabel" type="Label" parent="Button0"]
+margin_left = 333.0
+margin_top = 5.0
+margin_right = 434.0
+margin_bottom = 22.0
+custom_fonts/font = SubResource( 9 )
+text = "クリア数: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AveTimeLabel" type="Label" parent="Button0"]
+margin_left = 333.0
+margin_top = 20.0
+margin_right = 445.0
+margin_bottom = 37.0
+custom_fonts/font = SubResource( 9 )
+text = "平均タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BestTimeLabel" type="Label" parent="Button0"]
+margin_left = 333.0
+margin_top = 35.0
+margin_right = 445.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 9 )
+text = "最短タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button1" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 289.0
+margin_right = 479.0
+margin_bottom = 343.0
+custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+text = "初級問題を生成　　     　　"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NSolvedLabel" type="Label" parent="Button1"]
+margin_left = 333.0
+margin_top = 5.0
+margin_right = 434.0
+margin_bottom = 22.0
+custom_fonts/font = SubResource( 9 )
+text = "クリア数: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AveTimeLabel" type="Label" parent="Button1"]
+margin_left = 333.0
+margin_top = 20.0
+margin_right = 445.0
+margin_bottom = 37.0
+custom_fonts/font = SubResource( 9 )
+text = "平均タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BestTimeLabel" type="Label" parent="Button1"]
+margin_left = 333.0
+margin_top = 35.0
+margin_right = 445.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 9 )
+text = "最短タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button2" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 369.0
+margin_right = 479.0
+margin_bottom = 423.0
+custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+text = "初中級問題を生成　　  　   "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NSolvedLabel" type="Label" parent="Button2"]
+margin_left = 333.0
+margin_top = 5.0
+margin_right = 434.0
+margin_bottom = 22.0
+custom_fonts/font = SubResource( 9 )
+text = "クリア数: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AveTimeLabel" type="Label" parent="Button2"]
+margin_left = 333.0
+margin_top = 20.0
+margin_right = 445.0
+margin_bottom = 37.0
+custom_fonts/font = SubResource( 9 )
+text = "平均タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BestTimeLabel" type="Label" parent="Button2"]
+margin_left = 333.0
+margin_top = 35.0
+margin_right = 445.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 9 )
+text = "最短タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button3" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 449.0
+margin_right = 479.0
+margin_bottom = 503.0
+custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+text = "入門問題集　　　  　   "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NSolvedLabel" type="Label" parent="Button3"]
+margin_left = 333.0
+margin_top = 5.0
+margin_right = 434.0
+margin_bottom = 22.0
+custom_fonts/font = SubResource( 9 )
+text = "クリア数: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AveTimeLabel" type="Label" parent="Button3"]
+margin_left = 333.0
+margin_top = 20.0
+margin_right = 445.0
+margin_bottom = 37.0
+custom_fonts/font = SubResource( 9 )
+text = "平均タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BestTimeLabel" type="Label" parent="Button3"]
+margin_left = 333.0
+margin_top = 35.0
+margin_right = 445.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 9 )
+text = "最短タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button4" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 529.0
+margin_right = 479.0
+margin_bottom = 583.0
+custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+text = "初級問題集　　     　　"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NSolvedLabel" type="Label" parent="Button4"]
+margin_left = 333.0
+margin_top = 5.0
+margin_right = 434.0
+margin_bottom = 22.0
+custom_fonts/font = SubResource( 9 )
+text = "クリア数: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AveTimeLabel" type="Label" parent="Button4"]
+margin_left = 333.0
+margin_top = 20.0
+margin_right = 445.0
+margin_bottom = 37.0
+custom_fonts/font = SubResource( 9 )
+text = "平均タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BestTimeLabel" type="Label" parent="Button4"]
+margin_left = 333.0
+margin_top = 35.0
+margin_right = 445.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 9 )
+text = "最短タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button5" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 609.0
+margin_right = 479.0
+margin_bottom = 663.0
+custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+text = "初中級問題集　　  　   "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NSolvedLabel" type="Label" parent="Button5"]
+margin_left = 333.0
+margin_top = 5.0
+margin_right = 434.0
+margin_bottom = 22.0
+custom_fonts/font = SubResource( 9 )
+text = "クリア数: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AveTimeLabel" type="Label" parent="Button5"]
+margin_left = 333.0
+margin_top = 20.0
+margin_right = 445.0
+margin_bottom = 37.0
+custom_fonts/font = SubResource( 9 )
+text = "平均タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BestTimeLabel" type="Label" parent="Button5"]
+margin_left = 333.0
+margin_top = 35.0
+margin_right = 445.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 9 )
+text = "最短タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button6" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 689.0
+margin_right = 479.0
+margin_bottom = 743.0
+custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+text = "今日の問題　　　  　  "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NSolvedLabel" type="Label" parent="Button6"]
+visible = false
+margin_left = 333.0
+margin_top = 5.0
+margin_right = 434.0
+margin_bottom = 22.0
+custom_fonts/font = SubResource( 9 )
+text = "クリア数: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="AveTimeLabel" type="Label" parent="Button6"]
+visible = false
+margin_left = 333.0
+margin_top = 20.0
+margin_right = 445.0
+margin_bottom = 37.0
+custom_fonts/font = SubResource( 9 )
+text = "平均タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="BestTimeLabel" type="Label" parent="Button6"]
+visible = false
+margin_left = 333.0
+margin_top = 35.0
+margin_right = 445.0
+margin_bottom = 52.0
+custom_fonts/font = SubResource( 9 )
+text = "最短タイム: "
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CoinButton" type="TextureButton" parent="."]
+margin_left = 23.0
+margin_top = 766.0
+margin_right = 71.0
+margin_bottom = 814.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="CoinButton"]
+margin_left = -8.0
+margin_top = 53.0
+margin_right = 56.0
+margin_bottom = 72.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 11 )
+text = "コイン"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="NCoinLabel" type="Label" parent="CoinButton"]
+margin_right = 48.0
+margin_bottom = 48.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 12 )
+text = "10"
+align = 1
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CoinLabel" type="Label" parent="."]
+margin_left = 95.0
+margin_top = 782.0
+margin_right = 499.0
+margin_bottom = 803.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 13 )
+text = "※ 毎日アプリを開くと、コインが２個増えます。"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="pressed" from="Button0" to="." method="_on_Button0_pressed"]
+[connection signal="pressed" from="Button1" to="." method="_on_Button1_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_Button2_pressed"]
+[connection signal="pressed" from="Button3" to="." method="_on_Button3_pressed"]
+[connection signal="pressed" from="Button4" to="." method="_on_Button4_pressed"]
+[connection signal="pressed" from="Button5" to="." method="_on_Button5_pressed"]
+[connection signal="pressed" from="Button6" to="." method="_on_Button6_pressed"]
