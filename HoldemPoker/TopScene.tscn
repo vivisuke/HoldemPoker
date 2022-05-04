@@ -82,7 +82,7 @@ icon = ExtResource( 5 )
 [node name="NameLabel" type="Label" parent="."]
 margin_left = 23.0
 margin_top = 809.0
-margin_right = 221.0
+margin_right = 240.0
 margin_bottom = 834.0
 rect_rotation = -0.0329332
 custom_colors/font_color = Color( 1, 1, 1, 1 )
@@ -90,10 +90,31 @@ custom_fonts/font = SubResource( 4 )
 text = "Name:"
 align = 2
 
+[node name="BalanceHeadLabel" type="Label" parent="."]
+margin_left = 23.0
+margin_top = 753.0
+margin_right = 240.0
+margin_bottom = 778.0
+rect_rotation = -0.0329332
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 4 )
+text = "Balance:"
+align = 2
+
+[node name="BalanceLabel" type="Label" parent="."]
+margin_left = 245.0
+margin_top = 753.0
+margin_right = 391.0
+margin_bottom = 778.0
+rect_rotation = -0.0329332
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 4 )
+text = "200"
+
 [node name="UserNameEdit" type="LineEdit" parent="."]
-margin_left = 240.0
+margin_left = 245.0
 margin_top = 804.0
-margin_right = 394.0
+margin_right = 399.0
 margin_bottom = 839.0
 theme = SubResource( 5 )
 custom_fonts/font = SubResource( 6 )

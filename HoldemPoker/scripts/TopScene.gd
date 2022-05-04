@@ -15,10 +15,12 @@ func to_MainScene():
 	get_tree().change_scene("res://MainScene.tscn")
 
 func _on_Button0_pressed():
+	g.ai_type = g.AI_HONEST
 	#get_tree().change_scene("res://MainScene.tscn")
 	to_MainScene()
 	pass # Replace with function body.
 func _on_Button1_pressed():
+	g.ai_type = g.AI_SMALL_BLUFF
 	#get_tree().change_scene("res://MainScene.tscn")
 	to_MainScene()
 	pass # Replace with function body.

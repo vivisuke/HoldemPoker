@@ -1,10 +1,16 @@
 extends Node2D
 
+enum {
+	AI_HONEST = 0,
+	AI_SMALL_BLUFF,
+	AI_BLUFF,
+}
 const INIT_BALANCE = 200
 
 const KEY_LOGIN_DATE = "LoginDate"
 const KEY_USER_NAME = "user_name"
 
+var ai_type = AI_HONEST		# AI タイプ
 var saved_data = {}			# 自動保存データ辞書
 
 
