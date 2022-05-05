@@ -44,6 +44,8 @@ enum {
 	READY = 0,
 	CARD_MOVING,
 	CARD_OPENING,
+	CHIPS_COLLECTING,		# プレイヤーベットチップを中央に移動中
+	CHIPS_COLLECTED,		# プレイヤーベットチップを中央に移動中終了
 	INITIALIZED,
 }
 enum {		# アクションボタン
@@ -138,7 +140,7 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if true:
+	if false:
 		randomize()
 		rng.randomize()
 	else:
@@ -307,6 +309,10 @@ func on_chip_move_finished(node):
 	print("on_chip_move_finished():")
 	#print(node)
 	node.queue_free()		# チップオブジェクト消去
+	n_moving -= 1
+	if n_moving == 0 && sub_state == CHIPS_COLLECTING:
+		sub_state = CHIPS_COLLECTED
+		next_round()
 	pass
 func next_round():
 	print("nActPlayer = ", nActPlayer)
@@ -314,10 +320,12 @@ func next_round():
 	#for i in range(N_PLAYERS): n_raised[i] = 0
 	n_raised = 0
 	$NRaisedLabel.text = "# raised: 0/%d" % MAX_N_RAISES
-	if state >= PRE_FLOP && state <= RIVER:
+	if state >= PRE_FLOP && state <= RIVER && sub_state != CHIPS_COLLECTED:
 		# プレイヤーベットチップを中央に移動処理
+		sub_state = CHIPS_COLLECTED
 		var sum = 0		# 全プレイヤーのベット合計
 		var dst = $Table/Chips.get_global_position()		# テーブル中央チップ位置
+		n_moving = 0
 		for i in range(N_PLAYERS):
 			if bet_chips_plyr[i] != 0:		# ベットしている場合
 				var ch = Chip.instance()
@@ -325,12 +333,15 @@ func next_round():
 				add_child(ch)
 				ch.move_to(dst, 0.6)		# プレイヤーベットチップを中央に移動
 				ch.connect("move_finished", self, "on_chip_move_finished", [ch])
+				sub_state = CHIPS_COLLECTING
+				n_moving += 1
 			sum += bet_chips_plyr[i]
 			bet_chips_plyr[i] = 0
 			players[i].set_bet_chips(0)
 			players[i].show_bet_chips(false)
 		pot_chips += sum
 		$Table/Chips/PotLabel.text = String(pot_chips)
+		if sub_state == CHIPS_COLLECTING: return
 	if state != ROUND_FINISHED && nActPlayer == 1:		# 一人以外全員がフォールドした場合
 		#assert(false)
 		var wix
