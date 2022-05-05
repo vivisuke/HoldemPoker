@@ -677,7 +677,7 @@ func do_AI_action_small_bluff(pix, max_raise):
 	var r = rng.randf_range(0, 1.0)
 	if r <= pr_raise:
 		# レイズを行う
-		var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 4)))
+		var bc = min(max_raise, max(BB_CHIPS, int((pot_chips + cur_sum_bet) / 5)))
 		do_raise(pix, bc)
 	elif r <= pr_raise + pr_check_call:
 		# チェック or コールを行う
@@ -990,6 +990,7 @@ func show_hand():		# ShowDown時の処理
 	$AllInNextButton.text = "Next"
 	$AllInNextButton.disabled = false
 func on_all_folded(wix):		# wix 以外全員が降りた場合の処理
+	players[wix].show_bet_chips(false)
 	var ch = Chip.instance()
 	ch.set_position($Table/Chips.get_global_position())		# テーブル中央チップ位置
 	add_child(ch)
