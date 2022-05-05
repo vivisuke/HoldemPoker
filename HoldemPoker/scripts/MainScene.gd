@@ -28,6 +28,7 @@ enum {		# 状態
 	TURN,
 	RIVER,
 	SHOW_DOWN,
+	ROUND_FINISHED,
 }
 enum {
 	DEALER = 0,
@@ -144,8 +145,8 @@ func _ready():
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
 		#print("seed = ", sd)
-		#var sd = 0		# SPR#111
-		var sd = 1
+		var sd = 0		# SPR#111
+		#var sd = 1
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -314,14 +315,15 @@ func next_round():
 	n_raised = 0
 	$NRaisedLabel.text = "# raised: 0/%d" % MAX_N_RAISES
 	if state >= PRE_FLOP && state <= RIVER:
+		# プレイヤーベットチップを中央に移動処理
 		var sum = 0		# 全プレイヤーのベット合計
-		var dst = $Table/Chips.get_global_position()
+		var dst = $Table/Chips.get_global_position()		# テーブル中央チップ位置
 		for i in range(N_PLAYERS):
 			if bet_chips_plyr[i] != 0:		# ベットしている場合
 				var ch = Chip.instance()
 				ch.set_position(players[i].get_chip_pos())
 				add_child(ch)
-				ch.move_to(dst, 0.6)
+				ch.move_to(dst, 0.6)		# プレイヤーベットチップを中央に移動
 				ch.connect("move_finished", self, "on_chip_move_finished", [ch])
 			sum += bet_chips_plyr[i]
 			bet_chips_plyr[i] = 0
@@ -329,6 +331,17 @@ func next_round():
 			players[i].show_bet_chips(false)
 		pot_chips += sum
 		$Table/Chips/PotLabel.text = String(pot_chips)
+	if state != ROUND_FINISHED && nActPlayer == 1:		# 一人以外全員がフォールドした場合
+		#assert(false)
+		var wix
+		for i in range(N_PLAYERS):
+			if !is_folded[i]:
+				wix = i
+				break
+		on_all_folded(wix)
+		nActPlayer = N_PLAYERS
+		state = ROUND_FINISHED
+		return
 	if state == INIT:
 		state = PRE_FLOP
 		$BB2Button.text = "2BB"
@@ -442,7 +455,7 @@ func next_round():
 				players_card1[i].do_open()
 				players_card2[i].do_open()
 		pass
-	elif state == SHOW_DOWN:
+	elif state == SHOW_DOWN || state == ROUND_FINISHED:
 		state = INIT
 		nActPlayer = N_PLAYERS
 		dealer_ix = (dealer_ix + 1) % N_PLAYERS
@@ -569,7 +582,8 @@ func do_raise(pix, rc):
 func max_raise_chips(pix):		# 可能最大レイズ額
 	return max(0, players[pix].get_chips() - (bet_chips - bet_chips_plyr[pix]))
 func _process(delta):
-	if state == SHOW_DOWN: return
+	if state == SHOW_DOWN || state == ROUND_FINISHED:
+		return
 	#if nix != USER_IX || state == INIT:
 	#	sum_delta += delta
 	#	if sum_delta < WAIT_SEC: return
@@ -628,7 +642,8 @@ func _process(delta):
 	pass
 func do_AI_action_small_bluff(pix, max_raise):
 	var wrt : float = calc_win_rate(pix, nActPlayer - 1)		# 期待勝率計算
-	print("win rate[", pix, "] = ", wrt)
+	print("win rate[", pix, "] = ", wrt, " (*", nActPlayer, " = ", wrt * nActPlayer, ")")
+	#print("win rate[", pix, "] = ", wrt)
 	#print("wrt = ", wrt)
 	print("bet_chips_plyr[", pix, "] = ", bet_chips_plyr[pix])
 	var wrtnap = wrt * nActPlayer		# 期待勝率 * アクティブプレイヤー数
@@ -647,6 +662,7 @@ func do_AI_action_small_bluff(pix, max_raise):
 			pr_raise = t * 0.2
 			pr_check_call = t * 0.8 
 	var pr_fold = 1.0 - pr_raise - pr_check_call
+	print("prio rase = ", pr_raise*100, "%, call = ", pr_check_call*100, "%, fold = ", pr_fold*100, "%")
 	var r = rng.randf_range(0, 1.0)
 	if r <= pr_raise:
 		# レイズを行う
@@ -661,7 +677,7 @@ func do_AI_action_small_bluff(pix, max_raise):
 	#	if r <=
 func do_AI_action_honest(pix, max_raise):
 	var wrt = calc_win_rate(pix, nActPlayer - 1)		# 期待勝率計算
-	print("win rate[", pix, "] = ", wrt)
+	print("win rate[", pix, "] = ", wrt, " (*", nActPlayer, " = ", wrt * nActPlayer, ")")
 	#print("wrt = ", wrt)
 	print("bet_chips_plyr[", pix, "] = ", bet_chips_plyr[pix])
 	if( max_raise > 0 && wrt >= 1.0 / nActPlayer * 1.5 &&		# 期待勝率が1/人数の1.5倍以上の場合
@@ -673,7 +689,8 @@ func do_AI_action_honest(pix, max_raise):
 		var cc = bet_chips -  bet_chips_plyr[pix]	# コール必要額
 		var odds = float(pot_chips + cur_sum_bet + cc) / cc
 		print("total pot = ", (pot_chips + cur_sum_bet), " odds = ", odds)
-		if state == PRE_FLOP || wrt >= 1.0 / odds:
+		var wrt_odds = wrt * odds
+		if state == PRE_FLOP && wrt_odds >= 0.66 || wrt_odds >= 1.0:
 			print("called")
 			do_call(pix)
 		else:
@@ -961,6 +978,21 @@ func show_hand():		# ShowDown時の処理
 	#
 	$AllInNextButton.text = "Next"
 	$AllInNextButton.disabled = false
+func on_all_folded(wix):		# wix 以外全員が降りた場合の処理
+	var ch = Chip.instance()
+	ch.set_position($Table/Chips.get_global_position())		# テーブル中央チップ位置
+	add_child(ch)
+	ch.move_to(players[wix].get_chip_pos(), 0.6)		# プレイヤーベットチップを中央に移動
+	#
+	players[wix].add_chips(pot_chips)
+	# uncone: 以下を関数化
+	for i in range(N_PLAYERS):
+		players[i].show_diff_chips(true)
+	pot_chips = 0
+	$Table/Chips/PotLabel.text = String(pot_chips)
+	#
+	$AllInNextButton.text = "Next"
+	$AllInNextButton.disabled = false
 
 func show_hand_old():		# ShowDown時の処理
 	var max_hand = [-1]
@@ -1062,7 +1094,7 @@ func _on_RaiseButton_pressed():
 	disable_act_buttons()
 	next_player()
 func _on_AllInNextButton_pressed():
-	if state == SHOW_DOWN:
+	if state == SHOW_DOWN || state == ROUND_FINISHED:
 		$AllInNextButton.text = "AllIn"
 		$AllInNextButton.disabled = true
 		next_round()
