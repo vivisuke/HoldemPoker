@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://images/BG.png" type="Texture" id=1]
 [ext_resource path="res://fonts/Hokjesgeest-PDGB.ttf" type="DynamicFontData" id=2]
@@ -15,6 +15,9 @@ font_data = ExtResource( 2 )
 size = 24
 font_data = ExtResource( 4 )
 
+[sub_resource type="StyleBoxFlat" id=8]
+bg_color = Color( 0.243137, 0.560784, 0.435294, 1 )
+
 [sub_resource type="StyleBoxFlat" id=3]
 bg_color = Color( 0.180392, 0.309804, 0.309804, 1 )
 border_width_left = 1
@@ -28,6 +31,9 @@ corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 shadow_size = 8
 shadow_offset = Vector2( 4, 4 )
+
+[sub_resource type="StyleBoxFlat" id=9]
+bg_color = Color( 0.243137, 0.560784, 0.435294, 1 )
 
 [sub_resource type="DynamicFont" id=4]
 size = 24
@@ -69,6 +75,7 @@ margin_right = 479.0
 margin_bottom = 488.0
 rect_pivot_offset = Vector2( 386, 392 )
 custom_fonts/font = SubResource( 2 )
+custom_styles/hover = SubResource( 8 )
 custom_styles/normal = SubResource( 3 )
 text = "RingGame BB:2 honest AI"
 icon = ExtResource( 5 )
@@ -80,6 +87,7 @@ margin_right = 479.0
 margin_bottom = 566.0
 rect_pivot_offset = Vector2( 386, 392 )
 custom_fonts/font = SubResource( 2 )
+custom_styles/hover = SubResource( 9 )
 custom_styles/normal = SubResource( 3 )
 text = "RingGame BB:2 small bluff AI"
 icon = ExtResource( 5 )

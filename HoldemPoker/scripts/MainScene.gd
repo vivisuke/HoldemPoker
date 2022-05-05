@@ -140,7 +140,7 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if false:
+	if true:
 		randomize()
 		rng.randomize()
 	else:
@@ -198,6 +198,12 @@ func _ready():
 	#
 	update_d_SB_BB()	# D, SB, BB マーク設置
 	#update_title_text()
+	var txt = "6P RingGame BB:2 "
+	if g.ai_type == g.AI_HONEST:
+		txt += "honest AI"
+	else:
+		txt += "small bluff AI"
+	$TitleBar/Label.text = txt
 	update_roundLabel()
 	#
 	#$Chip.move_to(Vector2(10, 10), 2.0)		# Test
