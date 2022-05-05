@@ -211,7 +211,7 @@ margin_top = 780.0
 margin_right = 500.0
 margin_bottom = 810.0
 custom_fonts/font = SubResource( 1 )
-text = "AllIn"
+text = "All In"
 
 [connection signal="pressed" from="TitleBar/BackButton" to="." method="_on_BackButton_pressed"]
 [connection signal="open_finished" from="Table/PlayerBG1" to="." method="_on_PlayerBG_open_finished"]

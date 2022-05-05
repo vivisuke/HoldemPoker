@@ -1,0 +1,28 @@
+﻿AI Texas Holdem Poker 状態遷移
+    ┌────┐
+    │        ↓
+    │  ┌─────┐
+	│	│   INIT   │
+    │  └─────┘
+	│		  ↓
+	│	┌─────┐
+    │  │ PRE_FLOP │sub_state: CARD_MOVING → CARD_OPENING → READY
+    │  └─────┘
+	│		  ↓     
+	│	┌─────┐
+    │  │   FLOP   │sub_state: CARD_MOVING → CARD_OPENING → READY
+    │  └─────┘
+	│		  ↓     
+	│	┌─────┐
+    │  │  RIVER   │sub_state: CARD_MOVING → CARD_OPENING → READY
+    │  └─────┘
+	│		  ↓     
+	│	┌─────┐
+    │  │   TURN   │sub_state: CARD_MOVING → CARD_OPENING → READY
+    │  └─────┘
+	│		  ↓
+	│	┌─────┐
+    │  │SHOW_DOWN │sub_state: CARD_OPENING → READY
+    │  └─────┘
+	│		  │
+    └────┘
