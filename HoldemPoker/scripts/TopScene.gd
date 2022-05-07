@@ -4,6 +4,7 @@ onready var g = get_node("/root/Global")
 
 func _ready():
 	g.auto_load()
+	$BalanceLabel.text = String(g.saved_data[g.KEY_BALANCE])
 	$UserNameEdit.text = g.saved_data[g.KEY_USER_NAME]
 	pass # Replace with function body.
 

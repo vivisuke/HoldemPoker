@@ -416,7 +416,7 @@ func next_round():
 		$BB5Button.text = "pot"
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].set_text("called")
-			act_panels[i].get_node("PinkPanel").hide()
+			#act_panels[i].get_node("PinkPanel").hide()
 			act_panels[i].show()
 		#comu_cards = []
 		n_moving = N_FLOP_CARDS		# 3 for FLOP
@@ -500,7 +500,7 @@ func next_round():
 	update_next_player()
 func set_act_panel_text(i, txt):
 	act_panels[i].set_text(txt)
-	act_panels[i].get_node("PinkPanel").hide()
+	#act_panels[i].get_node("PinkPanel").hide()
 	act_panels[i].show()
 func hide_act_panels():
 	for i in range(N_PLAYERS):
@@ -582,9 +582,10 @@ func do_call(pix):
 	bet_chips_plyr[pix] = bet_chips
 func do_raise(pix, rc):
 	set_act_panel_text(pix, "raised")
-	act_panels[pix].get_node("PinkPanel").show()
+	act_panels[pix].color = Color.red
+	#act_panels[pix].get_node("PinkPanel").show()
 	#act_panels[pix].set_text("raised")
-	#act_panels[pix].show()
+	act_panels[pix].show()
 	bet_chips += rc			# コール分＋レイズ分 が実際に場に出される
 	cur_sum_bet += rc
 	players[pix].set_bet_chips(bet_chips)

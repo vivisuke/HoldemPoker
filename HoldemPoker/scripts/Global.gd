@@ -5,9 +5,10 @@ enum {
 	AI_SMALL_BLUFF,
 	AI_BLUFF,
 }
-const INIT_BALANCE = 200
+const INIT_BALANCE = 400
 
 const KEY_LOGIN_DATE = "LoginDate"
+const KEY_BALANCE = "balance"
 const KEY_USER_NAME = "user_name"
 
 var ai_type = AI_HONEST		# AI タイプ
@@ -32,7 +33,7 @@ func auto_load():
 		saved_data = file.get_var()
 		file.close()
 	#
-	if !saved_data.has("balance"): saved_data["balance"] = INIT_BALANCE
+	if !saved_data.has(KEY_BALANCE): saved_data[KEY_BALANCE] = INIT_BALANCE
 	if !saved_data.has(KEY_USER_NAME): saved_data[KEY_USER_NAME] = "Human"
 	return saved_data
 func auto_save():
