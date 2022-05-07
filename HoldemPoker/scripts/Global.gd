@@ -37,7 +37,7 @@ func auto_load():
 	if !saved_data.has(KEY_USER_NAME): saved_data[KEY_USER_NAME] = "Human"
 	return saved_data
 func auto_save():
-	saved_data["today"] = today_string()
+	saved_data[KEY_LOGIN_DATE] = today_string()
 	var file = File.new()
 	file.open(AutoSaveFileName, File.WRITE)
 	file.store_var(saved_data)

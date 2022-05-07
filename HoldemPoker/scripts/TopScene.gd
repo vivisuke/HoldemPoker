@@ -1,9 +1,14 @@
 extends Node2D
 
+const LOGIN_BONUS = 100
+
 onready var g = get_node("/root/Global")
 
 func _ready():
 	g.auto_load()
+	if !g.saved_data.has(g.KEY_LOGIN_DATE) || g.saved_data[g.KEY_LOGIN_DATE] != g.today_string():
+		g.saved_data[g.KEY_BALANCE] += LOGIN_BONUS
+		g.auto_save()
 	$BalanceLabel.text = String(g.saved_data[g.KEY_BALANCE])
 	$UserNameEdit.text = g.saved_data[g.KEY_USER_NAME]
 	pass # Replace with function body.
