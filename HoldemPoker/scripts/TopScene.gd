@@ -43,3 +43,7 @@ func _on_UserNameEdit_text_entered(new_text):
 	#g.saved_data[g.KEY_USER_NAME] = new_text
 	#g.auto_save()
 	pass # Replace with function body.
+
+
+func _on_Button2_pressed():
+	pass # Replace with function body.

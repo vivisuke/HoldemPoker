@@ -70,9 +70,9 @@ valign = 1
 
 [node name="Button0" type="Button" parent="."]
 margin_left = 23.0
-margin_top = 434.0
+margin_top = 400.0
 margin_right = 479.0
-margin_bottom = 488.0
+margin_bottom = 454.0
 rect_pivot_offset = Vector2( 386, 392 )
 custom_fonts/font = SubResource( 2 )
 custom_styles/hover = SubResource( 8 )
@@ -82,14 +82,26 @@ icon = ExtResource( 5 )
 
 [node name="Button1" type="Button" parent="."]
 margin_left = 23.0
-margin_top = 512.0
+margin_top = 480.0
 margin_right = 479.0
-margin_bottom = 566.0
+margin_bottom = 534.0
 rect_pivot_offset = Vector2( 386, 392 )
 custom_fonts/font = SubResource( 2 )
 custom_styles/hover = SubResource( 9 )
 custom_styles/normal = SubResource( 3 )
 text = "RingGame BB:2 small bluff AI"
+icon = ExtResource( 5 )
+
+[node name="Button2" type="Button" parent="."]
+margin_left = 23.0
+margin_top = 560.0
+margin_right = 479.0
+margin_bottom = 614.0
+rect_pivot_offset = Vector2( 386, 392 )
+custom_fonts/font = SubResource( 2 )
+custom_styles/hover = SubResource( 9 )
+custom_styles/normal = SubResource( 3 )
+text = "Kuhn Poker Optimal AI"
 icon = ExtResource( 5 )
 
 [node name="NameLabel" type="Label" parent="."]
@@ -143,4 +155,5 @@ align = 1
 
 [connection signal="pressed" from="Button0" to="." method="_on_Button0_pressed"]
 [connection signal="pressed" from="Button1" to="." method="_on_Button1_pressed"]
+[connection signal="pressed" from="Button2" to="." method="_on_Button2_pressed"]
 [connection signal="text_changed" from="UserNameEdit" to="." method="_on_UserNameEdit_text_changed"]
