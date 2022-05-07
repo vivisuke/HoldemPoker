@@ -129,7 +129,7 @@ var n_opening = 0
 var nActPlayer = N_PLAYERS		# 非フォールドプレイヤー数
 var deck_pos
 
-var balanece = INIT_CHIPS		# 暫定
+var balance
 
 onready var g = get_node("/root/Global")
 
@@ -168,8 +168,9 @@ func _ready():
 		pb.set_chips(INIT_CHIPS)
 		players.push_back(pb)
 		is_folded[i] = false
-	balanece -= INIT_CHIPS
-	$Table/BalanceLabel.text = "balance: %d" % balanece
+	balance = g.saved_data[g.KEY_BALANCE]
+	balance -= INIT_CHIPS
+	$Table/BalanceLabel.text = "balance: %d" % balance
 	#print("width = ", players[0].texture.get_width())
 	#for i in range(N_COMU_CARS):
 	#	var cd = get_node("Table/CardBF%d" % (i+1))
@@ -481,8 +482,8 @@ func next_round():
 			if players[i].get_chips() <= 0:		# バーストした場合
 				players[i].set_chips(INIT_CHIPS/2)		# 初期チップの半分を与える
 				if i == USER_IX:
-					balanece -= INIT_CHIPS/2
-					$Table/BalanceLabel.text = "balance: %d" % balanece
+					balance -= INIT_CHIPS/2
+					$Table/BalanceLabel.text = "balance: %d" % balance
 		update_d_SB_BB()
 		for i in range(N_PLAYERS):
 			players_card1[i].queue_free()
@@ -1140,5 +1141,8 @@ func _on_BB5Button_pressed():
 
 
 func _on_BackButton_pressed():
+	balance += players[USER_IX].get_chips()
+	g.saved_data[g.KEY_BALANCE] = balance
+	g.auto_save()
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
