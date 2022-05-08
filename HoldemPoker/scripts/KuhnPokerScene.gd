@@ -93,6 +93,9 @@ func _ready():
 		players.push_back(pb)
 		is_folded[i] = false
 	#
+	balance = g.saved_data[g.KEY_BALANCE]
+	balance -= INIT_CHIPS
+	$Table/BalanceLabel.text = "balance: %d" % balance
 	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
 
 
