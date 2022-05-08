@@ -8,7 +8,7 @@ enum {
 	RANK_J, RANK_Q, RANK_K, RANK_A, N_RANK,
 }
 const RANK_STR = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
-enum {
+enum {		# 手役
 	HIGH_CARD = 0,
 	ONE_PAIR,
 	TWO_PAIR,
@@ -40,7 +40,7 @@ enum {
 	BG_PLY,			# 手番
 	BG_FOLDED,
 }
-enum {
+enum {				# sub_state
 	READY = 0,
 	CARD_MOVING,
 	CARD_OPENING,
@@ -50,14 +50,8 @@ enum {
 }
 enum {		# アクションボタン
 	CHECK_CALL = 0,
-	#CALL,
 	FOLD,
 	RAISE,
-	ALL_IN,
-	BB2,
-	BB3,
-	BB4,
-	BB5,
 	N_ACT_BUTTONS,
 }
 #const N_SUIT = 4
@@ -75,7 +69,8 @@ const BB_CHIPS = 2
 const SB_CHIPS = BB_CHIPS / 2
 const USER_IX = 0				# プレイヤー： players[USER_IX]
 const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
-const N_TRAIALS = 5000			# 期待勝率計算 モンテカルロ法試行回数
+const N_PLAYOUT = 5000			# 期待勝率計算 モンテカルロ法試行回数
+const N_PLAYOUT2 = 500			# 期待勝率計算 モンテカルロ法試行回数（ユーザフォールド時）
 const MAX_N_RAISES = 4			# 現ラウンドにおける最大レイズ回数
 const stateText = [
 	"",		# for INIT
@@ -736,7 +731,8 @@ func calc_win_rate(pix : int, nEnemy : int) -> float:
 	var wsum = 0.0
 	var dk = []				# デッキ用配列
 	dk.resize(N_CARDS)
-	for nt in range(N_TRAIALS):
+	var n_playout = N_PLAYOUT if !is_folded[USER_IX] else N_PLAYOUT2
+	for nt in range(n_playout):
 		for i in range(N_CARDS):		# デッキ初期化
 			var st : int = i / N_RANK
 			var rank : int = i % N_RANK
@@ -762,7 +758,7 @@ func calc_win_rate(pix : int, nEnemy : int) -> float:
 			if r == 0:			# 引き分けの場合
 				nw += 1
 		if win: wsum += 1.0 / nw
-	return wsum / N_TRAIALS
+	return wsum / n_playout
 func add_rank_pair(v, p1, p2, hand):	# ペアの場合に、ペア以外の数字を大きい順に結果配列に追加
 	var rnk = []
 	for i in range(v.size()):
