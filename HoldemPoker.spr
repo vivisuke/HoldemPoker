@@ -260,7 +260,7 @@
 0254 ◎ C 05/08 05/08 0.001│ToDo│トップ画面：「KurnPoker」ボタン押下→KurnPokerScene に遷移
 0255 ● C 05/08            │ToDo│ユーザプレイヤーがフォールドした場合は、モンテカルロ法試行回数を100回？に減らす
 0256 ◎ C 05/09 05/09 0.001│ToDo│KurnPoker画面：戻るボタン
-0257 ● C 05/09            │ToDo│KurnPoker画面：人間プレイヤー名表示
+0257 ◎ C 05/09 05/09 0.001│ToDo│KurnPoker画面：人間プレイヤー名表示
 0258 ● C 05/09            │ToDo│KurnPoker画面：手役表示は消す
 0259 ● C 05/09            │ToDo│KurnPoker画面：持ち込みチップ数は 200 に
 0260 ◎ C 05/09 05/09 0.001│ToDo│KurnPoker画面：players 配列でプレイヤー管理

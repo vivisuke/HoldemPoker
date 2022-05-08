@@ -73,6 +73,15 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card = []		# プレイヤーに配られたカード
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
+var balance
+
+onready var g = get_node("/root/Global")
+
+var CardBF = load("res://CardBF.tscn")		# カード裏面
+var Chip = load("res://Chip.tscn")			# 移動可能チップ
+var ActionPanel = load("res://ActionPanel.tscn")
+
+var rng = RandomNumberGenerator.new()
 
 func _ready():
 	is_folded.resize(N_PLAYERS)
@@ -83,7 +92,8 @@ func _ready():
 		pb.set_chips(INIT_CHIPS)
 		players.push_back(pb)
 		is_folded[i] = false
-	pass # Replace with function body.
+	#
+	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
 
 
 
