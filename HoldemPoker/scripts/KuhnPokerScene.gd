@@ -69,6 +69,7 @@ const N_RANK_BITS = 4			# カード：(suit << N_RANK_BITS) | rank
 const CARD_WIDTH = 50
 const N_PLAYERS = 2				# プレイヤー人数（2 for ヘッズ・アップ）
 
+var cards = [0, 0, 0]			# 使用カード
 var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card = []		# プレイヤーに配られたカード
 var act_panels = []			# プレイヤーアクション表示パネル
@@ -77,13 +78,20 @@ var balance
 
 onready var g = get_node("/root/Global")
 
-var CardBF = load("res://CardBF.tscn")		# カード裏面
+var CardBF = load("res://CardBF.tscn")		# カード裏表面
 var Chip = load("res://Chip.tscn")			# 移動可能チップ
 var ActionPanel = load("res://ActionPanel.tscn")
 
 var rng = RandomNumberGenerator.new()
 
 func _ready():
+	var TABLE_CENTER = $Table.position
+	for i in range(cards.size()):
+		cards[i] = CardBF.instance()
+		cards[i].set_position(TABLE_CENTER + Vector2(CARD_WIDTH*(i-1), 0))
+		cards[i].set_sr(HEARTS, RANK_J + i)
+		cards[i].do_open()
+		add_child(cards[i])
 	is_folded.resize(N_PLAYERS)
 	players = []
 	for i in range(N_PLAYERS):

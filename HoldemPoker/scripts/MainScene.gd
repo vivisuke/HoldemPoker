@@ -128,7 +128,7 @@ var balance
 
 onready var g = get_node("/root/Global")
 
-var CardBF = load("res://CardBF.tscn")		# カード裏面
+var CardBF = load("res://CardBF.tscn")		# カード裏表面
 var Chip = load("res://Chip.tscn")			# 移動可能チップ
 var ActionPanel = load("res://ActionPanel.tscn")
 

@@ -50,6 +50,9 @@ func move_to(dst : Vector2, dur : float):
 	move_elapsed = 0.0
 	moving = true
 	pass
+func set_open():
+	$Front.show()
+	$Back.hide()
 func do_open():
 	opening = OPENING_FH
 	theta = 0.0
