@@ -69,11 +69,6 @@ const N_RANK_BITS = 4			# カード：(suit << N_RANK_BITS) | rank
 const CARD_WIDTH = 50
 const N_PLAYERS = 2				# プレイヤー人数（2 for ヘッズ・アップ）
 
-var cards = [0, 0, 0]			# 使用カード
-var players = []		# プレイヤーパネル配列、[0] for Human
-var players_card = []		# プレイヤーに配られたカード
-var act_panels = []			# プレイヤーアクション表示パネル
-var is_folded = []			# 各プレイヤーが Fold 済みか？
 var state = INIT
 var sub_state = READY
 var balance
@@ -81,6 +76,14 @@ var n_opening = 0
 var n_closing = 0
 var n_moving = 0
 var TABLE_CENTER
+var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISES 以下）
+var nix = -1			# 次の手番
+var dealer_ix = 0		# ディーラプレイヤーインデックス
+var cards = [0, 0, 0]			# 使用カード
+var players = []		# プレイヤーパネル配列、[0] for Human
+var players_card = []		# プレイヤーに配られたカード
+var act_panels = []			# プレイヤーアクション表示パネル
+var is_folded = []			# 各プレイヤーが Fold 済みか？
 
 onready var g = get_node("/root/Global")
 
@@ -91,8 +94,27 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
+	if true:
+		randomize()
+		rng.randomize()
+	else:
+		rng.randomize()
+		#var sd = rng.randi_range(0, 9999)
+		#print("seed = ", sd)
+		var sd = 0		# SPR#111
+		#var sd = 1
+		#var sd = 7
+		#var sd = 3852
+		#var sd = 9830		# 引き分けあり
+		seed(sd)
+		rng.set_seed(sd)
+	#
 	state = INIT
 	TABLE_CENTER = $Table.position
+	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
+	print("dealer_ix = ", dealer_ix)
+	nix = (dealer_ix + 1) % N_PLAYERS		# 次の手番
+	#
 	n_closing = cards.size()
 	for i in range(cards.size()):
 		cards[i] = CardBF.instance()
@@ -112,12 +134,23 @@ func _ready():
 		pb.set_chips(INIT_CHIPS)
 		players.push_back(pb)
 		is_folded[i] = false
+		if i == nix: pb.set_BG(BG_PLY)
 	#
 	balance = g.saved_data[g.KEY_BALANCE]
 	balance -= INIT_CHIPS
 	$Table/BalanceLabel.text = "balance: %d" % balance
 	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
+	#
+	update_d_mark()
 
+func update_d_mark():
+	for i in range(N_PLAYERS):
+		var mk = players[i].get_node("Mark")
+		if i == dealer_ix:
+			mk.show()
+		else:
+			mk.hide()
+	
 func on_opening_finished():
 	n_opening -= 1
 	#if n_opening == 0:

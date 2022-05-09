@@ -33,7 +33,7 @@ var src_pos = Vector2(0, 0)
 var dst_pos = Vector2(0, 0)
 
 func _ready():
-	print("_ready()")
+	#print("_ready()")
 	if bFront:
 		$Front.show()
 		$Back.hide()
@@ -66,7 +66,7 @@ func move_to(dst : Vector2, dur : float):
 	moving = true
 	pass
 func show_front():
-	print("show_front()")
+	#print("show_front()")
 	bFront = true
 	$Front.show()
 	$Back.hide()
