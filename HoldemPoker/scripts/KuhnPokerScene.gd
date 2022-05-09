@@ -47,6 +47,7 @@ enum {				# sub_state
 	INITIALIZED,
 	SHUFFLE_0,				# カードシャフル中（前半）
 	SHUFFLE_1,				# カードシャフル中（後半）
+	DEALING,				# カード配布中
 }
 enum {		# アクションボタン
 	CHECK_CALL = 0,
@@ -183,6 +184,7 @@ func on_moving_finished():
 	n_moving -= 1
 	if n_moving == 0:
 		if state == INIT:
+			cards.shuffle()			# カードシャフル
 			if sub_state == READY:
 				sub_state = SHUFFLE_0
 				n_moving = cards.size()
@@ -195,6 +197,13 @@ func on_moving_finished():
 				for i in range(cards.size()):
 					#cards[i].connect("moving_finished", self, "on_moving_finished")
 					cards[i].move_to(TABLE_CENTER, 0.3)
+			elif sub_state == SHUFFLE_1:
+				sub_state = DEALING
+				n_moving = cards.size()
+				for i in range(N_PLAYERS):
+					#cards[i].connect("moving_finished", self, "on_moving_finished")
+					var dst = players[i].get_global_position() + Vector2(0, 4)
+					cards[i].move_to(dst, 0.3)
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
