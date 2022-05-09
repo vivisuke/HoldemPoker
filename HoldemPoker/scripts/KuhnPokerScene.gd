@@ -48,6 +48,7 @@ enum {				# sub_state
 	SHUFFLE_0,				# カードシャフル中（前半）
 	SHUFFLE_1,				# カードシャフル中（後半）
 	DEALING,				# カード配布中
+	OPENING,				# 人間プレイヤーのカードオープン中
 }
 enum {		# アクションボタン
 	CHECK_CALL = 0,
@@ -71,6 +72,7 @@ const CARD_WIDTH = 50
 const N_PLAYERS = 2				# プレイヤー人数（2 for ヘッズ・アップ）
 const ANTE_CHIPS = 1
 const BET_CHIPS = 1				# 1chip のみベット可能
+const USER_IX = 0
 
 var state = INIT
 var sub_state = READY
@@ -164,13 +166,14 @@ func update_players_BG():
 		players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
 	
 func on_opening_finished():
-	n_opening -= 1
+	#n_opening -= 1
 	#if n_opening == 0:
 	#	if state == INIT:
 	#		n_closing = cards.size()
 	#		for i in range(cards.size()):
 	#			cards[i].connect("closing_finished", self, "on_closing_finished")
 	#			cards[i].do_close()
+	pass
 func on_closing_finished():
 	n_closing -= 1
 	if n_closing == 0:
@@ -198,12 +201,16 @@ func on_moving_finished():
 					#cards[i].connect("moving_finished", self, "on_moving_finished")
 					cards[i].move_to(TABLE_CENTER, 0.3)
 			elif sub_state == SHUFFLE_1:
-				sub_state = DEALING
-				n_moving = cards.size()
+				sub_state = DEALING			# 2人のプレイヤーにカードを配る
+				n_moving = N_PLAYERS
 				for i in range(N_PLAYERS):
 					#cards[i].connect("moving_finished", self, "on_moving_finished")
 					var dst = players[i].get_global_position() + Vector2(0, 4)
 					cards[i].move_to(dst, 0.3)
+			elif sub_state == DEALING:
+				sub_state = OPENING
+				cards[USER_IX].connect("opening_finished", self, "on_opening_finished")
+				cards[USER_IX].do_open()
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
