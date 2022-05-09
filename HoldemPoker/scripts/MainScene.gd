@@ -334,7 +334,7 @@ func next_round():
 				ch.set_position(players[i].get_chip_pos())
 				add_child(ch)
 				ch.move_to(dst, 0.6)		# プレイヤーベットチップを中央に移動
-				ch.connect("move_finished", self, "on_chip_move_finished", [ch])
+				ch.connect("moving_finished", self, "on_chip_move_finished", [ch])
 				sub_state = CHIPS_COLLECTING
 				n_moving += 1
 			sum += bet_chips_plyr[i]
@@ -378,7 +378,7 @@ func next_round():
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
 			#players[i].get_node("CardParent").add_child(cd)
-			cd.connect("move_finished", self, "move_finished")
+			cd.connect("moving_finished", self, "on_moving_finished")
 			cd.connect("opening_finished", self, "opening_finished")
 			var dst = players[di].get_position() + Vector2(-CARD_WIDTH/2, -4)
 			cd.wait_move_to(i * 0.1, dst, 0.3)
@@ -391,7 +391,7 @@ func next_round():
 			deck_ix += 1
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
-			cd.connect("move_finished", self, "move_finished")
+			cd.connect("moving_finished", self, "on_moving_finished")
 			cd.connect("opening_finished", self, "opening_finished")
 			var dst = players[di].get_position() + Vector2(CARD_WIDTH/2, -4)
 			cd.wait_move_to((N_PLAYERS + i) * 0.1, dst, 0.3)
@@ -424,7 +424,7 @@ func next_round():
 			deck_ix += 1
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
-			cd.connect("move_finished", self, "move_finished")
+			cd.connect("moving_finished", self, "on_moving_finished")
 			cd.connect("opening_finished", self, "opening_finished")
 			cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
 	elif state == FLOP:
@@ -437,7 +437,7 @@ func next_round():
 		deck_ix += 1
 		cd.set_position(deck_pos)
 		$Table.add_child(cd)
-		cd.connect("move_finished", self, "move_finished")
+		cd.connect("moving_finished", self, "on_moving_finished")
 		cd.connect("opening_finished", self, "opening_finished")
 		cd.move_to(Vector2(CARD_WIDTH, COMU_CARD_PY), 0.3)
 	elif state == TURN:
@@ -450,7 +450,7 @@ func next_round():
 		deck_ix += 1
 		cd.set_position(deck_pos)
 		$Table.add_child(cd)
-		cd.connect("move_finished", self, "move_finished")
+		cd.connect("moving_finished", self, "on_moving_finished")
 		cd.connect("opening_finished", self, "opening_finished")
 		cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
 	elif state == RIVER:
@@ -510,10 +510,10 @@ func _input(event):
 			next_round()		# 次のラウンドに遷移
 		#elif state == SHOW_DOWN:
 		#	next_game()
-func move_finished():
+func on_moving_finished():
 	n_moving -= 1
 	if n_moving == 0:
-		print("move_finished")
+		print("on_moving_finished")
 		sub_state = CARD_OPENING
 		if state == PRE_FLOP:
 			n_opening = 2

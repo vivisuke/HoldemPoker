@@ -2,7 +2,7 @@ extends Node2D
 
 signal opening_finished
 signal closing_finished
-signal move_finished
+signal moving_finished
 enum {		# state
 	STATE_NONE = 0,
 	OPENING_FH,			# オープン中 前半
@@ -93,7 +93,7 @@ func _process(delta):
 		set_position(src_pos * (1.0 - r) + dst_pos * r)		# 位置更新
 		if move_elapsed == move_dur:		# 移動終了の場合
 			moving = false
-			emit_signal("move_finished")	# 移動終了シグナル発行
+			emit_signal("moving_finished")	# 移動終了シグナル発行
 	#if state != STATE_NONE:
 	#	print("state = ", state)
 	if state == OPENING_FH:

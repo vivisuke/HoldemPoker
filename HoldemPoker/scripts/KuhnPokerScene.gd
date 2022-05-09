@@ -45,6 +45,8 @@ enum {				# sub_state
 	CHIPS_COLLECTING,		# プレイヤーベットチップを中央に移動中
 	CHIPS_COLLECTED,		# プレイヤーベットチップを中央に移動中終了
 	INITIALIZED,
+	SHUFFLE_0,				# カードシャフル中（前半）
+	SHUFFLE_1,				# カードシャフル中（後半）
 }
 enum {		# アクションボタン
 	CHECK_CALL = 0,
@@ -72,10 +74,13 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card = []		# プレイヤーに配られたカード
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
-var state
+var state = INIT
+var sub_state = READY
 var balance
 var n_opening = 0
 var n_closing = 0
+var n_moving = 0
+var TABLE_CENTER
 
 onready var g = get_node("/root/Global")
 
@@ -87,8 +92,8 @@ var rng = RandomNumberGenerator.new()
 
 func _ready():
 	state = INIT
-	var TABLE_CENTER = $Table.position
-	n_opening = cards.size()
+	TABLE_CENTER = $Table.position
+	n_closing = cards.size()
 	for i in range(cards.size()):
 		cards[i] = CardBF.instance()
 		cards[i].set_position(TABLE_CENTER + Vector2(CARD_WIDTH*(i-1), 0))
@@ -115,15 +120,37 @@ func _ready():
 
 func on_opening_finished():
 	n_opening -= 1
-	if n_opening == 0:
-		if state == INIT:
-			n_closing = cards.size()
-			for i in range(cards.size()):
-				cards[i].connect("closing_finished", self, "on_closing_finished")
-				cards[i].do_close()
+	#if n_opening == 0:
+	#	if state == INIT:
+	#		n_closing = cards.size()
+	#		for i in range(cards.size()):
+	#			cards[i].connect("closing_finished", self, "on_closing_finished")
+	#			cards[i].do_close()
 func on_closing_finished():
 	n_closing -= 1
+	if n_closing == 0:
+		n_moving = cards.size()
+		for i in range(cards.size()):
+			cards[i].connect("moving_finished", self, "on_moving_finished")
+			cards[i].move_to(TABLE_CENTER, 0.2)
+			#cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
 
+func on_moving_finished():
+	n_moving -= 1
+	if n_moving == 0:
+		if state == INIT:
+			if sub_state == READY:
+				sub_state = SHUFFLE_0
+				n_moving = cards.size()
+				for i in range(cards.size()):
+					#cards[i].connect("moving_finished", self, "on_moving_finished")
+					cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
+			elif sub_state == SHUFFLE_0:
+				sub_state = SHUFFLE_1
+				n_moving = cards.size()
+				for i in range(cards.size()):
+					#cards[i].connect("moving_finished", self, "on_moving_finished")
+					cards[i].move_to(TABLE_CENTER, 0.3)
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
