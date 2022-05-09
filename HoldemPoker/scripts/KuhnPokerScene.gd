@@ -68,6 +68,8 @@ const RANK_MASK = 0x0f
 const N_RANK_BITS = 4			# カード：(suit << N_RANK_BITS) | rank
 const CARD_WIDTH = 50
 const N_PLAYERS = 2				# プレイヤー人数（2 for ヘッズ・アップ）
+const ANTE_CHIPS = 1
+const BET_CHIPS = 1				# 1chip のみベット可能
 
 var state = INIT
 var sub_state = READY
@@ -84,6 +86,8 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card = []		# プレイヤーに配られたカード
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
+var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
+var round_bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数合計
 
 onready var g = get_node("/root/Global")
 
@@ -141,15 +145,22 @@ func _ready():
 	$Table/BalanceLabel.text = "balance: %d" % balance
 	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
 	#
-	update_d_mark()
+	update_players_BG()
 
-func update_d_mark():
+func update_players_BG():
+	bet_chips_plyr.resize(N_PLAYERS)
+	round_bet_chips_plyr.resize(N_PLAYERS)
 	for i in range(N_PLAYERS):
 		var mk = players[i].get_node("Mark")
 		if i == dealer_ix:
 			mk.show()
 		else:
 			mk.hide()
+		bet_chips_plyr[i] = ANTE_CHIPS
+		round_bet_chips_plyr[i] = ANTE_CHIPS
+		players[i].show_bet_chips(true)
+		players[i].set_bet_chips(bet_chips_plyr[i])
+		players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
 	
 func on_opening_finished():
 	n_opening -= 1
