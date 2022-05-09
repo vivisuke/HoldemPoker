@@ -266,10 +266,10 @@
 0260 ◎ C 05/09 05/09 0.001│ToDo│KurnPoker画面：players 配列でプレイヤー管理
 0261 ◎ C 05/09 05/09 0.001│ToDo│KurnPoker画面：Fold, Check/Call, Raise ボタン設置
 0262 ◎ C 05/09 05/09 0.001│ToDo│KurnPoker画面：初期状態として、J, Q, K を中央に表示
-0263 ● C 05/09            │ToDo│
-0264 ● C 05/09            │ToDo│
-0265 ● C 05/09            │ToDo│
-0266 ● C 05/09            │ToDo│
+0263 ● C 05/09            │ToDo│KurnPoker画面：ディーラを乱数で決め、そちらだけDマーク表示
+0264 ◎ C 05/09 05/09 0.001│ToDo│KurnPoker画面：カードを伏せるアニメーション
+0265 ◎ C 05/09 05/09 0.001│ToDo│「Kurn Poker」ではなく「KurnPoker」表記に統一
+0266 ● C 05/09            │ToDo│KurnPoker画面：カードをシャッフルするアニメーション
 0267 ● C 05/09            │ToDo│
 0268 ● C 05/09            │ToDo│
 0269 ● C 05/09            │ToDo│

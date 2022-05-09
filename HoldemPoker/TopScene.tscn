@@ -101,7 +101,7 @@ rect_pivot_offset = Vector2( 386, 392 )
 custom_fonts/font = SubResource( 2 )
 custom_styles/hover = SubResource( 9 )
 custom_styles/normal = SubResource( 3 )
-text = "Kuhn Poker optimal AI"
+text = "KuhnPoker optimal AI"
 icon = ExtResource( 5 )
 
 [node name="NameLabel" type="Label" parent="."]

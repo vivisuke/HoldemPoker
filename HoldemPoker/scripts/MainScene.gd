@@ -379,7 +379,7 @@ func next_round():
 			$Table.add_child(cd)
 			#players[i].get_node("CardParent").add_child(cd)
 			cd.connect("move_finished", self, "move_finished")
-			cd.connect("open_finished", self, "open_finished")
+			cd.connect("opening_finished", self, "opening_finished")
 			var dst = players[di].get_position() + Vector2(-CARD_WIDTH/2, -4)
 			cd.wait_move_to(i * 0.1, dst, 0.3)
 		players_card2.resize(N_PLAYERS)
@@ -392,7 +392,7 @@ func next_round():
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
 			cd.connect("move_finished", self, "move_finished")
-			cd.connect("open_finished", self, "open_finished")
+			cd.connect("opening_finished", self, "opening_finished")
 			var dst = players[di].get_position() + Vector2(CARD_WIDTH/2, -4)
 			cd.wait_move_to((N_PLAYERS + i) * 0.1, dst, 0.3)
 		act_panels.resize(N_PLAYERS)
@@ -425,7 +425,7 @@ func next_round():
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
 			cd.connect("move_finished", self, "move_finished")
-			cd.connect("open_finished", self, "open_finished")
+			cd.connect("opening_finished", self, "opening_finished")
 			cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
 	elif state == FLOP:
 		state = TURN
@@ -438,7 +438,7 @@ func next_round():
 		cd.set_position(deck_pos)
 		$Table.add_child(cd)
 		cd.connect("move_finished", self, "move_finished")
-		cd.connect("open_finished", self, "open_finished")
+		cd.connect("opening_finished", self, "opening_finished")
 		cd.move_to(Vector2(CARD_WIDTH, COMU_CARD_PY), 0.3)
 	elif state == TURN:
 		state = RIVER
@@ -451,7 +451,7 @@ func next_round():
 		cd.set_position(deck_pos)
 		$Table.add_child(cd)
 		cd.connect("move_finished", self, "move_finished")
-		cd.connect("open_finished", self, "open_finished")
+		cd.connect("opening_finished", self, "opening_finished")
 		cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
 	elif state == RIVER:
 		state = SHOW_DOWN
@@ -531,7 +531,7 @@ func move_finished():
 			comu_cards[N_FLOP_CARDS + 1].do_open()
 		else:
 			sub_state = READY
-func open_finished():
+func opening_finished():
 	n_opening -= 1
 	print(n_opening)
 	if n_opening == 0:

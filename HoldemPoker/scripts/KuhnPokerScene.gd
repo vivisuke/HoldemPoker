@@ -23,10 +23,8 @@ enum {		# 手役
 };
 enum {		# 状態
 	INIT = 0,
-	PRE_FLOP,
-	FLOP,
-	TURN,
-	RIVER,
+	DEAL,
+	BET,
 	SHOW_DOWN,
 	ROUND_FINISHED,
 }
@@ -74,7 +72,10 @@ var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card = []		# プレイヤーに配られたカード
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
+var state
 var balance
+var n_opening = 0
+var n_closing = 0
 
 onready var g = get_node("/root/Global")
 
@@ -85,12 +86,18 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
+	state = INIT
 	var TABLE_CENTER = $Table.position
+	n_opening = cards.size()
 	for i in range(cards.size()):
 		cards[i] = CardBF.instance()
 		cards[i].set_position(TABLE_CENTER + Vector2(CARD_WIDTH*(i-1), 0))
 		cards[i].set_sr(HEARTS, RANK_J + i)
-		cards[i].do_open()
+		#cards[i].connect("opening_finished", self, "on_opening_finished")
+		#cards[i].do_open()
+		cards[i].show_front()
+		cards[i].connect("closing_finished", self, "on_closing_finished")
+		cards[i].do_close()
 		add_child(cards[i])
 	is_folded.resize(N_PLAYERS)
 	players = []
@@ -106,7 +113,16 @@ func _ready():
 	$Table/BalanceLabel.text = "balance: %d" % balance
 	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
 
-
+func on_opening_finished():
+	n_opening -= 1
+	if n_opening == 0:
+		if state == INIT:
+			n_closing = cards.size()
+			for i in range(cards.size()):
+				cards[i].connect("closing_finished", self, "on_closing_finished")
+				cards[i].do_close()
+func on_closing_finished():
+	n_closing -= 1
 
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
