@@ -113,6 +113,7 @@ func _ready():
 	n_closing = cards.size()
 	for i in range(cards.size()):
 		cards[i] = CardBF.instance()
+		#cards[i].set_position(Vector2(CARD_WIDTH*(i-1), 0) - TABLE_CENTER)
 		cards[i].set_position(TABLE_CENTER + Vector2(CARD_WIDTH*(i-1), 0))
 		cards[i].set_sr(HEARTS, RANK_J + i)
 		#cards[i].connect("opening_finished", self, "on_opening_finished")
@@ -139,8 +140,9 @@ func _ready():
 		var ap = ActionPanel.instance()
 		act_panels[i] = ap
 		ap.hide()
-		ap.set_position(players[i].position - ap.rect_size/2)
-		$Table.add_child(ap)
+		ap.set_position(TABLE_CENTER + players[i].position - ap.rect_size/2)
+		add_child(ap)
+		#$Table.add_child(ap)
 	# 行動ボタン
 	act_buttons.resize(N_ACT_BUTTONS)
 	act_buttons[FOLD] = $FoldButton
