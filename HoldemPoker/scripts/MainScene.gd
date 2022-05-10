@@ -307,8 +307,8 @@ func deal_cards():
 #func next_game():
 #	state = INIT
 #	update_roundLabel()
-func on_chip_move_finished(node):
-	print("on_chip_move_finished():")
+func on_chip_moving_finished(node):
+	print("on_chip_moving_finished():")
 	#print(node)
 	node.queue_free()		# チップオブジェクト消去
 	n_moving -= 1
@@ -334,7 +334,7 @@ func next_round():
 				ch.set_position(players[i].get_chip_pos())
 				add_child(ch)
 				ch.move_to(dst, 0.6)		# プレイヤーベットチップを中央に移動
-				ch.connect("moving_finished", self, "on_chip_move_finished", [ch])
+				ch.connect("moving_finished", self, "on_chip_moving_finished", [ch])
 				sub_state = CHIPS_COLLECTING
 				n_moving += 1
 			sum += bet_chips_plyr[i]

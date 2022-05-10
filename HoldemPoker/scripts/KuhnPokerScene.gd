@@ -72,9 +72,11 @@ var n_actions = 0		# プレイヤー行動数
 var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISES 以下）
 var nix = -1			# 次の手番
 var dealer_ix = 0		# ディーラプレイヤーインデックス
+var winner_ix			# 勝者インデックス
+var loser_ix			# 敗者インデックス
 var act_buttons = []		# アクションボタン
-var cards = [0, 0, 0]			# 使用カード
-var players = []		# プレイヤーパネル配列、[0] for Human
+var cards = [0, 0, 0]		# 使用カード
+var players = []			# プレイヤーパネル配列、[0] for Human
 var players_card = []		# プレイヤーに配られたカード
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
@@ -192,8 +194,22 @@ func on_opening_finished():
 			enable_act_buttons()
 	elif state == SHOW_DOWN:
 		print("SHOW_DOWN > on_opening_finished()")
-		emphasize_next_player()
-		# undone: 勝敗判定
+		#emphasize_next_player()
+		if players_card[USER_IX].get_rank() > players_card[AI_IX].get_rank():
+			print("User won")
+			winner_ix = USER_IX		# 勝者
+			loser_ix = AI_IX
+		else:
+			print("AI won")
+			winner_ix = AI_IX
+			loser_ix = USER_IX		# 敗者
+		players[loser_ix].show_bet_chips(false)
+		var ch = Chip.instance()
+		ch.position = players[loser_ix].get_chip_pos()
+		add_child(ch)
+		#n_moving = 1
+		ch.connect("moving_finished", self, "on_chip_moving_finished")
+		ch.move_to(players[winner_ix].get_chip_pos(), 0.5)
 		pass
 	#n_opening -= 1
 	#if n_opening == 0:
@@ -212,6 +228,12 @@ func on_closing_finished():
 			cards[i].move_to(TABLE_CENTER, 0.2)
 			#cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
 
+func on_chip_moving_finished():
+	if state == SHOW_DOWN:
+		var ch = bet_chips_plyr[winner_ix] + bet_chips_plyr[loser_ix]
+		players[winner_ix].set_chips(players[winner_ix].get_chips() + ch)
+		players[winner_ix].show_bet_chips(false)
+		pass
 func on_moving_finished():
 	n_moving -= 1
 	if n_moving == 0:
@@ -276,7 +298,9 @@ func next_player():
 	n_actions += 1
 	if n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		state = SHOW_DOWN
-		for i in range(N_PLAYERS): act_panels[i].hide()
+		emphasize_next_player()		# 次の手番非強調
+		disable_act_buttons()		# 行動ボタンディセーブル
+		for i in range(N_PLAYERS): act_panels[i].hide()		# アクションパネル非表示
 		players_card[AI_IX].connect("opening_finished", self, "on_opening_finished")
 		players_card[AI_IX].do_open()
 		#do_show_down()

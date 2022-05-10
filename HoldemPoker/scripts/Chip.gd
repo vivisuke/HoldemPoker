@@ -1,6 +1,6 @@
 extends Sprite
 
-signal move_finished
+signal moving_finished
 
 var moving = false
 var move_dur = 0.0				# 移動所要時間（単位：秒）
@@ -25,4 +25,4 @@ func _process(delta):
 		set_position(src_pos * (1.0 - r) + dst_pos * r)		# 位置更新
 		if move_elapsed == move_dur:		# 移動終了の場合
 			moving = false
-			emit_signal("move_finished")	# 移動終了シグナル発行
+			emit_signal("moving_finished")	# 移動終了シグナル発行
