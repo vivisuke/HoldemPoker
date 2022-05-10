@@ -183,6 +183,9 @@ func on_opening_finished():
 		state = SEL_ACTION		# アクション選択可能状態
 		if nix == USER_IX:
 			enable_act_buttons()
+	elif state == SHOW_DOWN:
+		# undone: 勝敗判定
+		pass
 	#n_opening -= 1
 	#if n_opening == 0:
 	#	if state == INIT:
@@ -253,10 +256,19 @@ func do_check_call(pix):
 		set_act_panel_text(pix, "checked")
 	next_player()
 func next_player():
-	nix = (nix + 1) % N_PLAYERS
-	update_next_player()
-	if nix == USER_IX:
-		enable_act_buttons()	# 行動ボタンイネーブル
+	n_actions += 1
+	if n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
+		state = SHOW_DOWN
+		players_card[AI_IX].connect("opening_finished", self, "on_opening_finished")
+		players_card[AI_IX].do_open()
+		#do_show_down()
+	else:
+		nix = (nix + 1) % N_PLAYERS
+		update_next_player()
+		if nix == USER_IX:
+			enable_act_buttons()	# 行動ボタンイネーブル
+func do_show_down():
+	pass
 func set_act_panel_text(i, txt):
 	act_panels[i].set_text(txt)
 	act_panels[i].show()
