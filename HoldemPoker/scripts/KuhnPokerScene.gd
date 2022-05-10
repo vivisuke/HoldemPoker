@@ -57,6 +57,7 @@ const N_PLAYERS = 2				# プレイヤー人数（2 for ヘッズ・アップ）
 const ANTE_CHIPS = 1
 const BET_CHIPS = 1				# 1chip のみベット可能
 const USER_IX = 0
+const AI_IX = 1
 
 var state = INIT
 #var sub_state = READY
@@ -65,6 +66,7 @@ var n_opening = 0
 var n_closing = 0
 var n_moving = 0
 var TABLE_CENTER
+var n_actions = 0		# プレイヤー行動数
 var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISES 以下）
 var nix = -1			# 次の手番
 var dealer_ix = 0		# ディーラプレイヤーインデックス
@@ -86,15 +88,15 @@ var ActionPanel = load("res://ActionPanel.tscn")
 var rng = RandomNumberGenerator.new()
 
 func _ready():
-	if true:
+	if false:
 		randomize()
 		rng.randomize()
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
 		#print("seed = ", sd)
-		var sd = 0		# SPR#111
-		#var sd = 1
+		#var sd = 0
+		var sd = 2
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -120,6 +122,8 @@ func _ready():
 		cards[i].do_close()
 		add_child(cards[i])
 	cards.shuffle()			# カードシャフル
+	#for i in range(cards.size()):
+	#	print("rank = ", RANK_STR[cards[i].get_rank()])
 	is_folded.resize(N_PLAYERS)
 	players = []
 	for i in range(N_PLAYERS):
@@ -129,6 +133,14 @@ func _ready():
 		players.push_back(pb)
 		is_folded[i] = false
 		if i == nix: pb.set_BG(BG_PLY)
+	# 行動パネル
+	act_panels.resize(N_PLAYERS)
+	for i in range(N_PLAYERS):
+		var ap = ActionPanel.instance()
+		act_panels[i] = ap
+		ap.hide()
+		ap.set_position(players[i].position - ap.rect_size/2)
+		$Table.add_child(ap)
 	# 行動ボタン
 	act_buttons.resize(N_ACT_BUTTONS)
 	act_buttons[FOLD] = $FoldButton
@@ -167,6 +179,8 @@ func update_players_BG():
 func on_opening_finished():
 	if state == OPENING:		# 人間カードオープン
 		state = SEL_ACTION		# アクション選択可能状態
+		if nix == USER_IX:
+			enable_act_buttons()
 	#n_opening -= 1
 	#if n_opening == 0:
 	#	if state == INIT:
@@ -204,6 +218,8 @@ func on_moving_finished():
 			n_moving = N_PLAYERS
 			for i in range(N_PLAYERS):
 				players_card[i] = cards[i]
+				#var rnk = players_card[i].get_rank()		# 
+				#print(i, " rank = ", RANK_STR[rnk])
 				#cards[i].connect("moving_finished", self, "on_moving_finished")
 				var dst = players[i].get_global_position() + Vector2(0, 4)
 				cards[i].move_to(dst, 0.3)
@@ -224,10 +240,22 @@ func _process(delta):
 		return
 	if state == SEL_ACTION && nix != USER_IX:		# AI の手番
 		print("AI is thinking...")
-		# undone: AI アクション
+		do_act_AI()
+		#
 		nix = USER_IX			# 人間の手番に
 		update_next_player()
 		enable_act_buttons()	# 行動ボタンイネーブル
+func do_act_AI():
+	var rnk = players_card[AI_IX].get_rank()		# 
+	print("rank = ", RANK_STR[rnk])
+	do_check_call(AI_IX)
+func do_check_call(pix):
+	if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
+		set_act_panel_text(pix, "checked")
+		
+func set_act_panel_text(i, txt):
+	act_panels[i].set_text(txt)
+	act_panels[i].show()
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.

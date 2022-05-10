@@ -21,6 +21,7 @@ const NumTable = "234567890JQKA"
 const N_RANK_BITS = 4
 
 var sr = 0		# (suit << 4) | rank
+var rank = 0
 var bFront = false				# 表示面
 var state : int = 0
 var theta = 0.0
@@ -45,7 +46,9 @@ func get_sr():
 	return sr
 func set_suit(st):
 	$Front/Suit.set_frame(st)
-func set_rank(rank):
+func get_rank(): return rank
+func set_rank(r):
+	rank = r
 	if rank == RANK_10:
 		$Front/Label.text = "10"
 	else:
