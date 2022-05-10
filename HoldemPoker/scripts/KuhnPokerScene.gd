@@ -94,9 +94,10 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		#print("seed = ", sd)
+		var sd = OS.get_unix_time()
+		print("seed = ", sd)
 		#var sd = 0
-		var sd = 2
+		#var sd = 2
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -163,6 +164,9 @@ func enable_act_buttons():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = false
 
+#func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
+#	for i in range(N_PLAYERS):
+#		players[i].set_BG(
 func update_players_BG():
 	bet_chips_plyr.resize(N_PLAYERS)
 	round_bet_chips_plyr.resize(N_PLAYERS)
@@ -181,9 +185,12 @@ func update_players_BG():
 func on_opening_finished():
 	if state == OPENING:		# 人間カードオープン
 		state = SEL_ACTION		# アクション選択可能状態
+		emphasize_next_player()
 		if nix == USER_IX:
 			enable_act_buttons()
 	elif state == SHOW_DOWN:
+		print("SHOW_DOWN > on_opening_finished()")
+		emphasize_next_player()
 		# undone: 勝敗判定
 		pass
 	#n_opening -= 1
@@ -232,12 +239,12 @@ func on_moving_finished():
 			state = OPENING				# 人間プレイヤーのカードをオープン
 			players_card[USER_IX].connect("opening_finished", self, "on_opening_finished")
 			players_card[USER_IX].do_open()
-func update_next_player():
+func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
 	for i in range(N_PLAYERS):
 		if is_folded[i]:
 			players[i].set_BG(BG_FOLDED)
 		else:
-			players[i].set_BG(BG_PLY if state != INIT && i == nix else BG_WAIT)
+			players[i].set_BG(BG_PLY if state == SEL_ACTION && i == nix else BG_WAIT)
 	#if nix < act_panels.size():
 	#	act_panels[nix].hide()
 func _process(delta):
@@ -259,12 +266,13 @@ func next_player():
 	n_actions += 1
 	if n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		state = SHOW_DOWN
+		for i in range(N_PLAYERS): act_panels[i].hide()
 		players_card[AI_IX].connect("opening_finished", self, "on_opening_finished")
 		players_card[AI_IX].do_open()
 		#do_show_down()
 	else:
 		nix = (nix + 1) % N_PLAYERS
-		update_next_player()
+		emphasize_next_player()
 		if nix == USER_IX:
 			enable_act_buttons()	# 行動ボタンイネーブル
 func do_show_down():
