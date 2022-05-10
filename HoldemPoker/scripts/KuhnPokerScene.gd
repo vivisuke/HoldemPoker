@@ -184,7 +184,8 @@ func update_players_BG():
 		round_bet_chips_plyr[i] = ANTE_CHIPS
 		players[i].show_bet_chips(true)
 		players[i].set_bet_chips(bet_chips_plyr[i])
-		players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
+		#players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
+		players[i].sub_chips(bet_chips_plyr[i])
 	
 func on_opening_finished():
 	if state == OPENING:		# 人間カードオープン
@@ -231,7 +232,7 @@ func on_closing_finished():
 func on_chip_moving_finished():
 	if state == SHOW_DOWN:
 		var ch = bet_chips_plyr[winner_ix] + bet_chips_plyr[loser_ix]
-		players[winner_ix].set_chips(players[winner_ix].get_chips() + ch)
+		players[winner_ix].add_chips(ch)
 		players[winner_ix].show_bet_chips(false)
 		pass
 func on_moving_finished():
@@ -292,8 +293,19 @@ func do_act_AI():
 func do_check_call(pix):
 	if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		set_act_panel_text(pix, "checked")
+	else:
+		players[pix].sub_chips(BET_CHIPS)
+		bet_chips_plyr[pix] += BET_CHIPS
+		players[pix].set_bet_chips(bet_chips_plyr[pix])
 	do_wait()
 	#next_player()
+func do_raise(pix):
+	n_raised += 1
+	players[pix].sub_chips(BET_CHIPS)
+	bet_chips_plyr[pix] += BET_CHIPS
+	players[pix].set_bet_chips(bet_chips_plyr[pix])
+	set_act_panel_text(pix, "raised")
+	do_wait()
 func next_player():
 	n_actions += 1
 	if n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
@@ -323,8 +335,7 @@ func _on_FoldButton_pressed():
 	pass # Replace with function body.
 func _on_CheckCallButton_pressed():
 	do_check_call(USER_IX)
-	pass # Replace with function body.
 func _on_RaiseButton_pressed():
-	pass # Replace with function body.
+	do_raise(USER_IX)
 func _on_NextButton_pressed():
 	pass # Replace with function body.
