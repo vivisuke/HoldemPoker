@@ -133,7 +133,7 @@ func _ready():
 		pb.set_chips(INIT_CHIPS)
 		players.push_back(pb)
 		is_folded[i] = false
-		if i == nix: pb.set_BG(BG_PLY)
+		#if i == nix: pb.set_BG(BG_PLY)
 	# 行動パネル
 	act_panels.resize(N_PLAYERS)
 	for i in range(N_PLAYERS):
@@ -244,7 +244,6 @@ func _process(delta):
 		print("AI is thinking...")
 		do_act_AI()
 		#
-		next_player()
 func do_act_AI():
 	var rnk = players_card[AI_IX].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
