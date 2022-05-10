@@ -15,6 +15,7 @@ enum {		# 状態
 	DEALING,		# カード配布中
 	OPENING,		# 人間プレイヤーのカードオープン中
 	SEL_ACTION,		# アクション選択
+	WAITING,		# アクション選択後のウェイト状態
 	SHOW_DOWN,
 	ROUND_FINISHED,
 }
@@ -60,6 +61,7 @@ const USER_IX = 0
 const AI_IX = 1
 
 var state = INIT
+var waiting = 0.0		# 0超ならウェイト状態 → 次のプレイヤーに手番を移動
 #var sub_state = READY
 var balance
 var n_opening = 0
@@ -247,8 +249,15 @@ func emphasize_next_player():		# 次の手番のプレイヤー背景上部を�
 			players[i].set_BG(BG_PLY if state == SEL_ACTION && i == nix else BG_WAIT)
 	#if nix < act_panels.size():
 	#	act_panels[nix].hide()
+func do_wait():
+	waiting = 0.5		# 0.5秒ウェイト
 func _process(delta):
 	if state == SHOW_DOWN || state == ROUND_FINISHED:
+		return
+	if waiting > 0.0:		# 行動後のウェイト状態の場合
+		waiting -= delta
+		if waiting <= 0.0:	# ウェイト終了
+			next_player()	# 次のプレイヤーに手番を移動
 		return
 	if state == SEL_ACTION && nix != USER_IX:		# AI の手番
 		print("AI is thinking...")
@@ -261,7 +270,8 @@ func do_act_AI():
 func do_check_call(pix):
 	if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		set_act_panel_text(pix, "checked")
-	next_player()
+	do_wait()
+	#next_player()
 func next_player():
 	n_actions += 1
 	if n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
