@@ -244,9 +244,7 @@ func _process(delta):
 		print("AI is thinking...")
 		do_act_AI()
 		#
-		nix = USER_IX			# 人間の手番に
-		update_next_player()
-		enable_act_buttons()	# 行動ボタンイネーブル
+		next_player()
 func do_act_AI():
 	var rnk = players_card[AI_IX].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
@@ -254,10 +252,24 @@ func do_act_AI():
 func do_check_call(pix):
 	if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		set_act_panel_text(pix, "checked")
-		
+	next_player()
+func next_player():
+	nix = (nix + 1) % N_PLAYERS
+	update_next_player()
+	if nix == USER_IX:
+		enable_act_buttons()	# 行動ボタンイネーブル
 func set_act_panel_text(i, txt):
 	act_panels[i].set_text(txt)
 	act_panels[i].show()
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
+	pass # Replace with function body.
+
+
+func _on_FoldButton_pressed():
+	pass # Replace with function body.
+func _on_CheckCallButton_pressed():
+	do_check_call(USER_IX)
+	pass # Replace with function body.
+func _on_RaiseButton_pressed():
 	pass # Replace with function body.
