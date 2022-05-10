@@ -326,3 +326,5 @@ func _on_CheckCallButton_pressed():
 	pass # Replace with function body.
 func _on_RaiseButton_pressed():
 	pass # Replace with function body.
+func _on_NextButton_pressed():
+	pass # Replace with function body.
