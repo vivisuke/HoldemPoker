@@ -41,15 +41,9 @@ enum {
 #	OPENING,				# 人間プレイヤーのカードオープン中
 #}
 enum {		# アクションボタン
-	CHECK_CALL = 0,
-	#CALL,
-	FOLD,
+	FOLD = 0,
+	CHECK_CALL,
 	RAISE,
-	ALL_IN,
-	BB2,
-	BB3,
-	BB4,
-	BB5,
 	N_ACT_BUTTONS,
 }
 
@@ -74,6 +68,7 @@ var TABLE_CENTER
 var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISES 以下）
 var nix = -1			# 次の手番
 var dealer_ix = 0		# ディーラプレイヤーインデックス
+var act_buttons = []		# アクションボタン
 var cards = [0, 0, 0]			# 使用カード
 var players = []		# プレイヤーパネル配列、[0] for Human
 var players_card = []		# プレイヤーに配られたカード
@@ -134,6 +129,12 @@ func _ready():
 		players.push_back(pb)
 		is_folded[i] = false
 		if i == nix: pb.set_BG(BG_PLY)
+	# 行動ボタン
+	act_buttons.resize(N_ACT_BUTTONS)
+	act_buttons[FOLD] = $FoldButton
+	act_buttons[CHECK_CALL] = $CheckCallButton
+	act_buttons[RAISE] = $RaiseButton
+	disable_act_buttons()			# 全コマンドボタンディセーブル
 	#
 	balance = g.saved_data[g.KEY_BALANCE]
 	balance -= INIT_CHIPS
@@ -141,6 +142,9 @@ func _ready():
 	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
 	#
 	update_players_BG()
+func disable_act_buttons():
+	for i in range(N_ACT_BUTTONS):
+		act_buttons[i].disabled = true
 
 func update_players_BG():
 	bet_chips_plyr.resize(N_PLAYERS)
