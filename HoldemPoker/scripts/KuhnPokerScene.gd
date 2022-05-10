@@ -145,6 +145,9 @@ func _ready():
 func disable_act_buttons():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
+func enable_act_buttons():
+	for i in range(N_ACT_BUTTONS):
+		act_buttons[i].disabled = false
 
 func update_players_BG():
 	bet_chips_plyr.resize(N_PLAYERS)
@@ -208,12 +211,23 @@ func on_moving_finished():
 			state = OPENING				# 人間プレイヤーのカードをオープン
 			players_card[USER_IX].connect("opening_finished", self, "on_opening_finished")
 			players_card[USER_IX].do_open()
+func update_next_player():
+	for i in range(N_PLAYERS):
+		if is_folded[i]:
+			players[i].set_BG(BG_FOLDED)
+		else:
+			players[i].set_BG(BG_PLY if state != INIT && i == nix else BG_WAIT)
+	#if nix < act_panels.size():
+	#	act_panels[nix].hide()
 func _process(delta):
 	if state == SHOW_DOWN || state == ROUND_FINISHED:
 		return
 	if state == SEL_ACTION && nix != USER_IX:		# AI の手番
 		print("AI is thinking...")
-		nix = USER_IX		# 人間の手番に
+		# undone: AI アクション
+		nix = USER_IX			# 人間の手番に
+		update_next_player()
+		enable_act_buttons()	# 行動ボタンイネーブル
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
