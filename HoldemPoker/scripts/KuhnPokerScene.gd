@@ -8,23 +8,13 @@ enum {
 	RANK_J, RANK_Q, RANK_K, RANK_A, N_RANK,
 }
 const RANK_STR = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
-enum {		# 手役
-	HIGH_CARD = 0,
-	ONE_PAIR,
-	TWO_PAIR,
-	THREE_OF_A_KIND,
-	STRAIGHT,
-	FLUSH,
-	FULL_HOUSE,
-	FOUR_OF_A_KIND,
-	STRAIGHT_FLUSH,
-	ROYAL_FLUSH,
-	N_KIND_HAND,
-};
 enum {		# 状態
 	INIT = 0,
-	DEAL,
-	BET,
+	SHUFFLE_0,		# カードシャフル中（前半）
+	SHUFFLE_1,		# カードシャフル中（後半）
+	DEALING,		# カード配布中
+	OPENING,		# 人間プレイヤーのカードオープン中
+	SEL_ACTION,		# アクション選択
 	SHOW_DOWN,
 	ROUND_FINISHED,
 }
@@ -38,18 +28,18 @@ enum {
 	BG_PLY,			# 手番
 	BG_FOLDED,
 }
-enum {				# sub_state
-	READY = 0,
-	CARD_MOVING,
-	CARD_OPENING,
-	CHIPS_COLLECTING,		# プレイヤーベットチップを中央に移動中
-	CHIPS_COLLECTED,		# プレイヤーベットチップを中央に移動中終了
-	INITIALIZED,
-	SHUFFLE_0,				# カードシャフル中（前半）
-	SHUFFLE_1,				# カードシャフル中（後半）
-	DEALING,				# カード配布中
-	OPENING,				# 人間プレイヤーのカードオープン中
-}
+#enum {				# sub_state
+#	READY = 0,
+#	CARD_MOVING,
+#	CARD_OPENING,
+#	CHIPS_COLLECTING,		# プレイヤーベットチップを中央に移動中
+#	CHIPS_COLLECTED,		# プレイヤーベットチップを中央に移動中終了
+#	INITIALIZED,
+#	SHUFFLE_0,				# カードシャフル中（前半）
+#	SHUFFLE_1,				# カードシャフル中（後半）
+#	DEALING,				# カード配布中
+#	OPENING,				# 人間プレイヤーのカードオープン中
+#}
 enum {		# アクションボタン
 	CHECK_CALL = 0,
 	#CALL,
@@ -75,7 +65,7 @@ const BET_CHIPS = 1				# 1chip のみベット可能
 const USER_IX = 0
 
 var state = INIT
-var sub_state = READY
+#var sub_state = READY
 var balance
 var n_opening = 0
 var n_closing = 0
@@ -116,6 +106,7 @@ func _ready():
 		seed(sd)
 		rng.set_seed(sd)
 	#
+	players_card.resize(N_PLAYERS)
 	state = INIT
 	TABLE_CENTER = $Table.position
 	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
@@ -133,6 +124,7 @@ func _ready():
 		cards[i].connect("closing_finished", self, "on_closing_finished")
 		cards[i].do_close()
 		add_child(cards[i])
+	cards.shuffle()			# カードシャフル
 	is_folded.resize(N_PLAYERS)
 	players = []
 	for i in range(N_PLAYERS):
@@ -166,6 +158,8 @@ func update_players_BG():
 		players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
 	
 func on_opening_finished():
+	if state == OPENING:		# 人間カードオープン
+		state = SEL_ACTION		# アクション選択可能状態
 	#n_opening -= 1
 	#if n_opening == 0:
 	#	if state == INIT:
@@ -187,30 +181,35 @@ func on_moving_finished():
 	n_moving -= 1
 	if n_moving == 0:
 		if state == INIT:
-			cards.shuffle()			# カードシャフル
-			if sub_state == READY:
-				sub_state = SHUFFLE_0
-				n_moving = cards.size()
-				for i in range(cards.size()):
-					#cards[i].connect("moving_finished", self, "on_moving_finished")
-					cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
-			elif sub_state == SHUFFLE_0:
-				sub_state = SHUFFLE_1
-				n_moving = cards.size()
-				for i in range(cards.size()):
-					#cards[i].connect("moving_finished", self, "on_moving_finished")
-					cards[i].move_to(TABLE_CENTER, 0.3)
-			elif sub_state == SHUFFLE_1:
-				sub_state = DEALING			# 2人のプレイヤーにカードを配る
-				n_moving = N_PLAYERS
-				for i in range(N_PLAYERS):
-					#cards[i].connect("moving_finished", self, "on_moving_finished")
-					var dst = players[i].get_global_position() + Vector2(0, 4)
-					cards[i].move_to(dst, 0.3)
-			elif sub_state == DEALING:
-				sub_state = OPENING
-				cards[USER_IX].connect("opening_finished", self, "on_opening_finished")
-				cards[USER_IX].do_open()
+			state = SHUFFLE_0			# シャフルアニメーション前半
+			n_moving = cards.size()
+			for i in range(cards.size()):
+				#cards[i].connect("moving_finished", self, "on_moving_finished")
+				cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
+		elif state == SHUFFLE_0:
+			state = SHUFFLE_1			# シャフルアニメーション後半
+			n_moving = cards.size()
+			for i in range(cards.size()):
+				#cards[i].connect("moving_finished", self, "on_moving_finished")
+				cards[i].move_to(TABLE_CENTER, 0.3)
+		elif state == SHUFFLE_1:
+			state = DEALING				# 2人のプレイヤーにカードを配る
+			n_moving = N_PLAYERS
+			for i in range(N_PLAYERS):
+				players_card[i] = cards[i]
+				#cards[i].connect("moving_finished", self, "on_moving_finished")
+				var dst = players[i].get_global_position() + Vector2(0, 4)
+				cards[i].move_to(dst, 0.3)
+		elif state == DEALING:
+			state = OPENING				# 人間プレイヤーのカードをオープン
+			players_card[USER_IX].connect("opening_finished", self, "on_opening_finished")
+			players_card[USER_IX].do_open()
+func _process(delta):
+	if state == SHOW_DOWN || state == ROUND_FINISHED:
+		return
+	if state == SEL_ACTION && nix != USER_IX:		# AI の手番
+		print("AI is thinking...")
+		nix = USER_IX		# 人間の手番に
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
