@@ -129,7 +129,7 @@ func _ready():
 		cards[i].connect("closing_finished", self, "on_closing_finished")
 		cards[i].do_close()
 		add_child(cards[i])
-	cards.shuffle()			# カードシャフル
+	#cards.shuffle()			# カードシャフル
 	#for i in range(cards.size()):
 	#	print("rank = ", RANK_STR[cards[i].get_rank()])
 	is_folded.resize(N_PLAYERS)
@@ -270,6 +270,7 @@ func on_moving_finished():
 				#cards[i].connect("moving_finished", self, "on_moving_finished")
 				cards[i].move_to(TABLE_CENTER, 0.3)
 		elif state == SHUFFLE_1:
+			cards.shuffle()
 			state = DEALING				# 2人のプレイヤーにカードを配る
 			n_moving = N_PLAYERS
 			for i in range(N_PLAYERS):
