@@ -252,6 +252,7 @@ func on_chip_moving_finished():
 		var ch = bet_chips_plyr[winner_ix] + bet_chips_plyr[loser_ix]
 		players[winner_ix].add_chips(ch)
 		players[winner_ix].show_bet_chips(false)
+		disable_act_buttons()
 		$NextButton.disabled = false
 		pass
 func on_moving_finished():
@@ -398,7 +399,7 @@ func next_hand():
 	n_closing = 1
 	players_card[USER_IX].connect("closing_finished", self, "on_closing_finished")
 	players_card[USER_IX].do_close()
-	if !is_folded[AI_IX] && !is_folded[USER_IX_IX]:
+	if !is_folded[AI_IX] && !is_folded[USER_IX]:
 		n_closing = 2
 		players_card[AI_IX].connect("closing_finished", self, "on_closing_finished")
 		players_card[AI_IX].do_close()
