@@ -395,6 +395,8 @@ func next_hand():
 	n_raised = 0
 	update_n_raised_label()
 	update_players_BG()
+	for i in range(N_PLAYERS):
+		act_panels[i].hide()
 	n_closing = 1
 	players_card[USER_IX].connect("closing_finished", self, "on_closing_finished")
 	players_card[USER_IX].do_close()
