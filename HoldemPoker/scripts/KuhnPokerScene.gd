@@ -169,7 +169,20 @@ func disable_act_buttons():
 func enable_act_buttons():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = false
-
+func can_check():
+	return bet_chips_plyr[USER_IX] == bet_chips_plyr[AI_IX]
+func update_act_buttons():
+	if nix != USER_IX:
+		disable_act_buttons()
+	else:
+		$FoldButton.disabled = false
+		$CheckCallButton.disabled = false
+		if can_check():
+			$CheckCallButton.text = "Check"
+		else:
+			$CheckCallButton.text = "Call %d" % (bet_chips_plyr[AI_IX] - bet_chips_plyr[USER_IX])
+		$RaiseButton.disabled = n_raised != 0
+		$NextButton.disabled = true
 #func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
 #	for i in range(N_PLAYERS):
 #		players[i].set_BG(
@@ -296,9 +309,9 @@ func do_act_AI():
 	var rnk = players_card[AI_IX].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
 	var rd = rng.randf_range(0.0, 1.0)		# [0.0, 1.0] 乱数
-	var can_check = bet_chips_plyr[USER_IX] == bet_chips_plyr[AI_IX]
+	var can_chk = can_check()
 	var can_raise = n_raised == 0
-	print("can_check = ", can_check, ", can_raise = ", can_raise)
+	print("can_check = ", can_chk, ", can_raise = ", can_raise)
 	if n_actions == 0:		# 初手
 		if( rnk == RANK_J && rd <= alpha ||
 			rnk == RANK_K && rd <= alpha*3 ):
@@ -312,7 +325,7 @@ func do_act_AI():
 			else:
 				do_check_call(AI_IX)
 		elif rnk == RANK_Q:
-			if can_check || rd <= 1.0/3.0:
+			if can_chk || rd <= 1.0/3.0:
 				do_check_call(AI_IX)
 			else:
 				do_fold(AI_IX)
@@ -345,6 +358,7 @@ func do_raise(pix):
 	do_wait()
 func do_fold(pix):
 	is_folded[pix] = true		# 必要？
+	set_act_panel_text(pix, "folded")
 	state = SHOW_DOWN
 	loser_ix = pix
 	winner_ix = (USER_IX + AI_IX) - pix
@@ -363,7 +377,9 @@ func next_player():
 		nix = (nix + 1) % N_PLAYERS
 		emphasize_next_player()
 		if nix == USER_IX:
-			enable_act_buttons()	# 行動ボタンイネーブル
+			act_panels[USER_IX].hide()
+			update_act_buttons()
+			#enable_act_buttons()	# 行動ボタンイネーブル
 #func do_show_down():
 #	pass
 func set_act_panel_text(i, txt):
