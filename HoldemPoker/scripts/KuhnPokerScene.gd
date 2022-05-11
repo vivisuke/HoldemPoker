@@ -156,6 +156,7 @@ func _ready():
 	act_buttons[CHECK_CALL] = $CheckCallButton
 	act_buttons[RAISE] = $RaiseButton
 	disable_act_buttons()			# 全コマンドボタンディセーブル
+	$NextButton.disabled = true
 	#
 	balance = g.saved_data[g.KEY_BALANCE]
 	balance -= INIT_CHIPS
