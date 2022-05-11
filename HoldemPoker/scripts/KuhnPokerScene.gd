@@ -74,6 +74,7 @@ var nix = -1			# 次の手番
 var dealer_ix = 0		# ディーラプレイヤーインデックス
 var winner_ix			# 勝者インデックス
 var loser_ix			# 敗者インデックス
+var alpha = 0.0			# Ｊレイズ確率
 var act_buttons = []		# アクションボタン
 var cards = [0, 0, 0]		# 使用カード
 var players = []			# プレイヤーパネル配列、[0] for Human
@@ -108,6 +109,7 @@ func _ready():
 		seed(sd)
 		rng.set_seed(sd)
 	#
+	alpha = rng.randf_range(0.1, 0.3)
 	players_card.resize(N_PLAYERS)
 	state = INIT
 	TABLE_CENTER = $Table.position
@@ -291,7 +293,37 @@ func _process(delta):
 func do_act_AI():
 	var rnk = players_card[AI_IX].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
-	do_check_call(AI_IX)
+	var rd = rng.randf_range(0.0, 1.0)		# [0.0, 1.0] 乱数
+	var can_check = bet_chips_plyr[USER_IX] == bet_chips_plyr[AI_IX]
+	var can_raise = n_raised == 0
+	print("can_check = ", can_check, ", can_raise = ", can_raise)
+	if n_actions == 0:		# 初手
+		if( rnk == RANK_J && rd <= alpha ||
+			rnk == RANK_K && rd <= alpha*3 ):
+				do_raise(AI_IX)
+		else:
+			do_check_call(AI_IX)
+	if n_actions == 1:		# ２手目
+		if rnk == RANK_K:
+			if can_raise:
+				do_raise(AI_IX)
+			else:
+				do_check_call(AI_IX)
+		elif rnk == RANK_Q:
+			if can_check || rd <= 1.0/3.0:
+				do_check_call(AI_IX)
+			else:
+				do_fold(AI_IX)
+		else:	# Ｊの場合
+			if can_raise && rd <= 1.0/3.0:
+				do_raise(AI_IX)
+			else:
+				do_fold(AI_IX)
+	else:	# ３手目
+		if rd <= alpha + 1.0/3.0:
+			do_check_call(AI_IX)
+		else:
+			do_fold(AI_IX)
 func do_check_call(pix):
 	if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		set_act_panel_text(pix, "checked")
@@ -329,11 +361,13 @@ func next_player():
 		emphasize_next_player()
 		if nix == USER_IX:
 			enable_act_buttons()	# 行動ボタンイネーブル
-func do_show_down():
-	pass
+#func do_show_down():
+#	pass
 func set_act_panel_text(i, txt):
 	act_panels[i].set_text(txt)
 	act_panels[i].show()
+func next_hand():
+	pass
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
@@ -344,4 +378,6 @@ func _on_CheckCallButton_pressed():
 func _on_RaiseButton_pressed():
 	do_raise(USER_IX)
 func _on_NextButton_pressed():
+	if state == SHOW_DOWN:
+		next_hand()
 	pass # Replace with function body.
