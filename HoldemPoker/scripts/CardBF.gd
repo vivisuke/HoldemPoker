@@ -119,7 +119,7 @@ func _process(delta):
 			$Front.set_scale(Vector2(1.0, 1.0))
 			emit_signal("opening_finished")
 	elif state == CLOSING_FH:
-		theta += delta * TH_SCALE
+		theta += delta * TH_SCALE * 1.5
 		if theta < PI/2:
 			$Front.set_scale(Vector2(cos(theta), 1.0))
 		else:
@@ -129,7 +129,7 @@ func _process(delta):
 			theta -= PI
 			$Back.set_scale(Vector2(cos(theta), 1.0))
 	elif state == CLOSING_SH:
-		theta += delta * TH_SCALE
+		theta += delta * TH_SCALE * 1.5
 		theta = min(theta, 0)
 		if theta < 0:
 			$Back.set_scale(Vector2(cos(theta), 1.0))

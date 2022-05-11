@@ -342,9 +342,14 @@ func do_act_AI():
 				do_raise(AI_IX)
 			else:
 				do_fold(AI_IX)
-	else:	# ３手目
-		if rd <= alpha + 1.0/3.0:
+	else:	# ３手目（チェック→レイズ の場合）
+		if rnk == RANK_K:
 			do_check_call(AI_IX)
+		elif rnk == RANK_Q:
+			if rd <= alpha + 1.0/3.0:
+				do_check_call(AI_IX)
+			else:
+				do_fold(AI_IX)
 		else:
 			do_fold(AI_IX)
 func do_check_call(pix):
