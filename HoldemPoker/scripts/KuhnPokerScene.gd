@@ -204,13 +204,7 @@ func on_opening_finished():
 			print("AI won")
 			winner_ix = AI_IX
 			loser_ix = USER_IX		# 敗者
-		players[loser_ix].show_bet_chips(false)
-		var ch = Chip.instance()
-		ch.position = players[loser_ix].get_chip_pos()
-		add_child(ch)
-		#n_moving = 1
-		ch.connect("moving_finished", self, "on_chip_moving_finished")
-		ch.move_to(players[winner_ix].get_chip_pos(), 0.5)
+		settle_chips()
 		pass
 	#n_opening -= 1
 	#if n_opening == 0:
@@ -220,6 +214,14 @@ func on_opening_finished():
 	#			cards[i].connect("closing_finished", self, "on_closing_finished")
 	#			cards[i].do_close()
 	pass
+func settle_chips():
+	players[loser_ix].show_bet_chips(false)
+	var ch = Chip.instance()
+	ch.position = players[loser_ix].get_chip_pos()
+	add_child(ch)
+	#n_moving = 1
+	ch.connect("moving_finished", self, "on_chip_moving_finished")
+	ch.move_to(players[winner_ix].get_chip_pos(), 0.5)
 func on_closing_finished():
 	n_closing -= 1
 	if n_closing == 0:
@@ -306,6 +308,12 @@ func do_raise(pix):
 	players[pix].set_bet_chips(bet_chips_plyr[pix])
 	set_act_panel_text(pix, "raised")
 	do_wait()
+func do_fold(pix):
+	is_folded[pix] = true		# 必要？
+	state = SHOW_DOWN
+	loser_ix = pix
+	winner_ix = (USER_IX + AI_IX) - pix
+	settle_chips()
 func next_player():
 	n_actions += 1
 	if n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
@@ -329,10 +337,8 @@ func set_act_panel_text(i, txt):
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
-
-
 func _on_FoldButton_pressed():
-	pass # Replace with function body.
+	do_fold(USER_IX)
 func _on_CheckCallButton_pressed():
 	do_check_call(USER_IX)
 func _on_RaiseButton_pressed():
