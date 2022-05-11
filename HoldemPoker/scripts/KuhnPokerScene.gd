@@ -173,6 +173,8 @@ func enable_act_buttons():
 #func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
 #	for i in range(N_PLAYERS):
 #		players[i].set_BG(
+func update_n_raised_label():
+	$NRaisedLabel.text = "# raised: %d/1" % n_raised
 func update_players_BG():
 	bet_chips_plyr.resize(N_PLAYERS)
 	round_bet_chips_plyr.resize(N_PLAYERS)
@@ -335,6 +337,7 @@ func do_check_call(pix):
 	#next_player()
 func do_raise(pix):
 	n_raised += 1
+	update_n_raised_label()
 	players[pix].sub_chips(BET_CHIPS)
 	bet_chips_plyr[pix] += BET_CHIPS
 	players[pix].set_bet_chips(bet_chips_plyr[pix])
