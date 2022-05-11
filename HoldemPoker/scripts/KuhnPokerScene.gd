@@ -359,7 +359,7 @@ func do_raise(pix):
 	set_act_panel_text(pix, "raised")
 	do_wait()
 func do_fold(pix):
-	is_folded[pix] = true		# 必要？
+	is_folded[pix] = true
 	set_act_panel_text(pix, "folded")
 	state = SHOW_DOWN
 	loser_ix = pix
@@ -398,7 +398,7 @@ func next_hand():
 	n_closing = 1
 	players_card[USER_IX].connect("closing_finished", self, "on_closing_finished")
 	players_card[USER_IX].do_close()
-	if !is_folded[AI_IX]:
+	if !is_folded[AI_IX] && !is_folded[USER_IX_IX]:
 		n_closing = 2
 		players_card[AI_IX].connect("closing_finished", self, "on_closing_finished")
 		players_card[AI_IX].do_close()
