@@ -252,6 +252,7 @@ func on_chip_moving_finished():
 		var ch = bet_chips_plyr[winner_ix] + bet_chips_plyr[loser_ix]
 		players[winner_ix].add_chips(ch)
 		players[winner_ix].show_bet_chips(false)
+		$NextButton.disabled = false
 		pass
 func on_moving_finished():
 	n_moving -= 1
@@ -318,7 +319,7 @@ func do_act_AI():
 				do_raise(AI_IX)
 		else:
 			do_check_call(AI_IX)
-	if n_actions == 1:		# ２手目
+	elif n_actions == 1:		# ２手目
 		if rnk == RANK_K:
 			if can_raise:
 				do_raise(AI_IX)
@@ -392,6 +393,14 @@ func next_hand():
 	n_actions = 0
 	n_raised = 0
 	update_players_BG()
+	n_closing = 1
+	players_card[USER_IX].connect("closing_finished", self, "on_closing_finished")
+	players_card[USER_IX].do_close()
+	if !is_folded[AI_IX]:
+		n_closing = 2
+		players_card[AI_IX].connect("closing_finished", self, "on_closing_finished")
+		players_card[AI_IX].do_close()
+	$NextButton.disabled = true
 	pass
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
