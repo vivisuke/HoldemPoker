@@ -82,7 +82,7 @@ var players_card = []		# プレイヤーに配られたカード
 var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
 var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
-var round_bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数合計
+#var round_bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数合計
 
 onready var g = get_node("/root/Global")
 
@@ -99,13 +99,13 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		var sd = OS.get_unix_time()
-		print("seed = ", sd)
-		#var sd = 0
+		#var sd = OS.get_unix_time()
+		var sd = 0
 		#var sd = 2
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
+		print("seed = ", sd)
 		seed(sd)
 		rng.set_seed(sd)
 	#
@@ -190,7 +190,7 @@ func update_n_raised_label():
 	$NRaisedLabel.text = "# raised: %d/1" % n_raised
 func update_players_BG():
 	bet_chips_plyr.resize(N_PLAYERS)
-	round_bet_chips_plyr.resize(N_PLAYERS)
+	#round_bet_chips_plyr.resize(N_PLAYERS)
 	for i in range(N_PLAYERS):
 		var mk = players[i].get_node("Mark")
 		if i == dealer_ix:
@@ -198,10 +198,9 @@ func update_players_BG():
 		else:
 			mk.hide()
 		bet_chips_plyr[i] = ANTE_CHIPS
-		round_bet_chips_plyr[i] = ANTE_CHIPS
+		#round_bet_chips_plyr[i] = ANTE_CHIPS
 		players[i].show_bet_chips(true)
 		players[i].set_bet_chips(bet_chips_plyr[i])
-		#players[i].set_chips(players[i].get_chips() - bet_chips_plyr[i])
 		players[i].sub_chips(bet_chips_plyr[i])
 	
 func on_opening_finished():
@@ -312,6 +311,7 @@ func do_act_AI():
 	var can_chk = can_check()
 	var can_raise = n_raised == 0
 	print("can_check = ", can_chk, ", can_raise = ", can_raise)
+	print("n_actions = ", n_actions)
 	if n_actions == 0:		# 初手
 		if( rnk == RANK_J && rd <= alpha ||
 			rnk == RANK_K && rd <= alpha*3 ):
@@ -386,6 +386,12 @@ func set_act_panel_text(i, txt):
 	act_panels[i].set_text(txt)
 	act_panels[i].show()
 func next_hand():
+	state = INIT
+	dealer_ix = (dealer_ix + 1) % N_PLAYERS
+	nix = (dealer_ix + 1) % N_PLAYERS
+	n_actions = 0
+	n_raised = 0
+	update_players_BG()
 	pass
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
