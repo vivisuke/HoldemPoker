@@ -395,8 +395,6 @@ func next_hand():
 	n_raised = 0
 	update_n_raised_label()
 	update_players_BG()
-	for i in range(N_PLAYERS):
-		act_panels[i].hide()
 	n_closing = 1
 	players_card[USER_IX].connect("closing_finished", self, "on_closing_finished")
 	players_card[USER_IX].do_close()
@@ -404,6 +402,9 @@ func next_hand():
 		n_closing = 2
 		players_card[AI_IX].connect("closing_finished", self, "on_closing_finished")
 		players_card[AI_IX].do_close()
+	for i in range(N_PLAYERS):
+		act_panels[i].hide()
+		is_folded[i] = false
 	$NextButton.disabled = true
 	pass
 func _on_BackButton_pressed():
