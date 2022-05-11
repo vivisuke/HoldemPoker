@@ -192,6 +192,8 @@ func update_players_BG():
 	bet_chips_plyr.resize(N_PLAYERS)
 	#round_bet_chips_plyr.resize(N_PLAYERS)
 	for i in range(N_PLAYERS):
+		players[i].copy_to_prev_chips()
+		players[i].show_diff_chips(false)
 		var mk = players[i].get_node("Mark")
 		if i == dealer_ix:
 			mk.show()
@@ -252,6 +254,8 @@ func on_chip_moving_finished():
 		var ch = bet_chips_plyr[winner_ix] + bet_chips_plyr[loser_ix]
 		players[winner_ix].add_chips(ch)
 		players[winner_ix].show_bet_chips(false)
+		players[winner_ix].show_diff_chips(true)	# チップ増減表示
+		players[loser_ix].show_diff_chips(true)		# チップ増減表示
 		disable_act_buttons()
 		$NextButton.disabled = false
 		pass
