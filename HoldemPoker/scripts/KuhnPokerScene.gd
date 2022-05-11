@@ -99,9 +99,9 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		#var sd = OS.get_unix_time()
+		var sd = OS.get_unix_time()
 		#var sd = 0
-		var sd = 1
+		#var sd = 1
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
