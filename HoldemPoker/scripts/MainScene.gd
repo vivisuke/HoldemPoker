@@ -52,6 +52,11 @@ enum {		# アクションボタン
 	CHECK_CALL = 0,
 	FOLD,
 	RAISE,
+	ALL_IN,
+	BB2,
+	BB3,
+	BB4,
+	BB5,
 	N_ACT_BUTTONS,
 }
 #const N_SUIT = 4
