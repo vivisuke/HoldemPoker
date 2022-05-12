@@ -419,6 +419,9 @@ func next_hand():
 	$NextButton.disabled = true
 	pass
 func _on_BackButton_pressed():
+	balance += players[USER_IX].get_chips()
+	g.saved_data[g.KEY_BALANCE] = balance
+	g.auto_save()
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
 func _on_FoldButton_pressed():
