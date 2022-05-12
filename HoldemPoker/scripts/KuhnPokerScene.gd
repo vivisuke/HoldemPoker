@@ -19,12 +19,12 @@ enum {		# 状態
 	SHOW_DOWN,
 	ROUND_FINISHED,
 }
-enum {
-	DEALER = 0,
-	SB,
-	BB,
-}
-enum {
+#enum {
+#	DEALER = 0,
+#	SB,
+#	BB,
+#}
+enum {				# プレイヤーパネル背景色
 	BG_WAIT = 0,
 	BG_PLY,			# 手番
 	BG_FOLDED,
@@ -354,8 +354,9 @@ func do_act_AI():
 			do_fold(AI_IX)
 func do_check_call(pix):
 	if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
-		set_act_panel_text(pix, "checked")
+		set_act_panel_text(pix, "checked", Color.lightgray)
 	else:
+		set_act_panel_text(pix, "called", Color.lightgray)
 		players[pix].sub_chips(BET_CHIPS)
 		bet_chips_plyr[pix] += BET_CHIPS
 		players[pix].set_bet_chips(bet_chips_plyr[pix])
@@ -367,11 +368,11 @@ func do_raise(pix):
 	players[pix].sub_chips(BET_CHIPS)
 	bet_chips_plyr[pix] += BET_CHIPS
 	players[pix].set_bet_chips(bet_chips_plyr[pix])
-	set_act_panel_text(pix, "raised")
+	set_act_panel_text(pix, "raised", Color.pink)
 	do_wait()
 func do_fold(pix):
 	is_folded[pix] = true
-	set_act_panel_text(pix, "folded")
+	set_act_panel_text(pix, "folded", Color.darkgray)
 	state = SHOW_DOWN
 	loser_ix = pix
 	winner_ix = (USER_IX + AI_IX) - pix
@@ -395,8 +396,9 @@ func next_player():
 			#enable_act_buttons()	# 行動ボタンイネーブル
 #func do_show_down():
 #	pass
-func set_act_panel_text(i, txt):
+func set_act_panel_text(i, txt, col):
 	act_panels[i].set_text(txt)
+	act_panels[i].color = col
 	act_panels[i].show()
 func next_hand():
 	state = INIT
