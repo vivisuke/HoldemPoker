@@ -499,9 +499,10 @@ func next_round():
 		nix = (dealer_ix + 1) % N_PLAYERS		# 次の手番
 		bet_chips = 0
 	update_next_player()
-func set_act_panel_text(i, txt):
+func set_act_panel_text(i, txt, col):
 	act_panels[i].set_text(txt)
 	#act_panels[i].get_node("PinkPanel").hide()
+	act_panels[i].color = col
 	act_panels[i].show()
 func hide_act_panels():
 	for i in range(N_PLAYERS):
@@ -560,17 +561,17 @@ func do_fold(pix):
 	players_card1[pix].hide()
 	players_card2[pix].hide()
 	players[pix].set_hand("")			# 手役表示クリア
-	set_act_panel_text(pix, "folded")
+	set_act_panel_text(pix, "folded", Color.darkgray)
 	#act_panels[pix].set_text("folded")
 	#act_panels[pix].get_node("PinkPanel").hide()
 	#act_panels[pix].show()
 func do_check(pix):
-	set_act_panel_text(pix, "checked")
+	set_act_panel_text(pix, "checked", Color.lightgray)
 	#act_panels[pix].set_text("checked")
 	#act_panels[pix].get_node("PinkPanel").hide()
 	#act_panels[pix].show()
 func do_call(pix):
-	set_act_panel_text(pix, "called")
+	set_act_panel_text(pix, "called", Color.lightgray)
 	#act_panels[pix].set_text("called")
 	#act_panels[pix].get_node("PinkPanel").hide()
 	#act_panels[pix].show()
@@ -582,8 +583,8 @@ func do_call(pix):
 	players[pix].sub_chips(cc)
 	bet_chips_plyr[pix] = bet_chips
 func do_raise(pix, rc):
-	set_act_panel_text(pix, "raised")
-	act_panels[pix].color = Color.red
+	set_act_panel_text(pix, "raised", Color.pink)
+	#act_panels[pix].color = Color.red
 	#act_panels[pix].get_node("PinkPanel").show()
 	#act_panels[pix].set_text("raised")
 	act_panels[pix].show()
@@ -625,7 +626,7 @@ func _process(delta):
 		else:
 			if !is_folded[nix]:
 				if players[nix].get_chips() == 0:		# 所持チップ０の場合
-					set_act_panel_text(nix, "skipped")
+					set_act_panel_text(nix, "skipped", Color.darkgray)
 					#act_panels[nix].set_text("skipped")
 					#act_panels[nix].get_node("PinkPanel").hide()
 					#act_panels[nix].show()
