@@ -42,12 +42,14 @@ const ANTE_CHIPS = 1
 const BET_CHIPS = 1				# 1chip のみベット可能
 const USER_IX = 0
 const AI_IX = 1
+const AI_IX2 = 2
 
 var state = INIT
 var waiting = 0.0		# 0超ならウェイト状態 → 次のプレイヤーに手番を移動
 #var sub_state = READY
 var balance
 var n_hands = 1			# 何ハンド目か
+var n_act_players = 0	# フォールドしていないプレイヤー数
 var n_opening = 0
 var n_closing = 0
 var n_moving = 0
@@ -83,8 +85,8 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		var sd = OS.get_unix_time()
-		#var sd = 0
+		#var sd = OS.get_unix_time()
+		var sd = 0
 		#var sd = 1
 		#var sd = 7
 		#var sd = 3852
@@ -347,6 +349,7 @@ func do_raise(pix):
 	do_wait()
 func do_fold(pix):
 	is_folded[pix] = true
+	n_act_players -= 1
 	set_act_panel_text(pix, "folded", Color.darkgray)
 	state = SHOW_DOWN
 	loser_ix = pix
@@ -354,7 +357,7 @@ func do_fold(pix):
 	settle_chips()
 func next_player():
 	n_actions += 1
-	if n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
+	if false:		#n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		state = SHOW_DOWN
 		emphasize_next_player()		# 次の手番非強調
 		disable_act_buttons()		# 行動ボタンディセーブル
@@ -401,3 +404,14 @@ func next_hand():
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
+
+
+func _on_FoldButton_pressed():
+	do_fold(USER_IX)
+func _on_CheckCallButton_pressed():
+	do_check_call(USER_IX)
+func _on_RaiseButton_pressed():
+	do_raise(USER_IX)
+func _on_NextButton_pressed():
+	if state == SHOW_DOWN:
+		next_hand()
