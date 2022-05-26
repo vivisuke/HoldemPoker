@@ -5,8 +5,8 @@ signal moving_finished
 var moving = false
 var move_dur = 0.0				# 移動所要時間（単位：秒）
 var move_elapsed = 0.0			# 移動経過時間（単位：秒）
-var src_pos = Vector2(0, 0)
-var dst_pos = Vector2(0, 0)
+var src_pos = Vector2(0, 0)		# 移動元位置
+var dst_pos = Vector2(0, 0)		# 移動先位置
 
 func _ready():
 	pass # Replace with function body.

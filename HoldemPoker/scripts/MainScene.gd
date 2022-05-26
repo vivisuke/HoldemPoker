@@ -373,7 +373,7 @@ func next_round():
 		n_moving = N_PLAYERS * 2		# 各プレイヤーにカードを２枚配布
 		sub_state = CARD_MOVING
 		#players_cards.resize(N_PLAYERS * 2)
-		players_card1.resize(N_PLAYERS)
+"""		players_card1.resize(N_PLAYERS)
 		for i in range(N_PLAYERS):
 			var di = (dealer_ix + 1 + i) % N_PLAYERS
 			var cd = CardBF.instance()		# カード裏面
@@ -384,10 +384,10 @@ func next_round():
 			$Table.add_child(cd)
 			#players[i].get_node("CardParent").add_child(cd)
 			cd.connect("moving_finished", self, "on_moving_finished")
-			cd.connect("opening_finished", self, "opening_finished")
+			cd.connect("opening_finished", self, "on_opening_finished")
 			var dst = players[di].get_position() + Vector2(-CARD_WIDTH/2, -4)
 			cd.wait_move_to(i * 0.1, dst, 0.3)
-		players_card2.resize(N_PLAYERS)
+"""		players_card2.resize(N_PLAYERS)
 		for i in range(N_PLAYERS):
 			var di = (dealer_ix + 1 + i) % N_PLAYERS
 			var cd = CardBF.instance()
@@ -397,7 +397,7 @@ func next_round():
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
 			cd.connect("moving_finished", self, "on_moving_finished")
-			cd.connect("opening_finished", self, "opening_finished")
+			cd.connect("opening_finished", self, "on_opening_finished")
 			var dst = players[di].get_position() + Vector2(CARD_WIDTH/2, -4)
 			cd.wait_move_to((N_PLAYERS + i) * 0.1, dst, 0.3)
 		act_panels.resize(N_PLAYERS)
@@ -417,7 +417,6 @@ func next_round():
 		$BB5Button.text = "pot"
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].set_text("called")
-			#act_panels[i].get_node("PinkPanel").hide()
 			act_panels[i].show()
 		#comu_cards = []
 		n_moving = N_FLOP_CARDS		# 3 for FLOP
@@ -430,7 +429,7 @@ func next_round():
 			cd.set_position(deck_pos)
 			$Table.add_child(cd)
 			cd.connect("moving_finished", self, "on_moving_finished")
-			cd.connect("opening_finished", self, "opening_finished")
+			cd.connect("opening_finished", self, "on_opening_finished")
 			cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
 	elif state == FLOP:
 		state = TURN
@@ -443,7 +442,7 @@ func next_round():
 		cd.set_position(deck_pos)
 		$Table.add_child(cd)
 		cd.connect("moving_finished", self, "on_moving_finished")
-		cd.connect("opening_finished", self, "opening_finished")
+		cd.connect("opening_finished", self, "on_opening_finished")
 		cd.move_to(Vector2(CARD_WIDTH, COMU_CARD_PY), 0.3)
 	elif state == TURN:
 		state = RIVER
@@ -456,7 +455,7 @@ func next_round():
 		cd.set_position(deck_pos)
 		$Table.add_child(cd)
 		cd.connect("moving_finished", self, "on_moving_finished")
-		cd.connect("opening_finished", self, "opening_finished")
+		cd.connect("opening_finished", self, "on_opening_finished")
 		cd.move_to(Vector2(CARD_WIDTH*2, COMU_CARD_PY), 0.3)
 	elif state == RIVER:
 		state = SHOW_DOWN
@@ -501,7 +500,6 @@ func next_round():
 	update_next_player()
 func set_act_panel_text(i, txt, col):
 	act_panels[i].set_text(txt)
-	#act_panels[i].get_node("PinkPanel").hide()
 	act_panels[i].color = col
 	act_panels[i].show()
 func hide_act_panels():
@@ -537,7 +535,7 @@ func on_moving_finished():
 			comu_cards[N_FLOP_CARDS + 1].do_open()
 		else:
 			sub_state = READY
-func opening_finished():
+func on_opening_finished():
 	n_opening -= 1
 	print(n_opening)
 	if n_opening == 0:
@@ -563,17 +561,14 @@ func do_fold(pix):
 	players[pix].set_hand("")			# 手役表示クリア
 	set_act_panel_text(pix, "folded", Color.darkgray)
 	#act_panels[pix].set_text("folded")
-	#act_panels[pix].get_node("PinkPanel").hide()
 	#act_panels[pix].show()
 func do_check(pix):
 	set_act_panel_text(pix, "checked", Color.lightgray)
 	#act_panels[pix].set_text("checked")
-	#act_panels[pix].get_node("PinkPanel").hide()
 	#act_panels[pix].show()
 func do_call(pix):
 	set_act_panel_text(pix, "called", Color.lightgray)
 	#act_panels[pix].set_text("called")
-	#act_panels[pix].get_node("PinkPanel").hide()
 	#act_panels[pix].show()
 	players[pix].set_bet_chips(bet_chips)
 	var cc = min(players[pix].get_chips(), bet_chips - bet_chips_plyr[pix])
@@ -585,7 +580,6 @@ func do_call(pix):
 func do_raise(pix, rc):
 	set_act_panel_text(pix, "raised", Color.pink)
 	#act_panels[pix].color = Color.red
-	#act_panels[pix].get_node("PinkPanel").show()
 	#act_panels[pix].set_text("raised")
 	act_panels[pix].show()
 	bet_chips += rc			# コール分＋レイズ分 が実際に場に出される
@@ -628,7 +622,6 @@ func _process(delta):
 				if players[nix].get_chips() == 0:		# 所持チップ０の場合
 					set_act_panel_text(nix, "skipped", Color.darkgray)
 					#act_panels[nix].set_text("skipped")
-					#act_panels[nix].get_node("PinkPanel").hide()
 					#act_panels[nix].show()
 				else:
 					var max_raise = max_raise_chips(nix)
@@ -834,9 +827,6 @@ func check_hand(v : Array) -> Array:
 			mask >>= 1
 		if( bitmap == 0x100f ):		# 1 0000 00000 1111 = 5432A
 			return [STRAIGHT_FLUSH, 0x0f]		# 5432A よりも 65432 の方が強い
-	#else:
-	#	s = -1
-	#
 	var threeOfAKindRank = -1		# 3 of a Kind の rcnt インデックス
 	var threeOfAKindRank2 = -1	# 3 of a Kind の rcnt インデックス その２
 	var pairRank1 = -1			# ペアの場合の rcnt インデックス

@@ -33,6 +33,9 @@ func _on_Button1_pressed():
 func _on_Button2_pressed():
 	get_tree().change_scene("res://KuhnPokerScene.tscn")
 	pass # Replace with function body.
+func _on_Button3_pressed():
+	get_tree().change_scene("res://3PKuhnPokerScene.tscn")
+	pass # Replace with function body.
 
 
 func _on_UserNameEdit_text_changed(new_text):
@@ -46,3 +49,5 @@ func _on_UserNameEdit_text_entered(new_text):
 	#g.saved_data[g.KEY_USER_NAME] = new_text
 	#g.auto_save()
 	pass # Replace with function body.
+
+
