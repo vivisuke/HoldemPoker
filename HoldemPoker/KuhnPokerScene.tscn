@@ -124,6 +124,15 @@ margin_bottom = 810.0
 custom_fonts/font = SubResource( 4 )
 text = "Next"
 
+[node name="NHandsLabel" type="Label" parent="."]
+margin_left = 11.0
+margin_top = 58.0
+margin_right = 153.0
+margin_bottom = 79.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = SubResource( 5 )
+text = "# hands: 1"
+
 [node name="NRaisedLabel" type="Label" parent="."]
 margin_left = 348.0
 margin_top = 752.0
@@ -133,15 +142,6 @@ custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = SubResource( 5 )
 text = "# raised: 0/1"
 align = 2
-
-[node name="NHandsLabel" type="Label" parent="."]
-margin_left = 11.0
-margin_top = 58.0
-margin_right = 153.0
-margin_bottom = 79.0
-custom_colors/font_color = Color( 1, 1, 1, 1 )
-custom_fonts/font = SubResource( 5 )
-text = "# hands: 1"
 
 [connection signal="pressed" from="TitleBar/BackButton" to="." method="_on_BackButton_pressed"]
 [connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
