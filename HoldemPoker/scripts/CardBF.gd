@@ -79,6 +79,9 @@ func do_open():
 	$Front.hide()
 	$Back.show()
 	$Back.set_scale(Vector2(1.0, 1.0))
+func do_wait_close(wait : float):
+	waiting_time = wait
+	do_close()
 func do_close():
 	state = CLOSING_FH
 	theta = 0.0

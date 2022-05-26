@@ -127,7 +127,7 @@ func _ready():
 		#cards[i].do_open()
 		cards[i].show_front()
 		cards[i].connect("closing_finished", self, "on_closing_finished")
-		cards[i].do_close()
+		cards[i].do_wait_close(1.0)
 		add_child(cards[i])
 	#cards.shuffle()			# カードシャフル
 	#for i in range(cards.size()):
