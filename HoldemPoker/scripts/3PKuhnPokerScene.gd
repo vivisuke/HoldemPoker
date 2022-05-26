@@ -60,7 +60,8 @@ var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISES �
 var nix = -1			# 次の手番
 var dealer_ix = 0		# ディーラプレイヤーインデックス
 var winner_ix			# 勝者インデックス
-var loser_ix			# 敗者インデックス
+var loser1_ix			# 敗者インデックス
+var loser2_ix			# 敗者インデックス
 var alpha = 0.0			# Ｊレイズ確率
 var act_buttons = []		# アクションボタン
 var cards = [0, 0, 0, 0, 0]		# 使用カード
@@ -192,6 +193,15 @@ func update_players_BG():
 		players[i].set_bet_chips(bet_chips_plyr[i])
 		players[i].sub_chips(bet_chips_plyr[i])
 	
+func determine_who_won():
+	var mxc = 0
+	#var mxi
+	for i in range(N_PLAYERS):
+		if !is_folded[i] && players_card[i].get_rank() > mxc:
+			mxc = players_card[i].get_rank()
+			winner_ix = i
+	#loser1_ix = (winner_ix + 1) % N_PLAYERS
+	#loser2_ix = (winner_ix + 2) % N_PLAYERS
 func on_opening_finished():
 	if state == OPENING:		# 人間カードオープン
 		state = SEL_ACTION		# アクション選択可能状態
@@ -201,24 +211,27 @@ func on_opening_finished():
 	elif state == SHOW_DOWN:
 		print("SHOW_DOWN > on_opening_finished()")
 		#emphasize_next_player()
-		if players_card[USER_IX].get_rank() > players_card[AI_IX].get_rank():
-			print("User won")
-			winner_ix = USER_IX		# 勝者
-			loser_ix = AI_IX
-		else:
-			print("AI won")
-			winner_ix = AI_IX
-			loser_ix = USER_IX		# 敗者
+		determine_who_won()
+		#if players_card[USER_IX].get_rank() > players_card[AI_IX].get_rank():
+		#	print("User won")
+		#	winner_ix = USER_IX		# 勝者
+		#	loser_ix = AI_IX
+		#else:
+		#	print("AI won")
+		#	winner_ix = AI_IX
+		#	loser_ix = USER_IX		# 敗者
 		settle_chips()
 		pass
 func settle_chips():
-	players[loser_ix].show_bet_chips(false)
-	var ch = Chip.instance()
-	ch.position = players[loser_ix].get_chip_pos()
-	add_child(ch)
-	#n_moving = 1
-	ch.connect("moving_finished", self, "on_chip_moving_finished")
-	ch.move_to(players[winner_ix].get_chip_pos(), 0.5)
+	for i in range(N_PLAYERS):
+		if i != winner_ix:
+			players[i].show_bet_chips(false)
+			var ch = Chip.instance()
+			ch.position = players[i].get_chip_pos()
+			add_child(ch)
+			ch.connect("moving_finished", self, "on_chip_moving_finished")
+			ch.move_to(players[winner_ix].get_chip_pos(), 0.5)
+		n_moving = N_PLAYERS - 1
 func on_closing_finished():
 	n_closing -= 1
 	if n_closing == 0:
@@ -229,12 +242,15 @@ func on_closing_finished():
 			#cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
 
 func on_chip_moving_finished():
-	if state == SHOW_DOWN:
-		var ch = bet_chips_plyr[winner_ix] + bet_chips_plyr[loser_ix]
-		players[winner_ix].add_chips(ch)
-		players[winner_ix].show_bet_chips(false)
-		players[winner_ix].show_diff_chips(true)	# チップ増減表示
-		players[loser_ix].show_diff_chips(true)		# チップ増減表示
+	n_moving -= 1
+	if n_moving == 0 && state == SHOW_DOWN:
+		for i in range(N_PLAYERS):
+			if i != winner_ix:
+				var ch = bet_chips_plyr[winner_ix] + bet_chips_plyr[i]		# undone: 正しくないコード
+				players[winner_ix].add_chips(ch)
+				players[winner_ix].show_bet_chips(false)
+				players[winner_ix].show_diff_chips(true)	# チップ増減表示
+				players[i].show_diff_chips(true)		# チップ増減表示
 		disable_act_buttons()
 		$NextButton.disabled = false
 		pass

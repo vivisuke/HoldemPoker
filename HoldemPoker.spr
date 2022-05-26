@@ -345,7 +345,7 @@
 0339 ◎ C 05/27 05/27 0.001│ToDo│n_act_players 導入
 0340 ● C 05/27            │ToDo│SHOW_DOWN：3-Players に対応していない
 0340 ◎ C 05/27 05/27 0.001│ToDo│do_check(), do_call() を追加し、do_check_call() はそれらをコール
-0340 ● C 05/27            │ToDo│
+0340 ◎ C 05/27 05/27 0.001│ToDo│loser_ix は削除し、winner_ix を参照
 0340 ● C 05/27            │ToDo│
 0340 ● C 05/27            │ToDo│
 0340 ● C 05/27            │ToDo│
