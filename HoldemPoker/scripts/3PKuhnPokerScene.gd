@@ -243,7 +243,7 @@ func on_moving_finished():
 			n_moving = cards.size()
 			for i in range(cards.size()):
 				#cards[i].connect("moving_finished", self, "on_moving_finished")
-				cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
+				cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-2), 0), 0.3)
 		elif state == SHUFFLE_0:
 			state = SHUFFLE_1			# シャフルアニメーション後半
 			n_moving = cards.size()
