@@ -49,6 +49,7 @@ var waiting = 0.0		# 0超ならウェイト状態 → 次のプレイヤーに�
 #var sub_state = READY
 var balance
 var n_hands = 1			# 何ハンド目か
+var pot = 0				# ベット額合計
 var n_act_players = 0	# フォールドしていないプレイヤー数
 var n_opening = 0
 var n_closing = 0
@@ -255,6 +256,7 @@ func on_moving_finished():
 		elif state == SHUFFLE_1:
 			cards.shuffle()
 			n_act_players = N_PLAYERS
+			pot = 0
 			state = DEALING				# 2人のプレイヤーにカードを配る
 			n_moving = N_PLAYERS
 			for i in range(N_PLAYERS):
@@ -331,15 +333,22 @@ func do_act_AI():
 		else:
 			do_fold(AI_IX)
 func do_check_call(pix):
-	if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
-		set_act_panel_text(pix, "checked", Color.lightgray)
+	#if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
+	if n_raised == 0:
+		do_check(pix)
 	else:
-		set_act_panel_text(pix, "called", Color.lightgray)
-		players[pix].sub_chips(BET_CHIPS)
-		bet_chips_plyr[pix] += BET_CHIPS
-		players[pix].set_bet_chips(bet_chips_plyr[pix])
+		do_call(pix)
 	do_wait()
 	#next_player()
+func do_check(pix):
+	set_act_panel_text(pix, "checked", Color.lightgray)
+	do_wait()
+func do_call(pix):
+	set_act_panel_text(pix, "called", Color.lightgray)
+	players[pix].sub_chips(BET_CHIPS)
+	bet_chips_plyr[pix] += BET_CHIPS
+	players[pix].set_bet_chips(bet_chips_plyr[pix])
+	do_wait()
 func do_raise(pix):
 	n_raised += 1
 	update_n_raised_label()
