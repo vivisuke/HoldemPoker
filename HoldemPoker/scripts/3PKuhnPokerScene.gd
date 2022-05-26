@@ -254,6 +254,7 @@ func on_moving_finished():
 				cards[i].move_to(TABLE_CENTER, 0.3)
 		elif state == SHUFFLE_1:
 			cards.shuffle()
+			n_act_players = N_PLAYERS
 			state = DEALING				# 2人のプレイヤーにカードを配る
 			n_moving = N_PLAYERS
 			for i in range(N_PLAYERS):
@@ -351,19 +352,23 @@ func do_fold(pix):
 	is_folded[pix] = true
 	n_act_players -= 1
 	set_act_panel_text(pix, "folded", Color.darkgray)
-	state = SHOW_DOWN
-	loser_ix = pix
-	winner_ix = (USER_IX + AI_IX) - pix
-	settle_chips()
+	next_player()
+	#state = SHOW_DOWN
+	#loser_ix = pix
+	#winner_ix = (USER_IX + AI_IX) - pix
+	#settle_chips()
 func next_player():
 	n_actions += 1
-	if false:		#n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
+	if n_act_players == 1:
+	#n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		state = SHOW_DOWN
 		emphasize_next_player()		# 次の手番非強調
 		disable_act_buttons()		# 行動ボタンディセーブル
-		for i in range(N_PLAYERS): act_panels[i].hide()		# アクションパネル非表示
-		players_card[AI_IX].connect("opening_finished", self, "on_opening_finished")
-		players_card[AI_IX].do_open()
+		for i in range(N_PLAYERS):
+			act_panels[i].hide()		# アクションパネル非表示
+			if i != USER_IX && !is_folded[i]:
+				players_card[i].connect("opening_finished", self, "on_opening_finished")
+				players_card[i].do_open()
 		#do_show_down()
 	else:
 		nix = (nix + 1) % N_PLAYERS
