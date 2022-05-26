@@ -418,13 +418,16 @@ func next_hand():
 	n_raised = 0
 	update_n_raised_label()
 	update_players_BG()
-	n_closing = 1
-	players_card[USER_IX].connect("closing_finished", self, "on_closing_finished")
-	players_card[USER_IX].do_close()
-	if !is_folded[AI_IX] && !is_folded[USER_IX]:
-		n_closing = 2
-		players_card[AI_IX].connect("closing_finished", self, "on_closing_finished")
-		players_card[AI_IX].do_close()
+	n_closing = 0
+	for i in range(N_PLAYERS):
+		if !is_folded[i]:
+			players_card[i].connect("closing_finished", self, "on_closing_finished")
+			players_card[i].do_close()
+			n_closing += 1
+	#if !is_folded[AI_IX] && !is_folded[USER_IX]:
+	#	n_closing = 2
+	#	players_card[AI_IX].connect("closing_finished", self, "on_closing_finished")
+	#	players_card[AI_IX].do_close()
 	for i in range(N_PLAYERS):
 		act_panels[i].hide()
 		is_folded[i] = false
