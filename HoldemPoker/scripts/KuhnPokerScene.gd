@@ -19,28 +19,11 @@ enum {		# 状態
 	SHOW_DOWN,
 	ROUND_FINISHED,
 }
-#enum {
-#	DEALER = 0,
-#	SB,
-#	BB,
-#}
 enum {				# プレイヤーパネル背景色
 	BG_WAIT = 0,
 	BG_PLY,			# 手番
 	BG_FOLDED,
 }
-#enum {				# sub_state
-#	READY = 0,
-#	CARD_MOVING,
-#	CARD_OPENING,
-#	CHIPS_COLLECTING,		# プレイヤーベットチップを中央に移動中
-#	CHIPS_COLLECTED,		# プレイヤーベットチップを中央に移動中終了
-#	INITIALIZED,
-#	SHUFFLE_0,				# カードシャフル中（前半）
-#	SHUFFLE_1,				# カードシャフル中（後半）
-#	DEALING,				# カード配布中
-#	OPENING,				# 人間プレイヤーのカードオープン中
-#}
 enum {		# アクションボタン
 	FOLD = 0,
 	CHECK_CALL,
