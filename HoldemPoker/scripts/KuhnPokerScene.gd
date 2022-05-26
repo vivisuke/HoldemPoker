@@ -64,6 +64,7 @@ var state = INIT
 var waiting = 0.0		# 0超ならウェイト状態 → 次のプレイヤーに手番を移動
 #var sub_state = READY
 var balance
+var n_hands = 1			# 何ハンド目か
 var n_opening = 0
 var n_closing = 0
 var n_moving = 0
@@ -402,6 +403,8 @@ func set_act_panel_text(i, txt, col):
 	act_panels[i].show()
 func next_hand():
 	state = INIT
+	n_hands += 1
+	$NHandsLabel.text = "# hands: " + String(n_hands)
 	dealer_ix = (dealer_ix + 1) % N_PLAYERS
 	nix = (dealer_ix + 1) % N_PLAYERS
 	n_actions = 0
