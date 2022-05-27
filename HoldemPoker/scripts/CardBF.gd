@@ -73,6 +73,10 @@ func show_front():
 	bFront = true
 	$Front.show()
 	$Back.hide()
+func show_back():
+	bFront = false
+	$Front.hide()
+	$Back.show()
 func do_open():
 	state = OPENING_FH
 	theta = 0.0

@@ -245,12 +245,10 @@ func on_chip_moving_finished():
 	n_moving -= 1
 	if n_moving == 0 && state == SHOW_DOWN:
 		for i in range(N_PLAYERS):
-			if i != winner_ix:
-				var ch = bet_chips_plyr[winner_ix] + bet_chips_plyr[i]		# undone: 正しくないコード
-				players[winner_ix].add_chips(ch)
-				players[winner_ix].show_bet_chips(false)
-				players[winner_ix].show_diff_chips(true)	# チップ増減表示
-				players[i].show_diff_chips(true)		# チップ増減表示
+			players[winner_ix].add_chips(bet_chips_plyr[i])
+			players[i].show_diff_chips(true)		# チップ増減表示
+		players[winner_ix].show_bet_chips(false)
+		players[winner_ix].show_diff_chips(true)	# チップ増減表示
 		disable_act_buttons()
 		$NextButton.disabled = false
 		pass
@@ -378,6 +376,8 @@ func do_fold(pix):
 	n_act_players -= 1
 	set_act_panel_text(pix, "folded", Color.darkgray)
 	next_player()
+	if pix == USER_IX:
+		players_card[pix].show_back()
 	players_card[pix].move_to(TABLE_CENTER, 0.2)		# カードを中央に移動
 	#state = SHOW_DOWN
 	#loser_ix = pix
