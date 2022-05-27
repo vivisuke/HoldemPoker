@@ -169,7 +169,7 @@ func update_act_buttons():
 		if can_check():
 			$CheckCallButton.text = "Check"
 		else:
-			$CheckCallButton.text = "Call %d" % (bet_chips_plyr[AI_IX] - bet_chips_plyr[USER_IX])
+			$CheckCallButton.text = "Call 1"
 		$RaiseButton.disabled = n_raised != 0
 		$NextButton.disabled = true
 #func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
