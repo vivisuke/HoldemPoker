@@ -307,7 +307,7 @@ func _process(delta):
 		do_act_AI()
 		#
 func do_act_AI():
-	var rnk = players_card[AI_IX].get_rank()		# 
+	var rnk = players_card[nix].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
 	var rd = rng.randf_range(0.0, 1.0)		# [0.0, 1.0] 乱数
 	var can_chk = can_check()
@@ -317,35 +317,35 @@ func do_act_AI():
 	if n_actions == 0:		# 初手
 		if( rnk == RANK_J && rd <= alpha ||
 			rnk == RANK_K && rd <= alpha*3 ):
-				do_raise(AI_IX)
+				do_raise(nix)
 		else:
-			do_check_call(AI_IX)
+			do_check_call(nix)
 	elif n_actions == 1:		# ２手目
 		if rnk == RANK_K:
 			if can_raise:
-				do_raise(AI_IX)
+				do_raise(nix)
 			else:
-				do_check_call(AI_IX)
+				do_check_call(nix)
 		elif rnk == RANK_Q:
 			if can_chk || rd <= 1.0/3.0:
-				do_check_call(AI_IX)
+				do_check_call(nix)
 			else:
-				do_fold(AI_IX)
+				do_fold(nix)
 		else:	# Ｊの場合
 			if can_raise && rd <= 1.0/3.0:
-				do_raise(AI_IX)
+				do_raise(nix)
 			else:
-				do_fold(AI_IX)
+				do_fold(nix)
 	else:	# ３手目（チェック→レイズ の場合）
 		if rnk == RANK_K:
-			do_check_call(AI_IX)
+			do_check_call(nix)
 		elif rnk == RANK_Q:
 			if rd <= alpha + 1.0/3.0:
-				do_check_call(AI_IX)
+				do_check_call(nix)
 			else:
-				do_fold(AI_IX)
+				do_fold(nix)
 		else:
-			do_fold(AI_IX)
+			do_fold(nix)
 func do_check_call(pix):
 	#if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 	if n_raised == 0:
