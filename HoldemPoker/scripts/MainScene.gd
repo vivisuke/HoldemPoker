@@ -373,7 +373,7 @@ func next_round():
 		n_moving = N_PLAYERS * 2		# 各プレイヤーにカードを２枚配布
 		sub_state = CARD_MOVING
 		#players_cards.resize(N_PLAYERS * 2)
-"""		players_card1.resize(N_PLAYERS)
+		players_card1.resize(N_PLAYERS)
 		for i in range(N_PLAYERS):
 			var di = (dealer_ix + 1 + i) % N_PLAYERS
 			var cd = CardBF.instance()		# カード裏面
@@ -387,7 +387,7 @@ func next_round():
 			cd.connect("opening_finished", self, "on_opening_finished")
 			var dst = players[di].get_position() + Vector2(-CARD_WIDTH/2, -4)
 			cd.wait_move_to(i * 0.1, dst, 0.3)
-"""		players_card2.resize(N_PLAYERS)
+		players_card2.resize(N_PLAYERS)
 		for i in range(N_PLAYERS):
 			var di = (dealer_ix + 1 + i) % N_PLAYERS
 			var cd = CardBF.instance()

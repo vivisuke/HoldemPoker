@@ -378,6 +378,7 @@ func do_fold(pix):
 	n_act_players -= 1
 	set_act_panel_text(pix, "folded", Color.darkgray)
 	next_player()
+	players_card[pix].move_to(TABLE_CENTER, 0.2)		# カードを中央に移動
 	#state = SHOW_DOWN
 	#loser_ix = pix
 	#winner_ix = (USER_IX + AI_IX) - pix
