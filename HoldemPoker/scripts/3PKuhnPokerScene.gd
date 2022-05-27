@@ -389,7 +389,9 @@ func do_fold(pix):
 	#settle_chips()
 func next_player():
 	n_actions += 1
-	if n_act_players == 1:		# 一人以外全員降りた場合
+	nix = (nix + 1) % N_PLAYERS
+	if( n_act_players == 1 ||		# 一人以外全員降りた場合
+			bet_chips_plyr[nix] == ANTE_CHIPS + BET_CHIPS):
 		#n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		state = SHOW_DOWN
 		emphasize_next_player()		# 次の手番非強調
@@ -405,7 +407,6 @@ func next_player():
 				#	players_card[i].do_open()
 		#do_show_down()
 	else:
-		nix = (nix + 1) % N_PLAYERS
 		emphasize_next_player()
 		if nix == USER_IX:
 			act_panels[USER_IX].hide()
