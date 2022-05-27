@@ -398,14 +398,18 @@ func next_player():
 		disable_act_buttons()		# 行動ボタンディセーブル
 		#if !is_folded[USER_IX]:		# 人間が残っている場合
 		determine_who_won();
-		settle_chips()
+		#settle_chips()
 		#else:						# AI が残っている場合
+		n_opening = 0;
 		for i in range(N_PLAYERS):
 			act_panels[i].hide()		# アクションパネル非表示
 			if i != USER_IX && !is_folded[i]:
+				n_opening += 1
 				players_card[i].connect("opening_finished", self, "on_opening_finished")
 				players_card[i].do_open()
 		#do_show_down()
+		if n_opening == 0:		# 外AIがフォールドしている場合
+			settle_chips()
 	else:
 		emphasize_next_player()
 		if nix == USER_IX:
