@@ -159,7 +159,7 @@ func enable_act_buttons():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = false
 func can_check():
-	return bet_chips_plyr[USER_IX] == bet_chips_plyr[AI_IX]
+	return n_raised == 0
 func update_act_buttons():
 	if nix != USER_IX:
 		disable_act_buttons()
