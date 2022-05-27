@@ -54,6 +54,7 @@ var n_act_players = 0	# フォールドしていないプレイヤー数
 var n_opening = 0
 var n_closing = 0
 var n_moving = 0
+var n_chip_moving = 0	# 移動中チップ数
 var TABLE_CENTER
 var n_actions = 0		# プレイヤー行動数
 var n_raised = 0		# 現ラウンドでのレイズ回数合計（MAX_N_RAISES 以下）
@@ -231,7 +232,20 @@ func settle_chips():
 			add_child(ch)
 			ch.connect("moving_finished", self, "on_chip_moving_finished")
 			ch.move_to(players[winner_ix].get_chip_pos(), 0.5)
-		n_moving = N_PLAYERS - 1
+	n_chip_moving = N_PLAYERS - 1
+	print("n_chip_moving = ", n_chip_moving)
+func on_chip_moving_finished():
+	print("on_chip_moving_finished(): ", n_chip_moving)
+	n_chip_moving -= 1
+	if n_chip_moving == 0 && state == SHOW_DOWN:
+		for i in range(N_PLAYERS):
+			players[winner_ix].add_chips(bet_chips_plyr[i])
+			players[i].show_diff_chips(true)		# チップ増減表示
+		players[winner_ix].show_bet_chips(false)
+		players[winner_ix].show_diff_chips(true)	# チップ増減表示
+		disable_act_buttons()
+		$NextButton.disabled = false
+		pass
 func on_closing_finished():
 	n_closing -= 1
 	if n_closing == 0:
@@ -241,18 +255,8 @@ func on_closing_finished():
 			cards[i].move_to(TABLE_CENTER, 0.2)
 			#cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
 
-func on_chip_moving_finished():
-	n_moving -= 1
-	if n_moving == 0 && state == SHOW_DOWN:
-		for i in range(N_PLAYERS):
-			players[winner_ix].add_chips(bet_chips_plyr[i])
-			players[i].show_diff_chips(true)		# チップ増減表示
-		players[winner_ix].show_bet_chips(false)
-		players[winner_ix].show_diff_chips(true)	# チップ増減表示
-		disable_act_buttons()
-		$NextButton.disabled = false
-		pass
 func on_moving_finished():
+	print("on_moving_finished(): ", n_moving)
 	n_moving -= 1
 	if n_moving == 0:
 		if state == INIT:
