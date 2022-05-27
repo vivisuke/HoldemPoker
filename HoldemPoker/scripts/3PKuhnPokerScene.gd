@@ -396,15 +396,15 @@ func next_player():
 		state = SHOW_DOWN
 		emphasize_next_player()		# 次の手番非強調
 		disable_act_buttons()		# 行動ボタンディセーブル
-		if !is_folded[USER_IX]:		# 人間が残っている場合
-			determine_who_won();
-			settle_chips()
-		else:						# AI が残っている場合
-			for i in range(N_PLAYERS):
-				act_panels[i].hide()		# アクションパネル非表示
-				#if i != USER_IX && !is_folded[i]:
-				#	players_card[i].connect("opening_finished", self, "on_opening_finished")
-				#	players_card[i].do_open()
+		#if !is_folded[USER_IX]:		# 人間が残っている場合
+		determine_who_won();
+		settle_chips()
+		#else:						# AI が残っている場合
+		for i in range(N_PLAYERS):
+			act_panels[i].hide()		# アクションパネル非表示
+			if i != USER_IX && !is_folded[i]:
+				players_card[i].connect("opening_finished", self, "on_opening_finished")
+				players_card[i].do_open()
 		#do_show_down()
 	else:
 		emphasize_next_player()
