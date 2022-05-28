@@ -387,7 +387,7 @@ func next_player():
 	nix = (nix + 1) % N_PLAYERS
 	if( n_act_players == 1 ||		# 一人以外全員降りた場合
 			bet_chips_plyr[nix] == ANTE_CHIPS + BET_CHIPS ||
-			act_history == "ccc" ):
+			act_history == "ccc" || act_history == "fcc" || act_history == "cfc" || act_history == "ccf" ):
 		#n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 		state = SHOW_DOWN
 		emphasize_next_player()		# 次の手番非強調
