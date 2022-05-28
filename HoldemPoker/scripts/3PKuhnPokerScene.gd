@@ -74,6 +74,19 @@ var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチッ�
 #var round_bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数合計
 var act_history = ""		# 行動履歴、F for Fold, c for Check, C for Call, R for Raise
 
+var strategy = {
+	"A": 0.178082, "AR": 0, "ARC": 0, "ARF": 0, "Ac": 0.0045977, "AcR": 0, "AcRC": 0,
+	"AcRF": 0, "Acc": 0, "AccR": 0, "AccRC": 0, "AccRF": 0,
+	"K": 0.995745, "KR": 0.939471, "KRC": 1, "KRF": 0.0462529, "Kc": 1, "KcR": 0.00467017,
+	"KcRC": 0.942664, "KcRF": 0.399351, "Kcc": 0.530449, "KccR": 0.00251731, "KccRC": 0.566038, "KccRF": 0.00382409,
+	"Q": 0.952055, "QR": 0.992405, "QRC": 1, "QRF": 0.572205, "Qc": 1, "QcR": 0.659091,
+	"QcRC": 1, "QcRF": 0.99226, "Qcc": 1, "QccR": 0.994743, "QccRC": 1, "QccRF": 0.803985,
+	"J": 0.795006, "JR": 1, "JRC": 1, "JRF": 1, "Jc": 0.649451, "JcR": 1,
+	"JcRC": 1, "JcRF": 1, "Jcc": 0.442053, "JccR": 1, "JccRC": 1, "JccRF": 1,
+	"T": 0.897172, "TR": 1, "TRC": 1, "TRF": 1, "Tc": 0.856365, "TcR": 1,
+	"TcRC": 1, "TcRF": 1, "Tcc": 0.995054, "TccR": 1, "TccRC": 1, "TccRF": 1,	
+}
+
 onready var g = get_node("/root/Global")
 
 var CardBF = load("res://CardBF.tscn")		# カード裏表面
@@ -312,43 +325,18 @@ func do_act_AI():
 	print("act_history = ", act_history)
 	var rnk = players_card[nix].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
+	var key = RANK_STR[rnk] + act_history
 	var rd = rng.randf_range(0.0, 1.0)		# [0.0, 1.0] 乱数
-	var can_chk = can_check()
-	var can_raise = n_raised == 0
-	print("can_check = ", can_chk, ", can_raise = ", can_raise)
-	print("n_actions = ", n_actions)
-	if n_actions == 0:		# 初手
-		if( rnk == RANK_J && rd <= alpha ||
-			rnk == RANK_K && rd <= alpha*3 ):
-				do_raise(nix)
-		else:
-			do_check_call(nix)
-	elif n_actions == 1:		# ２手目
-		if rnk == RANK_K:
-			if can_raise:
-				do_raise(nix)
-			else:
-				do_check_call(nix)
-		elif rnk == RANK_Q:
-			if can_chk || rd <= 1.0/3.0:
-				do_check_call(nix)
-			else:
-				do_fold(nix)
-		else:	# Ｊの場合
-			if can_raise && rd <= 1.0/3.0:
-				do_raise(nix)
-			else:
-				do_fold(nix)
-	else:	# ３手目（チェック→レイズ の場合）
-		if rnk == RANK_K:
-			do_check_call(nix)
-		elif rnk == RANK_Q:
-			if rd <= alpha + 1.0/3.0:
-				do_check_call(nix)
-			else:
-				do_fold(nix)
+	if rd < strategy[key]:		# 弱気の行動を選択
+		if n_raised == 0:
+			do_check(nix)
 		else:
 			do_fold(nix)
+	else:	# 強気の行動を選択
+		if n_raised == 0:
+			do_raise(nix)
+		else:
+			do_call(nix)
 func do_check_call(pix):
 	#if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
 	if n_raised == 0:
