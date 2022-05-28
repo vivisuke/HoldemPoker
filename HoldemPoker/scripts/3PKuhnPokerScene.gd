@@ -50,7 +50,7 @@ var waiting = 0.0		# 0超ならウェイト状態 → 次のプレイヤーに�
 var balance
 var n_hands = 1			# 何ハンド目か
 var pot = 0				# ベット額合計
-var n_act_players = 0	# フォールドしていないプレイヤー数
+var n_act_players = N_PLAYERS	# フォールドしていないプレイヤー数
 var n_opening = 0
 var n_closing = 0
 var n_moving = 0
@@ -102,9 +102,9 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		var sd = OS.get_unix_time()
+		#var sd = OS.get_unix_time()
 		#var sd = 0
-		#var sd = 1
+		var sd = 1
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
@@ -290,6 +290,7 @@ func on_moving_finished():
 				cards[i].move_to(TABLE_CENTER, 0.3)
 		elif state == SHUFFLE_1:
 			state = DEALING				# 2人のプレイヤーにカードを配る
+			cards.shuffle()
 			n_moving = N_PLAYERS
 			for i in range(N_PLAYERS):
 				players_card[i] = cards[i]
@@ -326,9 +327,13 @@ func _process(delta):
 		#
 func do_act_AI():
 	print("act_history = ", act_history)
+	var hist = act_history
+	if n_raised == 0:
+		hist = hist.replace("f", "c")
+		print("act_history = ", act_history)
 	var rnk = players_card[nix].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
-	var key = RANK_STR[rnk] + act_history
+	var key = RANK_STR[rnk] + hist
 	var th = 0.5		# 閾値
 	if strategy.has(key):
 		th = strategy[key]
@@ -401,7 +406,7 @@ func next_player():
 		n_opening = 0;
 		for i in range(N_PLAYERS):
 			act_panels[i].hide()		# アクションパネル非表示
-			if i != USER_IX && !is_folded[i]:
+			if i != USER_IX && !is_folded[i] && n_act_players > 1:
 				n_opening += 1
 				players_card[i].connect("opening_finished", self, "on_opening_finished")
 				players_card[i].do_open()
@@ -429,17 +434,18 @@ func next_hand():
 	act_history = ""
 	n_actions = 0
 	n_raised = 0
-	n_act_players = N_PLAYERS
 	pot = 0
-	cards.shuffle()
+	#cards.shuffle()
 	update_n_raised_label()
 	update_players_BG()
 	n_closing = 0
+	#if n_act_players > 1:
 	for i in range(N_PLAYERS):
 		if !is_folded[i]:
 			players_card[i].connect("closing_finished", self, "on_closing_finished")
 			players_card[i].do_close()
 			n_closing += 1
+	n_act_players = N_PLAYERS
 	#if !is_folded[AI_IX] && !is_folded[USER_IX]:
 	#	n_closing = 2
 	#	players_card[AI_IX].connect("closing_finished", self, "on_closing_finished")
