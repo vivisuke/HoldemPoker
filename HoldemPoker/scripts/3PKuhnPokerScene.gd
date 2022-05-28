@@ -102,13 +102,13 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		#var sd = OS.get_unix_time()
+		var sd = OS.get_unix_time()
 		#var sd = 0
 		#var sd = 1
 		#var sd = 7
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
-		var sd = 1653725009
+		#var sd = 1653725009
 		print("seed = ", sd)
 		seed(sd)
 		rng.set_seed(sd)
@@ -165,6 +165,7 @@ func _ready():
 	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
 	#
 	update_players_BG()
+	update_act_buttons()
 	pass # Replace with function body.
 
 func disable_act_buttons():
@@ -181,6 +182,7 @@ func update_act_buttons():
 	else:
 		$FoldButton.disabled = false
 		$CheckCallButton.disabled = false
+		print("can_check() = ", can_check())
 		if can_check():
 			$CheckCallButton.text = "Check"
 		else:
