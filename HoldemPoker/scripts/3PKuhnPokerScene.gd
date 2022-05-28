@@ -263,14 +263,16 @@ func on_chip_moving_finished():
 		disable_act_buttons()
 		$NextButton.disabled = false
 		pass
+func collect_cards_to_the_deck():
+	n_moving = cards.size()
+	for i in range(cards.size()):
+		cards[i].connect("moving_finished", self, "on_moving_finished")
+		cards[i].move_to(TABLE_CENTER, 0.2)
+		#cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
 func on_closing_finished():
 	n_closing -= 1
 	if n_closing == 0:
-		n_moving = cards.size()
-		for i in range(cards.size()):
-			cards[i].connect("moving_finished", self, "on_moving_finished")
-			cards[i].move_to(TABLE_CENTER, 0.2)
-			#cards[i].move_to(TABLE_CENTER + Vector2(CARD_WIDTH/2*(i-1), 0), 0.3)
+		collect_cards_to_the_deck()		# カードを中央デッキに集める
 
 func on_moving_finished():
 	print("on_moving_finished(): ", n_moving)
@@ -439,12 +441,14 @@ func next_hand():
 	update_n_raised_label()
 	update_players_BG()
 	n_closing = 0
-	#if n_act_players > 1:
-	for i in range(N_PLAYERS):
-		if !is_folded[i]:
-			players_card[i].connect("closing_finished", self, "on_closing_finished")
-			players_card[i].do_close()
-			n_closing += 1
+	if n_act_players > 1:
+		for i in range(N_PLAYERS):
+			if !is_folded[i]:
+				players_card[i].connect("closing_finished", self, "on_closing_finished")
+				players_card[i].do_close()
+				n_closing += 1
+	else:
+		collect_cards_to_the_deck()
 	n_act_players = N_PLAYERS
 	#if !is_folded[AI_IX] && !is_folded[USER_IX]:
 	#	n_closing = 2
