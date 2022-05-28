@@ -71,12 +71,14 @@ func move_to(dst : Vector2, dur : float):
 func show_front():
 	#print("show_front()")
 	bFront = true
-	$Front.show()
 	$Back.hide()
+	$Front.show()
+	$Front.set_scale(Vector2(1.0, 1.0))
 func show_back():
 	bFront = false
 	$Front.hide()
 	$Back.show()
+	$Back.set_scale(Vector2(1.0, 1.0))
 func do_open():
 	state = OPENING_FH
 	theta = 0.0

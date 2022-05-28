@@ -103,9 +103,7 @@ func _ready():
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
 		#var sd = OS.get_unix_time()
-		#var sd = 0
-		var sd = 1
-		#var sd = 7
+		var sd = 2
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
 		#var sd = 1653725009
@@ -241,6 +239,8 @@ func on_opening_finished():
 		settle_chips()
 		pass
 func settle_chips():
+	#n_chip_moving = 0
+	if n_chip_moving != 0: return		# 複数回呼ばれてしまった場合は無視
 	for i in range(N_PLAYERS):
 		if i != winner_ix:
 			players[i].show_bet_chips(false)
@@ -249,7 +249,8 @@ func settle_chips():
 			add_child(ch)
 			ch.connect("moving_finished", self, "on_chip_moving_finished")
 			ch.move_to(players[winner_ix].get_chip_pos(), 0.5)
-	n_chip_moving = N_PLAYERS - 1
+			n_chip_moving += 1
+	#n_chip_moving = N_PLAYERS - 1
 	print("n_chip_moving = ", n_chip_moving)
 func on_chip_moving_finished():
 	print("on_chip_moving_finished(): ", n_chip_moving)
