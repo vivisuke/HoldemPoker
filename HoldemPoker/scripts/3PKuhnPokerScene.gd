@@ -102,8 +102,8 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		#var sd = OS.get_unix_time()
-		var sd = 0
+		var sd = OS.get_unix_time()
+		#var sd = 0
 		#var sd = 1
 		#var sd = 7
 		#var sd = 3852
@@ -326,8 +326,11 @@ func do_act_AI():
 	var rnk = players_card[nix].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
 	var key = RANK_STR[rnk] + act_history
+	var th = 0.5		# 閾値
+	if strategy.has(key):
+		th = strategy[key]
 	var rd = rng.randf_range(0.0, 1.0)		# [0.0, 1.0] 乱数
-	if rd < strategy[key]:		# 弱気の行動を選択
+	if rd < th:		# 乱数が th 未満なら弱気の行動を選択
 		if n_raised == 0:
 			do_check(nix)
 		else:
