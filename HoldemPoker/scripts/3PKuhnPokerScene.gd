@@ -72,6 +72,7 @@ var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
 var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
 #var round_bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数合計
+var act_history = ""		# 行動履歴、F for Fold, c for Check, C for Call, R for Raise
 
 onready var g = get_node("/root/Global")
 
@@ -272,9 +273,6 @@ func on_moving_finished():
 				#cards[i].connect("moving_finished", self, "on_moving_finished")
 				cards[i].move_to(TABLE_CENTER, 0.3)
 		elif state == SHUFFLE_1:
-			cards.shuffle()
-			n_act_players = N_PLAYERS
-			pot = 0
 			state = DEALING				# 2人のプレイヤーにカードを配る
 			n_moving = N_PLAYERS
 			for i in range(N_PLAYERS):
@@ -311,6 +309,7 @@ func _process(delta):
 		do_act_AI()
 		#
 func do_act_AI():
+	print("act_history = ", act_history)
 	var rnk = players_card[nix].get_rank()		# 
 	print("rank = ", RANK_STR[rnk])
 	var rd = rng.randf_range(0.0, 1.0)		# [0.0, 1.0] 乱数
@@ -359,15 +358,18 @@ func do_check_call(pix):
 	do_wait()
 	#next_player()
 func do_check(pix):
+	act_history += "c"
 	set_act_panel_text(pix, "checked", Color.lightgray)
 	do_wait()
 func do_call(pix):
+	act_history += "C"
 	set_act_panel_text(pix, "called", Color.lightgray)
 	players[pix].sub_chips(BET_CHIPS)
 	bet_chips_plyr[pix] += BET_CHIPS
 	players[pix].set_bet_chips(bet_chips_plyr[pix])
 	do_wait()
 func do_raise(pix):
+	act_history += "R"
 	n_raised += 1
 	update_n_raised_label()
 	players[pix].sub_chips(BET_CHIPS)
@@ -376,6 +378,7 @@ func do_raise(pix):
 	set_act_panel_text(pix, "raised", Color.pink)
 	do_wait()
 func do_fold(pix):
+	act_history += "F"
 	is_folded[pix] = true
 	n_act_players -= 1
 	set_act_panel_text(pix, "folded", Color.darkgray)
@@ -428,8 +431,12 @@ func next_hand():
 	$NHandsLabel.text = "# hands: " + String(n_hands)
 	dealer_ix = (dealer_ix + 1) % N_PLAYERS
 	nix = (dealer_ix + 1) % N_PLAYERS
+	act_history = ""
 	n_actions = 0
 	n_raised = 0
+	n_act_players = N_PLAYERS
+	pot = 0
+	cards.shuffle()
 	update_n_raised_label()
 	update_players_BG()
 	n_closing = 0
