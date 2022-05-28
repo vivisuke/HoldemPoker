@@ -103,7 +103,7 @@ func _ready():
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
 		#var sd = OS.get_unix_time()
-		var sd = 2
+		var sd = 3
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
 		#var sd = 1653725009
@@ -442,7 +442,7 @@ func next_hand():
 	update_n_raised_label()
 	update_players_BG()
 	n_closing = 0
-	if n_act_players > 1:
+	if n_act_players > 1 || !is_folded[USER_IX]:
 		for i in range(N_PLAYERS):
 			if !is_folded[i]:
 				players_card[i].connect("closing_finished", self, "on_closing_finished")
