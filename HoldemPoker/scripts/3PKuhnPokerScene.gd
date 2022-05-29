@@ -40,7 +40,7 @@ const CARD_WIDTH = 50
 const N_PLAYERS = 3				# プレイヤー人数
 const ANTE_CHIPS = 1
 const BET_CHIPS = 1				# 1chip のみベット可能
-const USER_IX = 0
+const HUMAN_IX = 0
 const AI_IX = 1
 const AI_IX2 = 2
 
@@ -102,8 +102,8 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		#var sd = OS.get_unix_time()
-		var sd = 0
+		var sd = OS.get_unix_time()
+		#var sd = 0
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
 		#var sd = 1653725009
@@ -175,7 +175,7 @@ func enable_act_buttons():
 func can_check():
 	return n_raised == 0
 func update_act_buttons():
-	if nix != USER_IX:
+	if nix != HUMAN_IX:
 		disable_act_buttons()
 	else:
 		$FoldButton.disabled = false
@@ -222,20 +222,20 @@ func on_opening_finished():
 	if state == OPENING:		# 人間カードオープン
 		state = SEL_ACTION		# アクション選択可能状態
 		emphasize_next_player()
-		if nix == USER_IX:
+		if nix == HUMAN_IX:
 			enable_act_buttons()
 	elif state == SHOW_DOWN:
 		print("SHOW_DOWN > on_opening_finished()")
 		#emphasize_next_player()
 		determine_who_won()
-		#if players_card[USER_IX].get_rank() > players_card[AI_IX].get_rank():
+		#if players_card[HUMAN_IX].get_rank() > players_card[AI_IX].get_rank():
 		#	print("User won")
-		#	winner_ix = USER_IX		# 勝者
+		#	winner_ix = HUMAN_IX		# 勝者
 		#	loser_ix = AI_IX
 		#else:
 		#	print("AI won")
 		#	winner_ix = AI_IX
-		#	loser_ix = USER_IX		# 敗者
+		#	loser_ix = HUMAN_IX		# 敗者
 		settle_chips()
 		pass
 func settle_chips():
@@ -304,8 +304,8 @@ func on_moving_finished():
 				cards[i].move_to(dst, 0.3)
 		elif state == DEALING:
 			state = OPENING				# 人間プレイヤーのカードをオープン
-			players_card[USER_IX].connect("opening_finished", self, "on_opening_finished")
-			players_card[USER_IX].do_open()
+			players_card[HUMAN_IX].connect("opening_finished", self, "on_opening_finished")
+			players_card[HUMAN_IX].do_open()
 func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
 	for i in range(N_PLAYERS):
 		if is_folded[i]:
@@ -324,7 +324,7 @@ func _process(delta):
 		if waiting <= 0.0:	# ウェイト終了
 			next_player()	# 次のプレイヤーに手番を移動
 		return
-	if state == SEL_ACTION && nix != USER_IX:		# AI の手番
+	if state == SEL_ACTION && nix != HUMAN_IX:		# AI の手番
 		print("AI is thinking...")
 		do_act_AI()
 		#
@@ -352,7 +352,7 @@ func do_act_AI():
 		else:
 			do_call(nix)
 func do_check_call(pix):
-	#if bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
+	#if bet_chips_plyr[AI_IX] == bet_chips_plyr[HUMAN_IX]:
 	if n_raised == 0:
 		do_check(pix)
 	else:
@@ -385,30 +385,31 @@ func do_fold(pix):
 	n_act_players -= 1
 	set_act_panel_text(pix, "folded", Color.darkgray)
 	next_player()
-	if pix == USER_IX:
+	if pix == HUMAN_IX:
 		players_card[pix].show_back()
 	players_card[pix].move_to(TABLE_CENTER, 0.2)		# カードを中央に移動
 	#state = SHOW_DOWN
 	#loser_ix = pix
-	#winner_ix = (USER_IX + AI_IX) - pix
+	#winner_ix = (HUMAN_IX + AI_IX) - pix
 	#settle_chips()
 func next_player():
 	n_actions += 1
+	nix = (nix + 1) % N_PLAYERS
 	if( n_act_players == 1 ||		# 一人以外全員降りた場合
 			bet_chips_plyr[nix] == ANTE_CHIPS + BET_CHIPS ||
 			act_history == "ccc" || act_history == "fcc" || act_history == "cfc" || act_history == "ccf" ):
-		#n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[USER_IX]:
+		#n_actions >= 2 && bet_chips_plyr[AI_IX] == bet_chips_plyr[HUMAN_IX]:
 		state = SHOW_DOWN
 		emphasize_next_player()		# 次の手番非強調
 		disable_act_buttons()		# 行動ボタンディセーブル
-		#if !is_folded[USER_IX]:		# 人間が残っている場合
+		#if !is_folded[HUMAN_IX]:		# 人間が残っている場合
 		determine_who_won();
 		#settle_chips()
 		#else:						# AI が残っている場合
 		n_opening = 0;
 		for i in range(N_PLAYERS):
 			act_panels[i].hide()		# アクションパネル非表示
-			if i != USER_IX && !is_folded[i] && n_act_players > 1:
+			if i != HUMAN_IX && !is_folded[i] && n_act_players > 1:
 				n_opening += 1
 				players_card[i].connect("opening_finished", self, "on_opening_finished")
 				players_card[i].do_open()
@@ -417,11 +418,11 @@ func next_player():
 			settle_chips()
 	else:
 		while true:
-			nix = (nix + 1) % N_PLAYERS
 			if !is_folded[nix]: break
+			nix = (nix + 1) % N_PLAYERS
 		emphasize_next_player()
-		if nix == USER_IX:
-			act_panels[USER_IX].hide()
+		if nix == HUMAN_IX:
+			act_panels[HUMAN_IX].hide()
 			update_act_buttons()
 			#enable_act_buttons()	# 行動ボタンイネーブル
 #func do_show_down():
@@ -444,7 +445,7 @@ func next_hand():
 	update_n_raised_label()
 	update_players_BG()
 	n_closing = 0
-	if n_act_players > 1 || !is_folded[USER_IX]:
+	if n_act_players > 1 || !is_folded[HUMAN_IX]:
 		for i in range(N_PLAYERS):
 			if !is_folded[i]:
 				players_card[i].connect("closing_finished", self, "on_closing_finished")
@@ -453,7 +454,7 @@ func next_hand():
 	else:
 		collect_cards_to_the_deck()
 	n_act_players = N_PLAYERS
-	#if !is_folded[AI_IX] && !is_folded[USER_IX]:
+	#if !is_folded[AI_IX] && !is_folded[HUMAN_IX]:
 	#	n_closing = 2
 	#	players_card[AI_IX].connect("closing_finished", self, "on_closing_finished")
 	#	players_card[AI_IX].do_close()
@@ -470,11 +471,11 @@ func _on_BackButton_pressed():
 
 
 func _on_FoldButton_pressed():
-	do_fold(USER_IX)
+	do_fold(HUMAN_IX)
 func _on_CheckCallButton_pressed():
-	do_check_call(USER_IX)
+	do_check_call(HUMAN_IX)
 func _on_RaiseButton_pressed():
-	do_raise(USER_IX)
+	do_raise(HUMAN_IX)
 func _on_NextButton_pressed():
 	if state == SHOW_DOWN:
 		next_hand()
