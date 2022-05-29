@@ -49,6 +49,7 @@ var waiting = 0.0		# 0超ならウェイト状態 → 次のプレイヤーに�
 #var sub_state = READY
 var balance
 var n_hands = 1			# 何ハンド目か
+var sum_rank = 0.0		# ランク合計
 var pot = 0				# ベット額合計
 var n_act_players = N_PLAYERS	# フォールドしていないプレイヤー数
 var n_opening = 0
@@ -221,6 +222,8 @@ func determine_who_won():
 func on_opening_finished():
 	if state == OPENING:		# 人間カードオープン
 		state = SEL_ACTION		# アクション選択可能状態
+		sum_rank += players_card[HUMAN_IX].get_rank() + (10 - RANK_10)
+		$Table/RankAveLabel.text = "rank ave: " + String(sum_rank / n_hands).left(4)
 		emphasize_next_player()
 		if nix == HUMAN_IX:
 			enable_act_buttons()
