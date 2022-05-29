@@ -102,8 +102,8 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		#var sd = OS.get_unix_time()
-		var sd = 3
+		var sd = OS.get_unix_time()
+		#var sd = 3
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
 		#var sd = 1653725009
@@ -459,6 +459,7 @@ func next_hand():
 		act_panels[i].hide()
 		is_folded[i] = false
 	$NextButton.disabled = true
+	$CheckCallButton.text = "Check"
 	pass
 
 func _on_BackButton_pressed():
