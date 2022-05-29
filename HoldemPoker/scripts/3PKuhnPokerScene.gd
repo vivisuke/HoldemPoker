@@ -102,8 +102,8 @@ func _ready():
 	else:
 		rng.randomize()
 		#var sd = rng.randi_range(0, 9999)
-		var sd = OS.get_unix_time()
-		#var sd = 3
+		#var sd = OS.get_unix_time()
+		var sd = 0
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
 		#var sd = 1653725009
@@ -394,7 +394,6 @@ func do_fold(pix):
 	#settle_chips()
 func next_player():
 	n_actions += 1
-	nix = (nix + 1) % N_PLAYERS
 	if( n_act_players == 1 ||		# 一人以外全員降りた場合
 			bet_chips_plyr[nix] == ANTE_CHIPS + BET_CHIPS ||
 			act_history == "ccc" || act_history == "fcc" || act_history == "cfc" || act_history == "ccf" ):
@@ -417,6 +416,9 @@ func next_player():
 		if n_opening == 0:		# 外AIがフォールドしている場合
 			settle_chips()
 	else:
+		while true:
+			nix = (nix + 1) % N_PLAYERS
+			if !is_folded[nix]: break
 		emphasize_next_player()
 		if nix == USER_IX:
 			act_panels[USER_IX].hide()
