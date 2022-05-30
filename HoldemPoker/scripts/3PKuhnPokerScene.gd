@@ -17,7 +17,7 @@ enum {		# 状態
 	SEL_ACTION,		# アクション選択
 	WAITING,		# アクション選択後のウェイト状態
 	SHOW_DOWN,
-	ROUND_FINISHED,
+	#ROUND_FINISHED,
 }
 enum {				# プレイヤーパネル背景色
 	BG_WAIT = 0,
@@ -46,6 +46,7 @@ const AI_IX2 = 2
 
 var state = INIT
 var waiting = 0.0		# 0超ならウェイト状態 → 次のプレイヤーに手番を移動
+var sec_to_trans = 0	# 次のハンドの自動遷移するまでの秒数（整数）
 #var sub_state = READY
 var balance
 var n_hands = 1			# 何ハンド目か
@@ -108,6 +109,8 @@ func _ready():
 		#var sd = 3852
 		#var sd = 9830		# 引き分けあり
 		#var sd = 1653725009
+		#var sd = 1653878624		# フォールドすると変？
+		
 		print("seed = ", sd)
 		seed(sd)
 		rng.set_seed(sd)
@@ -223,7 +226,7 @@ func on_opening_finished():
 	if state == OPENING:		# 人間カードオープン
 		state = SEL_ACTION		# アクション選択可能状態
 		sum_rank += players_card[HUMAN_IX].get_rank() + (10 - RANK_10)
-		$Table/RankAveLabel.text = "rank ave: " + String(sum_rank / n_hands).left(4)
+		$Table/RankAveLabel.text = "rank ave: " + String(sum_rank / n_hands).left(5)
 		emphasize_next_player()
 		if nix == HUMAN_IX:
 			enable_act_buttons()
@@ -320,12 +323,20 @@ func emphasize_next_player():		# 次の手番のプレイヤー背景上部を�
 func do_wait():
 	waiting = 0.5		# 0.5秒ウェイト
 func _process(delta):
-	if state == SHOW_DOWN || state == ROUND_FINISHED:
-		return
+	#if state == SHOW_DOWN:	#|| state == ROUND_FINISHED:
+	#	return
 	if waiting > 0.0:		# 行動後のウェイト状態の場合
 		waiting -= delta
+		if sec_to_trans != 0:
+			var sec : int = ceil(waiting)
+			if sec < sec_to_trans:
+				sec_to_trans = sec
+				$NextButton.text = "Next %d" % sec
 		if waiting <= 0.0:	# ウェイト終了
-			next_player()	# 次のプレイヤーに手番を移動
+			if state != SHOW_DOWN:
+				next_player()	# 次のプレイヤーに手番を移動
+			else:
+				next_hand()
 		return
 	if state == SEL_ACTION && nix != HUMAN_IX:		# AI の手番
 		print("AI is thinking...")
@@ -419,6 +430,9 @@ func next_player():
 		#do_show_down()
 		if n_opening == 0:		# 外AIがフォールドしている場合
 			settle_chips()
+		waiting = 6.0
+		sec_to_trans = int(waiting)
+		$NextButton.text = "Next %d" % sec_to_trans
 	else:
 		while true:
 			if !is_folded[nix]: break
