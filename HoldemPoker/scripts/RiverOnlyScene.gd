@@ -238,12 +238,16 @@ func on_moving_finished():
 	n_moving -= 1
 	if n_moving == 0:
 		#print("on_moving_finished")
-		if state == DEALING:		# プレイヤーカード配布終了
+		if state == DEALING:			# プレイヤーカード配布終了
 			players_card1[HUMAN_IX].do_open()
 			players_card2[HUMAN_IX].do_open()
 			state = OPENING
 			n_opening = 2
-		else:						# 共有カード配布終了
+		elif state == DEALING_COMU:		# 共有カード配布終了
+			n_opening = comu_cards.size()
+			for i in range(n_opening):
+				comu_cards[i].do_open()
+			state = OPENING_COMU
 			pass
 func on_opening_finished():
 	n_opening -= 1
