@@ -144,6 +144,26 @@ func _ready():
 	balance = g.saved_data[g.KEY_BALANCE]
 	balance -= INIT_CHIPS
 	$Table/BalanceLabel.text = "balance: %d" % balance
+	#
+	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
+	#players[0].set_BG(1)
+	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
+	print("dealer_ix = ", dealer_ix)
+	# 行動ボタン
+	act_buttons.resize(N_ACT_BUTTONS)
+	act_buttons[FOLD] = $FoldButton
+	act_buttons[CHECK_CALL] = $CheckCallButton
+	#act_buttons[CALL] = $CallButton
+	act_buttons[RAISE] = $RaiseButton
+	#act_buttons[ALL_IN] = $AllInNextButton
+	#act_buttons[BB2] = $BB2Button
+	#act_buttons[BB3] = $BB3Button
+	#act_buttons[BB4] = $BB4Button
+	#act_buttons[BB5] = $BB5Button
+	for i in range(N_ACT_BUTTONS):
+		act_buttons[i].disabled = true
+	#$RaiseSpinBox.set_value(BB_CHIPS)
+	#$RaiseSpinBox.editable = false
 
 
 
