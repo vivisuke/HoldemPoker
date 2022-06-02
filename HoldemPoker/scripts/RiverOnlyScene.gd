@@ -10,10 +10,10 @@ enum {
 const RANK_STR = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 enum {		# 状態
 	INIT = 0,
-	SHUFFLE_0,		# カードシャフル中（前半）
-	SHUFFLE_1,		# カードシャフル中（後半）
 	DEALING,		# カード配布中
 	OPENING,		# 人間プレイヤーのカードオープン中
+	DEALING_COMU,	# 共有カード配布中
+	OPENING_COMU,	# 共有カードオープン中
 	SEL_ACTION,		# アクション選択
 	WAITING,		# アクション選択後のウェイト状態
 	SHOW_DOWN,
@@ -65,12 +65,16 @@ var dealer_ix = 0		# ディーラプレイヤーインデックス
 var winner_ix			# 勝者インデックス
 var loser1_ix			# 敗者インデックス
 var loser2_ix			# 敗者インデックス
-var alpha = 0.0			# Ｊレイズ確率
+#var alpha = 0.0			# Ｊレイズ確率
 var act_buttons = []		# アクションボタン
-var cards = [0, 0, 0, 0, 0]		# 使用カード
+#var cards = [0, 0, 0, 0, 0]		# 使用カード
+var deck_ix = 0			# デッキトップインデックス
+var deck = []			# 要素：(suit << 4) | rank （※ rank:0～12 の数値、0 for 2,... 11 for King, 12 for Ace）
+var comu_cards = []		# コミュニティカード
 var players = []			# プレイヤーパネル配列、[0] for Human
-var players_card = []		# プレイヤーに配られたカード
-var act_panels = []			# プレイヤーアクション表示パネル
+var players_card1 = []		# プレイヤーに配られたカード その１
+var players_card2 = []		# プレイヤーに配られたカード その２
+#var players_card = []		# プレイヤーに配var act_panels = []			# プレイヤーアクション表示パネル
 var is_folded = []			# 各プレイヤーが Fold 済みか？
 var players_hand = []		# 各プレイヤーの手役
 var bet_chips_plyr = []		# 各プレイヤー現ラウンドのベットチップ数（パネル下部に表示されるチップ数）
@@ -165,7 +169,102 @@ func _ready():
 	#$RaiseSpinBox.set_value(BB_CHIPS)
 	#$RaiseSpinBox.editable = false
 	update_players_BG()
-	##update_act_buttons()
+	update_act_buttons()
+	#
+	#deal_cards()
+	dealing_cards_animation()
+	pass
+func card_to_suit(cd): return cd >> N_RANK_BITS
+func card_to_rank(cd): return cd & RANK_MASK
+func shuffle_cards():	# デッキ初期化、カードシャフル
+	deck.resize(N_CARDS)
+	for i in range(N_CARDS):
+		var st : int = i / N_RANK
+		var rank : int = i % N_RANK
+		deck[i] = (st<<N_RANK_BITS) | rank
+	deck.shuffle()
+	deck_ix = 0
+
+func deal_cards():	# 各プレイヤーにカード配布
+	shuffle_cards()
+	players_card1 = []
+	var ix = 0
+	for i in range(N_PLAYERS):
+		players_card1.push_back(deck[ix])
+		var st : int = card_to_suit(deck[ix])
+		var rank : int = card_to_rank(deck[ix])
+		ix += 1
+		players[i].set_card1(st, rank)
+	players_card2 = []
+	for i in range(N_PLAYERS):
+		players_card2.push_back(deck[ix])
+		var st : int = card_to_suit(deck[ix])
+		var rank : int = card_to_rank(deck[ix])
+		ix += 1
+		players[i].set_card2(st, rank)
+func dealing_cards_animation():		# 各プレイヤーにカード配布アニメーション
+	shuffle_cards()
+	players_card1.resize(N_PLAYERS)
+	for i in range(N_PLAYERS):
+		var di = (dealer_ix + 1 + i) % N_PLAYERS
+		var cd = CardBF.instance()		# カード裏面
+		players_card1[di] = cd
+		cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+		deck_ix += 1
+		cd.set_position(deck_pos)
+		$Table.add_child(cd)
+		cd.connect("moving_finished", self, "on_moving_finished")
+		cd.connect("opening_finished", self, "on_opening_finished")
+		var dst = players[di].get_position() + Vector2(-CARD_WIDTH/2, -4)
+		cd.wait_move_to(i * 0.1, dst, 0.3)
+	players_card2.resize(N_PLAYERS)
+	for i in range(N_PLAYERS):
+		var di = (dealer_ix + 1 + i) % N_PLAYERS
+		var cd = CardBF.instance()
+		players_card2[di] = cd
+		cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+		deck_ix += 1
+		cd.set_position(deck_pos)
+		$Table.add_child(cd)
+		cd.connect("moving_finished", self, "on_moving_finished")
+		cd.connect("opening_finished", self, "on_opening_finished")
+		var dst = players[di].get_position() + Vector2(CARD_WIDTH/2, -4)
+		cd.wait_move_to((N_PLAYERS + i) * 0.1, dst, 0.3)
+	state = DEALING
+	n_moving = N_PLAYERS * 2
+func on_moving_finished():
+	n_moving -= 1
+	if n_moving == 0:
+		print("on_moving_finished")
+		if state == DEALING:		# プレイヤーカード配布終了
+			n_opening = 2
+			players_card1[HUMAN_IX].do_open()
+			players_card2[HUMAN_IX].do_open()
+			state = OPENING
+		else:						# 共有カード配布終了
+			pass
+	
+func disable_act_buttons():
+	for i in range(N_ACT_BUTTONS):
+		act_buttons[i].disabled = true
+func enable_act_buttons():
+	for i in range(N_ACT_BUTTONS):
+		act_buttons[i].disabled = false
+func can_check():
+	return n_raised == 0
+func update_act_buttons():
+	if nix != HUMAN_IX:
+		disable_act_buttons()
+	else:
+		$FoldButton.disabled = false
+		$CheckCallButton.disabled = false
+		print("can_check() = ", can_check())
+		if can_check():
+			$CheckCallButton.text = "Check"
+		else:
+			$CheckCallButton.text = "Call 1"
+		$RaiseButton.disabled = n_raised != 0
+		$NextButton.disabled = true
 func update_players_BG():
 	bet_chips_plyr.resize(N_PLAYERS)
 	#round_bet_chips_plyr.resize(N_PLAYERS)

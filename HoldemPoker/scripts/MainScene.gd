@@ -271,8 +271,7 @@ func update_next_player():
 		act_panels[nix].hide()
 func card_to_suit(cd): return cd >> N_RANK_BITS
 func card_to_rank(cd): return cd & RANK_MASK
-func shuffle_cards():
-	# デッキカードシャフル
+func shuffle_cards():	# デッキ初期化、カードシャフル
 	deck.resize(N_CARDS)
 	for i in range(N_CARDS):
 		var st : int = i / N_RANK
