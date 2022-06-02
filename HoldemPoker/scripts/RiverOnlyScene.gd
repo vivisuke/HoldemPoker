@@ -164,6 +164,24 @@ func _ready():
 		act_buttons[i].disabled = true
 	#$RaiseSpinBox.set_value(BB_CHIPS)
 	#$RaiseSpinBox.editable = false
+	update_players_BG()
+	##update_act_buttons()
+func update_players_BG():
+	bet_chips_plyr.resize(N_PLAYERS)
+	#round_bet_chips_plyr.resize(N_PLAYERS)
+	for i in range(N_PLAYERS):
+		players[i].copy_to_prev_chips()
+		players[i].show_diff_chips(false)
+		var mk = players[i].get_node("Mark")
+		if i == dealer_ix:
+			mk.show()
+		else:
+			mk.hide()
+		bet_chips_plyr[i] = ANTE_CHIPS
+		#round_bet_chips_plyr[i] = ANTE_CHIPS
+		players[i].show_bet_chips(true)
+		players[i].set_bet_chips(bet_chips_plyr[i])
+		players[i].sub_chips(bet_chips_plyr[i])
 
 
 
