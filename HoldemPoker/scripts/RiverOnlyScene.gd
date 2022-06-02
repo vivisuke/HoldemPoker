@@ -37,6 +37,7 @@ const N_COMU_CARS = 5			# 共通カード枚数
 const RANK_MASK = 0x0f
 const N_RANK_BITS = 4			# カード：(suit << N_RANK_BITS) | rank
 const CARD_WIDTH = 50
+const COMU_CARD_PY = 80
 const N_PLAYERS = 3				# プレイヤー人数
 const ANTE_CHIPS = 1
 const BET_CHIPS = 1				# 1chip のみベット可能
@@ -136,6 +137,7 @@ func _ready():
 	deck_pos = $Table/CardDeck.get_position()
 	players_hand.resize(N_PLAYERS)
 	is_folded.resize(N_PLAYERS)
+	comu_cards.resize(N_COMU_CARS)
 	#n_raised.resize(N_PLAYERS)
 	players = []
 	for i in range(N_PLAYERS):
@@ -235,14 +237,30 @@ func dealing_cards_animation():		# 各プレイヤーにカード配布アニメ
 func on_moving_finished():
 	n_moving -= 1
 	if n_moving == 0:
-		print("on_moving_finished")
+		#print("on_moving_finished")
 		if state == DEALING:		# プレイヤーカード配布終了
-			n_opening = 2
 			players_card1[HUMAN_IX].do_open()
 			players_card2[HUMAN_IX].do_open()
 			state = OPENING
+			n_opening = 2
 		else:						# 共有カード配布終了
 			pass
+func on_opening_finished():
+	n_opening -= 1
+	if n_opening == 0:
+		if state == OPENING:		# 人間カードオープン終了
+			n_moving = N_COMU_CARS
+			state = DEALING_COMU
+			for i in range(n_moving):
+				var cd = CardBF.instance()
+				comu_cards[i] = cd
+				cd.set_sr(card_to_suit(deck[deck_ix]), card_to_rank(deck[deck_ix]))
+				deck_ix += 1
+				cd.set_position(deck_pos)
+				$Table.add_child(cd)
+				cd.connect("moving_finished", self, "on_moving_finished")
+				cd.connect("opening_finished", self, "on_opening_finished")
+				cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
 	
 func disable_act_buttons():
 	for i in range(N_ACT_BUTTONS):

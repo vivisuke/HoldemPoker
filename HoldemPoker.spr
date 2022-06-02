@@ -395,7 +395,7 @@
 0385 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：戻るボタン押下処理
 0386 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：中央にデッキを設置
 0387 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：各プレイヤーにカード２枚配布
-0388 ● C 06/03            │ToDo│RiverOnly：人間のみオープン後、コミュニティカード５枚配布→オープン
+0388 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：人間のみオープン後、コミュニティカード５枚配布
 0389 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：Fold, Check/Call, Raise, Next ボタン設置
 0390 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：# hand、# raised ラベル設置
 0391 ◎ C 06/03 06/03 0.001│ToDo│「3P RiverOnly」表記にする
@@ -403,7 +403,7 @@
 0393 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：ユーザ名表示
 0394 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：ディーラにのみディーラマーク表示
 0395 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：各プレイヤーにカード２枚配布後、人間のみオープン
-0396 ● C 06/03            │ToDo│
+0396 ● C 06/03            │ToDo│RiverOnly：コミュニティカード５枚配布→オープン
 0397 ● C 06/03            │ToDo│
 0398 ● C 06/03            │ToDo│
 0399 ● C 06/03            │ToDo│
