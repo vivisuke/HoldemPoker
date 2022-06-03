@@ -303,12 +303,15 @@ func on_opening_finished():
 				cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
 		elif state == OPENING_COMU:		# 共有カードオープン終了
 			state = SEL_ACTION
-			show_user_hand()
+			show_hand_name(HUMAN_IX)
 			#update_players_BG()
 			emphasize_next_player()
 		elif state == SHOW_DOWN:
 			print("SHOW_DOWN > on_opening_finished()")
 			emphasize_next_player()
+			for i in range(1, N_PLAYERS):	# 人間以外の手役名表示
+				if !is_folded[i]:
+					show_hand_name(i)
 			determine_who_won()
 			#if players_card[HUMAN_IX].get_rank() > players_card[AI_IX].get_rank():
 			#	print("User won")
@@ -356,15 +359,13 @@ func on_closing_finished():
 	if n_closing == 0:
 		collect_cards_to_the_deck()		# カードを中央デッキに集める
 	
-func show_user_hand():
-	if is_folded[HUMAN_IX]: return
+func show_hand_name(pix):
+	if is_folded[pix]: return
 	var v = []
-	v.push_back(players_card1[0].get_sr())
-	v.push_back(players_card2[0].get_sr())
+	v.push_back(players_card1[pix].get_sr())
+	v.push_back(players_card2[pix].get_sr())
 	for k in range(N_COMU_CARS): v.push_back(comu_cards[k].get_sr())
-	#print("i = ", i, ", v = ", v)
-	#print("hand = ", handName[check_hand(v)])
-	players[HUMAN_IX].set_hand(handName[check_hand(v)[0]])
+	players[pix].set_hand(handName[check_hand(v)[0]])
 # 手役判定
 # return: [手役, ランク１，ランク２,...]
 func check_hand(v : Array) -> Array:
