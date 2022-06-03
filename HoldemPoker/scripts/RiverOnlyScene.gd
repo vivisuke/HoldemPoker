@@ -306,19 +306,20 @@ func on_opening_finished():
 			show_user_hand()
 			#update_players_BG()
 			emphasize_next_player()
-	elif state == SHOW_DOWN:
-		print("SHOW_DOWN > on_opening_finished()")
-		emphasize_next_player()
-		determine_who_won()
-		#if players_card[HUMAN_IX].get_rank() > players_card[AI_IX].get_rank():
-		#	print("User won")
-		#	winner_ix = HUMAN_IX		# 勝者
-		#	loser_ix = AI_IX
-		#else:
-		#	print("AI won")
-		#	winner_ix = AI_IX
-		#	loser_ix = HUMAN_IX		# 敗者
-		settle_chips()
+		elif state == SHOW_DOWN:
+			print("SHOW_DOWN > on_opening_finished()")
+			emphasize_next_player()
+			determine_who_won()
+			#if players_card[HUMAN_IX].get_rank() > players_card[AI_IX].get_rank():
+			#	print("User won")
+			#	winner_ix = HUMAN_IX		# 勝者
+			#	loser_ix = AI_IX
+			#else:
+			#	print("AI won")
+			#	winner_ix = AI_IX
+			#	loser_ix = HUMAN_IX		# 敗者
+			# undone: AI 手役表示
+			settle_chips()
 func settle_chips():
 	#n_chip_moving = 0
 	if n_chip_moving != 0: return		# 複数回呼ばれてしまった場合は無視
@@ -609,8 +610,8 @@ func do_fold(pix):
 	if pix == HUMAN_IX:
 		players_card1[pix].show_back()
 		players_card2[pix].show_back()
-	players_card1[pix].move_to(TABLE_CENTER, 0.2)		# カードを中央に移動
-	players_card2[pix].move_to(TABLE_CENTER, 0.2)		# カードを中央に移動
+	players_card1[pix].move_to(deck_pos, 0.2)		# カードを中央に移動
+	players_card2[pix].move_to(deck_pos, 0.2)		# カードを中央に移動
 	#state = SHOW_DOWN
 	#loser_ix = pix
 	#winner_ix = (HUMAN_IX + AI_IX) - pix
