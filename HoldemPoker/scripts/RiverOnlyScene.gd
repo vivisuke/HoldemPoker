@@ -180,7 +180,8 @@ func _ready():
 	players[0].set_name(g.saved_data[g.KEY_USER_NAME])
 	#players[0].set_BG(1)
 	dealer_ix = rng.randi_range(0, N_PLAYERS - 1)
-	print("dealer_ix = ", dealer_ix)
+	nix = (dealer_ix + 1) % N_PLAYERS
+	print("dealer_ix = ", dealer_ix, ", nix = ", nix)
 	# 行動パネル
 	TABLE_CENTER = $Table.position
 	act_panels.resize(N_PLAYERS)
@@ -301,7 +302,10 @@ func on_opening_finished():
 				cd.connect("opening_finished", self, "on_opening_finished")
 				cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
 		elif state == OPENING_COMU:		# 共有カードオープン終了
+			state = SEL_ACTION
 			show_user_hand()
+			#update_players_BG()
+			emphasize_next_player()
 	elif state == SHOW_DOWN:
 		print("SHOW_DOWN > on_opening_finished()")
 		emphasize_next_player()
@@ -517,6 +521,7 @@ func determine_who_won():
 			mxc = players_card1[i].get_rank()
 			winner_ix = i
 func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
+	print("nix = ", nix)
 	for i in range(N_PLAYERS):
 		if is_folded[i]:
 			players[i].set_BG(BG_FOLDED)
