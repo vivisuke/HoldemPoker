@@ -72,7 +72,7 @@ const N_FLOP_CARDS = 3
 const N_PLAYERS = 6
 const BB_CHIPS = 2
 const SB_CHIPS = BB_CHIPS / 2
-const USER_IX = 0				# プレイヤー： players[USER_IX]
+const HUMAN_IX = 0				# プレイヤー： players[HUMAN_IX]
 const WAIT_SEC = 0.5			# 次プレイヤーに手番が移るまでの待ち時間（秒）
 const N_PLAYOUT = 5000			# 期待勝率計算 モンテカルロ法試行回数
 const N_PLAYOUT2 = 500			# 期待勝率計算 モンテカルロ法試行回数（ユーザフォールド時）
@@ -209,8 +209,8 @@ func _ready():
 	#
 	#$Chip.move_to(Vector2(10, 10), 2.0)		# Test
 	#
-	#print("chip pos = ", players[USER_IX].get_chip_pos())		# Test
-	#print("chip pos = ", players[USER_IX+1].get_chip_pos())
+	#print("chip pos = ", players[HUMAN_IX].get_chip_pos())		# Test
+	#print("chip pos = ", players[HUMAN_IX+1].get_chip_pos())
 	pass
 func update_roundLabel():
 	$RoundLabel.text = stateText[state]
@@ -463,7 +463,7 @@ func next_round():
 		for i in range(N_PLAYERS):		# 暫定コード
 			act_panels[i].hide()
 			if is_folded[i]: n_opening -= 1
-		if !is_folded[USER_IX]: n_opening -= 1		# ユーザプレイヤーのカードはすでにオープンされている
+		if !is_folded[HUMAN_IX]: n_opening -= 1		# ユーザプレイヤーのカードはすでにオープンされている
 		n_opening *= 2
 		sub_state = CARD_OPENING
 		for i in range(1, N_PLAYERS):	# 全プレイヤーのカードをオープン
@@ -479,7 +479,7 @@ func next_round():
 			#print("chils[", i, "] = ", players[i].get_chips())
 			if players[i].get_chips() <= 0:		# バーストした場合
 				players[i].set_chips(INIT_CHIPS/2)		# 初期チップの半分を与える
-				if i == USER_IX:
+				if i == HUMAN_IX:
 					balance -= INIT_CHIPS/2
 					$Table/BalanceLabel.text = "balance: %d" % balance
 		update_d_SB_BB()
@@ -520,8 +520,8 @@ func on_moving_finished():
 		sub_state = CARD_OPENING
 		if state == PRE_FLOP:
 			n_opening = 2
-			players_card1[USER_IX].do_open()
-			players_card2[USER_IX].do_open()
+			players_card1[HUMAN_IX].do_open()
+			players_card2[HUMAN_IX].do_open()
 		elif state == FLOP:
 			n_opening = N_FLOP_CARDS
 			for i in range(N_FLOP_CARDS):		# 3 for FLOP
@@ -541,8 +541,8 @@ func on_opening_finished():
 		sub_state = READY
 		if state == PRE_FLOP:
 			show_user_hand(0)
-			players[USER_IX].add_child(players_card1[USER_IX])
-			players[USER_IX].add_child(players_card2[USER_IX])
+			players[HUMAN_IX].add_child(players_card1[HUMAN_IX])
+			players[HUMAN_IX].add_child(players_card2[HUMAN_IX])
 		elif state == FLOP:
 			show_user_hand(3)
 		elif state == TURN:
@@ -597,7 +597,7 @@ func max_raise_chips(pix):		# 可能最大レイズ額
 func _process(delta):
 	if state == SHOW_DOWN || state == ROUND_FINISHED:
 		return
-	#if nix != USER_IX || state == INIT:
+	#if nix != HUMAN_IX || state == INIT:
 	#	sum_delta += delta
 	#	if sum_delta < WAIT_SEC: return
 	#	sum_delta -= WAIT_SEC
@@ -607,7 +607,7 @@ func _process(delta):
 		#print("sub_state != 0")
 		return
 	#print("nix = ", nix)
-	if nix == USER_IX && is_folded[nix]:		# ユーザプレイヤー手番 && Folded の場合
+	if nix == HUMAN_IX && is_folded[nix]:		# ユーザプレイヤー手番 && Folded の場合
 		next_player()
 	elif state == INIT:
 		# undone: 一定時間ウェイト？
@@ -624,15 +624,15 @@ func _process(delta):
 					#act_panels[nix].show()
 				else:
 					var max_raise = max_raise_chips(nix)
-					if nix == USER_IX:
-						#players[USER_IX].set_scale(Vector2(2.0, 2.0))
-						players[USER_IX].start_scale_up_down()
-						if bet_chips_plyr[USER_IX] < bet_chips:
-							act_buttons[CHECK_CALL].text = "Call %d" % (bet_chips - bet_chips_plyr[USER_IX])
+					if nix == HUMAN_IX:
+						#players[HUMAN_IX].set_scale(Vector2(2.0, 2.0))
+						players[HUMAN_IX].start_scale_up_down()
+						if bet_chips_plyr[HUMAN_IX] < bet_chips:
+							act_buttons[CHECK_CALL].text = "Call %d" % (bet_chips - bet_chips_plyr[HUMAN_IX])
 						else:
 							act_buttons[CHECK_CALL].text = "Check"
-						#act_buttons[CHECK].disabled = bet_chips_plyr[USER_IX] < bet_chips
-						#act_buttons[CALL].disabled = bet_chips_plyr[USER_IX] == bet_chips
+						#act_buttons[CHECK].disabled = bet_chips_plyr[HUMAN_IX] < bet_chips
+						#act_buttons[CALL].disabled = bet_chips_plyr[HUMAN_IX] == bet_chips
 						# コマンドボタン・スピンボックスをイネーブル
 						for i in range(N_ACT_BUTTONS):
 							act_buttons[i].disabled = false
@@ -642,10 +642,10 @@ func _process(delta):
 						$RaiseSpinBox.max_value = max_raise
 						$RaiseSpinBox.editable = true
 						sub_state = INITIALIZED
-						#print("win rate = ", calc_win_rate(USER_IX, nActPlayer - 1))	# 5: 暫定
+						#print("win rate = ", calc_win_rate(HUMAN_IX, nActPlayer - 1))	# 5: 暫定
 						return		# 次のプレイヤーに遷移しないように
 					else:
-						#players[USER_IX].set_scale(Vector2(1.0, 1.0))
+						#players[HUMAN_IX].set_scale(Vector2(1.0, 1.0))
 						if g.ai_type == g.AI_HONEST:
 							do_AI_action_honest(nix, max_raise)
 						else:
@@ -729,7 +729,7 @@ func calc_win_rate(pix : int, nEnemy : int) -> float:
 	var wsum = 0.0
 	var dk = []				# デッキ用配列
 	dk.resize(N_CARDS)
-	var n_playout = N_PLAYOUT if !is_folded[USER_IX] else N_PLAYOUT2
+	var n_playout = N_PLAYOUT if !is_folded[HUMAN_IX] else N_PLAYOUT2
 	for nt in range(n_playout):
 		for i in range(N_CARDS):		# デッキ初期化
 			var st : int = i / N_RANK
@@ -883,7 +883,7 @@ func check_hand(v : Array) -> Array:
 	return add_rank_pair(v, -1, -1, HIGH_CARD)
 	#return [HIGH_CARD]
 func show_user_hand(n):
-	if is_folded[USER_IX]: return
+	if is_folded[HUMAN_IX]: return
 	var v = []
 	v.push_back(players_card1[0].get_sr())
 	v.push_back(players_card2[0].get_sr())
@@ -1082,26 +1082,26 @@ func next_player():
 	update_next_player()
 	$RaiseSpinBox.set_value(BB_CHIPS)
 #func _on_CheckButton_pressed():
-#	do_check(USER_IX)
+#	do_check(HUMAN_IX)
 #	next_player()
 #	pass # Replace with function body.
 #func _on_CallButton_pressed():
-#	do_call(USER_IX)
+#	do_call(HUMAN_IX)
 #	next_player()
 func _on_FoldButton_pressed():
-	do_fold(USER_IX)
+	do_fold(HUMAN_IX)
 	disable_act_buttons()
 	next_player()
 func _on_CheckCallButton_pressed():
-	if bet_chips_plyr[USER_IX] < bet_chips:
-		do_call(USER_IX)
+	if bet_chips_plyr[HUMAN_IX] < bet_chips:
+		do_call(HUMAN_IX)
 	else:
-		do_check(USER_IX)
+		do_check(HUMAN_IX)
 	disable_act_buttons()
 	next_player()
 	pass # Replace with function body.
 func _on_RaiseButton_pressed():
-	do_raise(USER_IX, $RaiseSpinBox.get_value())
+	do_raise(HUMAN_IX, $RaiseSpinBox.get_value())
 	disable_act_buttons()
 	next_player()
 func _on_AllInNextButton_pressed():
@@ -1110,12 +1110,12 @@ func _on_AllInNextButton_pressed():
 		$AllInNextButton.disabled = true
 		next_round()
 	else:
-		var tc = bet_chips - bet_chips_plyr[USER_IX]	# コールに必要なチップ数
-		var rc = players[USER_IX].get_chips() - tc		# レイズチップ数
+		var tc = bet_chips - bet_chips_plyr[HUMAN_IX]	# コールに必要なチップ数
+		var rc = players[HUMAN_IX].get_chips() - tc		# レイズチップ数
 		if rc == 0:		# レイズ不可、コール可能
-			do_call(USER_IX)
+			do_call(HUMAN_IX)
 		elif rc > 0:	# レイズ可能
-			do_raise(USER_IX, rc)
+			do_raise(HUMAN_IX, rc)
 		next_player()
 	pass # Replace with function body.
 
@@ -1132,7 +1132,7 @@ func _on_BB5Button_pressed():
 
 
 func _on_BackButton_pressed():
-	balance += players[USER_IX].get_chips()
+	balance += players[HUMAN_IX].get_chips()
 	g.saved_data[g.KEY_BALANCE] = balance
 	g.auto_save()
 	get_tree().change_scene("res://TopScene.tscn")

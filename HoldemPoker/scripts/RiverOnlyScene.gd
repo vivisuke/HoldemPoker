@@ -7,7 +7,19 @@ enum {
 	RANK_7, RANK_8, RANK_9, RANK_10,
 	RANK_J, RANK_Q, RANK_K, RANK_A, N_RANK,
 }
-const RANK_STR = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
+enum {		# 手役
+	HIGH_CARD = 0,
+	ONE_PAIR,
+	TWO_PAIR,
+	THREE_OF_A_KIND,
+	STRAIGHT,
+	FLUSH,
+	FULL_HOUSE,
+	FOUR_OF_A_KIND,
+	STRAIGHT_FLUSH,
+	ROYAL_FLUSH,
+	N_KIND_HAND,
+};
 enum {		# 状態
 	INIT = 0,
 	DEALING,		# カード配布中
@@ -44,6 +56,19 @@ const BET_CHIPS = 1				# 1chip のみベット可能
 const HUMAN_IX = 0
 const AI_IX = 1
 const AI_IX2 = 2
+const RANK_STR = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
+const handName = [
+	"highCard",
+	"onePair",
+	"twoPair",
+	"threeOfAKind",
+	"straight",
+	"flush",
+	"fullHouse",
+	"fourOfAKind",
+	"straightFlush",
+	"RoyalFlush",
+]
 
 var state = INIT
 var waiting = 0.0		# 0超ならウェイト状態 → 次のプレイヤーに手番を移動
@@ -265,7 +290,129 @@ func on_opening_finished():
 				cd.connect("moving_finished", self, "on_moving_finished")
 				cd.connect("opening_finished", self, "on_opening_finished")
 				cd.move_to(Vector2(CARD_WIDTH*(i-2), COMU_CARD_PY), 0.3)
+		elif state == OPENING_COMU:		# 共有カードオープン終了
+			show_user_hand()
 	
+func show_user_hand():
+	if is_folded[HUMAN_IX]: return
+	var v = []
+	v.push_back(players_card1[0].get_sr())
+	v.push_back(players_card2[0].get_sr())
+	for k in range(N_COMU_CARS): v.push_back(comu_cards[k].get_sr())
+	#print("i = ", i, ", v = ", v)
+	#print("hand = ", handName[check_hand(v)])
+	players[HUMAN_IX].set_hand(handName[check_hand(v)[0]])
+# 手役判定
+# return: [手役, ランク１，ランク２,...]
+func check_hand(v : Array) -> Array:
+	var rcnt = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	var scnt = [0, 0, 0, 0]
+	for i in range(v.size()):			# 手札のランク、スートの数を数える
+		rcnt[card_to_rank(v[i])] += 1
+		scnt[card_to_suit(v[i])] += 1
+	var s = -1		# フラッシュの場合のスート
+	if scnt[CLUBS] >= 5: s = CLUBS
+	elif scnt[DIAMONDS] >= 5: s = DIAMONDS
+	elif scnt[HEARTS] >= 5: s = HEARTS
+	elif scnt[SPADES] >= 5: s = SPADES
+	if s >= CLUBS:		# フラッシュ確定
+		var bitmap = 0		# ランクをビット値に変換したものの合計
+		for i in v.size():
+			if( card_to_suit(v[i]) == s ):		# 同一スートの場合
+				bitmap |= 1 << card_to_rank(v[i])
+		var mask = 0x1f00		# AKQJT
+		for i in range(9):
+			if( (bitmap & mask) == mask ):
+				return [STRAIGHT_FLUSH, mask]
+			mask >>= 1
+		if( bitmap == 0x100f ):		# 1 0000 00000 1111 = 5432A
+			return [STRAIGHT_FLUSH, 0x0f]		# 5432A よりも 65432 の方が強い
+	var threeOfAKindRank = -1		# 3 of a Kind の rcnt インデックス
+	var threeOfAKindRank2 = -1	# 3 of a Kind の rcnt インデックス その２
+	var pairRank1 = -1			# ペアの場合の rcnt インデックス
+	var pairRank2 = -1			# ペアの場合の rcnt インデックス その２、pairRank1 > pairRank2 とする
+	for r in range(13):
+		if( rcnt[r] == 4):
+			return [FOUR_OF_A_KIND, r]		# 4 of a kind は他のプレイヤーと同じ数字になることはない
+		if( rcnt[r] == 3):
+			if( threeOfAKindRank < 0 ):
+				threeOfAKindRank = r
+			else:
+				threeOfAKindRank2 = r
+		elif( rcnt[r] == 2):
+			if pairRank1 < 0:
+				pairRank1 = r
+			elif pairRank2 < 0:
+				if pairRank1 > r:
+					pairRank2 = r
+				else:
+					pairRank2 = pairRank1
+					pairRank1 = r
+			else:
+				if r > pairRank1:
+					pairRank2 = pairRank1
+					pairRank1 = r
+				if r > pairRank2:
+					pairRank2 = r
+	# 3カード*2 もフルハウス
+	if( threeOfAKindRank >= 0 && (pairRank1 >= 0 || threeOfAKindRank2 >= 0) ):
+		return [FULL_HOUSE, threeOfAKindRank]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
+	if( s >= 0 ):
+		return add_rank(v, s, FLUSH)
+	#
+	var bitmap = 0
+	var mask = 1
+	for i in range(13):
+		if( rcnt[i] != 0 ):
+			bitmap |= mask
+		mask <<= 1
+	mask = 0x1f00		#	AKQJT
+	for i in range(9):
+		if( (bitmap & mask) == mask ):
+			return [STRAIGHT, mask]
+		mask >>= 1
+	if( (bitmap & 0x100f) == 0x100f ):		#	5432A
+		return [STRAIGHT, 0x0f]				# 5432A より 65432 の方が強い
+	if( threeOfAKindRank >= 0 ):
+		return [THREE_OF_A_KIND, threeOfAKindRank]		# 3 of a kind は他のプレイヤーと同じ数字になることはない
+	if( pairRank2 >= 0 ):
+		#return [TWO_PAIR]
+		return add_rank_pair(v, pairRank1, pairRank2, TWO_PAIR)
+	if( pairRank1 >= 0 ):
+		return add_rank_pair(v, pairRank1, -1, ONE_PAIR)
+		#return [ONE_PAIR]
+	return add_rank_pair(v, -1, -1, HIGH_CARD)
+func add_rank_pair(v, p1, p2, hand):	# ペアの場合に、ペア以外の数字を大きい順に結果配列に追加
+	var rnk = []
+	for i in range(v.size()):
+		var r = card_to_rank(v[i])
+		if r != p1 && r != p2:		# ペアの数字でない場合
+			rnk.push_back(r)
+	rnk.sort()		# 昇順ソート
+	var t = [hand]
+	var n = 5		# 配列に追加する枚数
+	if p2 >= 0:		# 2ペアの場合
+		t.push_back(p1)
+		t.push_back(p2)
+		n = 1
+	elif p1 >= 0:		# 1ペアの場合
+		t.push_back(p1)
+		n = 3
+	n = min(rnk.size(), n)
+	for i in range(n):
+		t.push_back(rnk[rnk.size()-1-i])		# ランクを降順に格納
+	return t
+func add_rank(v, s, hand):		# フラッシュの場合に、そのスートの数字を大きい順に結果配列に追加
+	var rnk = []
+	for i in range(v.size()):
+		if( card_to_suit(v[i]) == s ):		# 同一スートの場合
+			rnk.push_back(card_to_rank(v[i]))
+	rnk.sort()		# 昇順ソート
+	var t = [hand]
+	for i in range(5):				# 大きいランクから５枚を配列に追加
+		t.push_back(rnk[-1-i])		# ランクを降順に格納
+	#print("flush: ", t)
+	return t
 func disable_act_buttons():
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
