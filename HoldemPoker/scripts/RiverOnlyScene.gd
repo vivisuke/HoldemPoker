@@ -365,7 +365,8 @@ func show_hand_name(pix):
 	v.push_back(players_card1[pix].get_sr())
 	v.push_back(players_card2[pix].get_sr())
 	for k in range(N_COMU_CARS): v.push_back(comu_cards[k].get_sr())
-	players[pix].set_hand(handName[check_hand(v)[0]])
+	players_hand[pix] = check_hand(v)
+	players[pix].set_hand(handName[players_hand[pix][0]])
 # 手役判定
 # return: [手役, ランク１，ランク２,...]
 func check_hand(v : Array) -> Array:
@@ -516,11 +517,26 @@ func update_players_BG():
 		players[i].show_bet_chips(true)
 		players[i].set_bet_chips(bet_chips_plyr[i])
 		players[i].sub_chips(bet_chips_plyr[i])
+# ランクも考慮した手役比較
+# return: -1 for hand1 < hand2, +1 for hand1 > hand2
+func compare(hand1 : Array, hand2 : Array):
+	if hand1[0] == hand2[0]:
+		for i in range(1, hand1.size()):
+			if hand1[i] < hand2[i]: return -1
+			elif hand1[i] > hand2[i]: return 1
+		return 0
+	elif hand1[0] < hand2[0]:
+		return -1
+	else:
+		return 1
+# 勝者判定
+# 前提：show_hand_name() がすでにコールされ、players_hand[] が設定済みとする
 func determine_who_won():
-	var mxc = 0
-	for i in range(N_PLAYERS):
-		if !is_folded[i] && players_card1[i].get_rank() > mxc:		# 暫定コード
-			mxc = players_card1[i].get_rank()
+	winner_ix = HUMAN_IX
+	var h = players_hand[HUMAN_IX]
+	for i in range(1, N_PLAYERS):
+		if !is_folded[i] && compare(players_hand[i], h) > 0:
+			h = players_hand[i]
 			winner_ix = i
 func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
 	print("nix = ", nix)
@@ -628,6 +644,9 @@ func next_player():
 		emphasize_next_player()		# 次の手番非強調
 		disable_act_buttons()		# 行動ボタンディセーブル
 		#if !is_folded[HUMAN_IX]:		# 人間が残っている場合
+		for i in range(1, N_PLAYERS):	# 人間以外の手役名表示
+			if !is_folded[i]:
+				show_hand_name(i)
 		determine_who_won();
 		#settle_chips()
 		#else:						# AI が残っている場合
