@@ -700,3 +700,13 @@ func next_hand():
 func _on_BackButton_pressed():
 	get_tree().change_scene("res://TopScene.tscn")
 	pass # Replace with function body.
+
+func _on_FoldButton_pressed():
+	do_fold(HUMAN_IX)
+func _on_CheckCallButton_pressed():
+	do_check_call(HUMAN_IX)
+func _on_RaiseButton_pressed():
+	do_raise(HUMAN_IX)
+func _on_NextButton_pressed():
+	if state == SHOW_DOWN:
+		next_hand()

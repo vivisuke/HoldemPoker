@@ -406,9 +406,9 @@
 0396 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：コミュニティカード５枚配布→オープン
 0397 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：コミュカードオープン → 人間の手役名表示
 0398 ◎ C 06/03 06/04 0.001│ToDo│RiverOnly：手番プレイヤー背景上部を黄色に
-0399 ● C 06/03            │ToDo│RiverOnly：AI の手番なら行動選択
+0399 ◎ C 06/03 06/04 0.001│ToDo│RiverOnly：AI の手番なら行動選択
 0400 ◎ C 06/03 06/03 0.001│ToDo│RiverOnly：Fold, Check/Call, Raise 処理関数実装
-0401 ● C 06/03            │ToDo│RiverOnly：Fold, Check/Call, Raise ボタン押下処理
+0401 ◎ C 06/03 06/04 0.001│ToDo│RiverOnly：Fold, Check/Call, Raise ボタン押下処理
 0402 ◎ C 06/03 06/04 0.001│問題│RiverOnly：nix が初期化されていない
 0403 ● C 06/03            │ToDo│
 0404 ● C 06/03            │ToDo│

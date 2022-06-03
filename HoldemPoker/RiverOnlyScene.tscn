@@ -160,3 +160,7 @@ text = "# raised: 0/1"
 align = 2
 
 [connection signal="pressed" from="TitleBar/BackButton" to="." method="_on_BackButton_pressed"]
+[connection signal="pressed" from="FoldButton" to="." method="_on_FoldButton_pressed"]
+[connection signal="pressed" from="CheckCallButton" to="." method="_on_CheckCallButton_pressed"]
+[connection signal="pressed" from="RaiseButton" to="." method="_on_RaiseButton_pressed"]
+[connection signal="pressed" from="NextButton" to="." method="_on_NextButton_pressed"]
