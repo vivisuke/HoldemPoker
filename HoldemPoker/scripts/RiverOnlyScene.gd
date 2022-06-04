@@ -56,6 +56,7 @@ const BET_CHIPS = 1				# 1chip のみベット可能
 const HUMAN_IX = 0
 const AI_IX = 1
 const AI_IX2 = 2
+const N_PLAYOUT = 5000			# 期待勝率計算 モンテカルロ法試行回数
 const RANK_STR = ["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 const handName = [
 	"highCard",
@@ -567,15 +568,64 @@ func _process(delta):
 		print("AI is thinking...")
 		do_act_AI()
 		#
+func get_unused_card(dk):	# 未使用カードをひとつゲット、そのカードは使用済みに
+	var ix
+	while true:
+		ix = rng.randi_range(0, N_CARDS-1)
+		if dk[ix] >= 0: break
+	var cd = dk[ix]
+	dk[ix] = -1	# 使用済みフラグON
+	return cd
+# モンテカルロ法による期待勝率計算、return [0.0, 1.0]
+func calc_win_rate(pix : int, nEnemy : int) -> float:
+	var v = []		# v[0], v[1]：手札、v[2]～ コミュニティカード（無い場合もあり）
+	v.push_back(players_card1[pix].get_sr())
+	v.push_back(players_card2[pix].get_sr())
+	for k in range(comu_cards.size()):
+		v.push_back(comu_cards[k].get_sr())
+	var wsum = 0.0
+	var dk = []				# デッキ用配列
+	dk.resize(N_CARDS)
+	var n_playout = N_PLAYOUT	#if !is_folded[HUMAN_IX] else N_PLAYOUT2
+	for nt in range(n_playout):
+		for i in range(N_CARDS):		# デッキ初期化
+			var st : int = i / N_RANK
+			var rank : int = i % N_RANK
+			dk[i] = (st<<N_RANK_BITS) | rank
+		for i in range(v.size()):
+			var ix = card_to_suit(v[i]) * 13 + card_to_rank(v[i])
+			dk[ix] = -1			# 使用済みフラグON
+		# 自分の手札
+		var u = v.duplicate()
+		while u.size() < 7:
+			u.push_back(get_unused_card(dk))
+		var oh = check_hand(u)
+		var nw = 1		# 勝者数
+		var win = true
+		for e in range(nEnemy):
+			u[0] = get_unused_card(dk)
+			u[1] = get_unused_card(dk)
+			var eh = check_hand(u)
+			var r = compare(oh, eh)
+			if r < 0:
+				win = false
+				break		# 負けの場合
+			if r == 0:			# 引き分けの場合
+				nw += 1
+		if win: wsum += 1.0 / nw
+	return wsum / n_playout
 func do_act_AI():
 	print("act_history = ", act_history)
 	var hist = act_history
 	if n_raised == 0:
 		hist = hist.replace("f", "c")
 		print("act_history = ", act_history)
-	var rnk = players_card1[nix].get_rank()		# 暫定コード
-	print("rank = ", RANK_STR[rnk])
-	var key = RANK_STR[rnk] + hist
+	var wr = calc_win_rate(nix, N_PLAYERS-1)
+	print("win rate = ", wr)
+	var rnk = min(int(wr * 5), 4)			#	[0, 4]
+	#var rnk = players_card1[nix].get_rank()		# 暫定コード
+	print("rank = ", rnk)
+	var key = "TJQKA"[rnk] + hist
 	var th = 0.5		# 閾値
 	if strategy.has(key):
 		th = strategy[key]
@@ -599,10 +649,12 @@ func do_check_call(pix):
 	do_wait()
 	#next_player()
 func do_check(pix):
+	print("*** checked")
 	act_history += "c"
 	set_act_panel_text(pix, "checked", Color.lightgray)
 	do_wait()
 func do_call(pix):
+	print("*** called")
 	act_history += "C"
 	set_act_panel_text(pix, "called", Color.lightgray)
 	players[pix].sub_chips(BET_CHIPS)
@@ -610,6 +662,7 @@ func do_call(pix):
 	players[pix].set_bet_chips(bet_chips_plyr[pix])
 	do_wait()
 func do_raise(pix):
+	print("*** raised")
 	act_history += "R"
 	n_raised += 1
 	update_n_raised_label()
@@ -619,6 +672,7 @@ func do_raise(pix):
 	set_act_panel_text(pix, "raised", Color.pink)
 	do_wait()
 func do_fold(pix):
+	print("*** folded")
 	act_history += "F"
 	is_folded[pix] = true
 	n_act_players -= 1
