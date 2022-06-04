@@ -362,12 +362,15 @@ func on_closing_finished():
 	
 func show_hand_name(pix):
 	if is_folded[pix]: return
+	calc_players_hand(pix)
+	players[pix].set_hand(handName[players_hand[pix][0]])
+func calc_players_hand(pix):
+	if is_folded[pix]: return
 	var v = []
 	v.push_back(players_card1[pix].get_sr())
 	v.push_back(players_card2[pix].get_sr())
 	for k in range(N_COMU_CARS): v.push_back(comu_cards[k].get_sr())
 	players_hand[pix] = check_hand(v)
-	players[pix].set_hand(handName[players_hand[pix][0]])
 # 手役判定
 # return: [手役, ランク１，ランク２,...]
 func check_hand(v : Array) -> Array:
@@ -531,7 +534,7 @@ func compare(hand1 : Array, hand2 : Array):
 	else:
 		return 1
 # 勝者判定
-# 前提：show_hand_name() がすでにコールされ、players_hand[] が設定済みとする
+# 前提：calc_players_hand() がすでにコールされ、players_hand[] が設定済みとする
 func determine_who_won():
 	winner_ix = HUMAN_IX
 	var h = players_hand[HUMAN_IX]
@@ -700,7 +703,8 @@ func next_player():
 		#if !is_folded[HUMAN_IX]:		# 人間が残っている場合
 		for i in range(1, N_PLAYERS):	# 人間以外の手役名表示
 			if !is_folded[i]:
-				show_hand_name(i)
+				calc_players_hand(i)
+				#show_hand_name(i)
 		determine_who_won();
 		#settle_chips()
 		#else:						# AI が残っている場合
@@ -714,7 +718,7 @@ func next_player():
 				players_card2[i].connect("opening_finished", self, "on_opening_finished")
 				players_card2[i].do_open()
 		#do_show_down()
-		if n_opening == 0:		# 外AIがフォールドしている場合
+		if n_opening == 0:		# 全AIがフォールドしている場合
 			settle_chips()
 		waiting = 6.0
 		sec_to_trans = int(waiting)
