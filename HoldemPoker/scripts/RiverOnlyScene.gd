@@ -285,6 +285,8 @@ func on_moving_finished():
 			for i in range(n_opening):
 				comu_cards[i].do_open()
 			state = OPENING_COMU
+		elif state == SHOW_DOWN:
+			next_hand()
 			pass
 func on_opening_finished():
 	n_opening -= 1
@@ -349,6 +351,17 @@ func on_chip_moving_finished():
 		$NextButton.disabled = false
 		pass
 func collect_cards_to_the_deck():
+	n_moving = 0
+	for i in range(comu_cards.size()):
+		comu_cards[i].connect("moving_finished", self, "on_moving_finished")
+		comu_cards[i].move_to(deck_pos, 0.2)
+		n_moving += 1
+	for i in range(N_PLAYERS):
+		if !is_folded[i]:
+			players_card1[i].move_to(deck_pos, 0.2)
+			players_card2[i].move_to(deck_pos, 0.2)
+			n_moving += 2
+	
 	##n_moving = cards.size()
 	##for i in range(cards.size()):
 	##	cards[i].connect("moving_finished", self, "on_moving_finished")
@@ -565,7 +578,8 @@ func _process(delta):
 			if state != SHOW_DOWN:
 				next_player()	# 次のプレイヤーに手番を移動
 			else:
-				next_hand()
+				close_and_collect_cards()
+				#next_hand()
 		return
 	if state == SEL_ACTION && nix != HUMAN_IX:		# AI の手番
 		print("AI is thinking...")
@@ -738,6 +752,21 @@ func set_act_panel_text(i, txt, col):
 	act_panels[i].set_text(txt)
 	act_panels[i].color = col
 	act_panels[i].show()
+func close_and_collect_cards():
+	n_closing = 0
+	for i in range(comu_cards.size()):
+		comu_cards[i].connect("closing_finished", self, "on_closing_finished")
+		comu_cards[i].do_close()
+		n_closing += 1
+	if n_act_players > 1:	# 一人以外降りた場合はカードをオープンしていない
+		for i in range(N_PLAYERS):
+			if !is_folded[i]:
+				players_card1[i].connect("closing_finished", self, "on_closing_finished")
+				players_card1[i].do_close()
+				players_card2[i].connect("closing_finished", self, "on_closing_finished")
+				players_card2[i].do_close()
+				n_closing += 2
+
 func next_hand():
 	state = INIT
 	n_hands += 1
@@ -751,17 +780,8 @@ func next_hand():
 	#cards.shuffle()
 	update_n_raised_label()
 	update_players_BG()
-	n_closing = 0
-	if n_act_players > 1 || !is_folded[HUMAN_IX]:
-		for i in range(N_PLAYERS):
-			if !is_folded[i]:
-				players_card1[i].connect("closing_finished", self, "on_closing_finished")
-				players_card1[i].do_close()
-				players_card2[i].connect("closing_finished", self, "on_closing_finished")
-				players_card2[i].do_close()
-				n_closing += 2
-	else:
-		collect_cards_to_the_deck()
+	#else:
+	#	collect_cards_to_the_deck()
 	n_act_players = N_PLAYERS
 	#if !is_folded[AI_IX] && !is_folded[HUMAN_IX]:
 	#	n_closing = 2
@@ -788,4 +808,5 @@ func _on_RaiseButton_pressed():
 	do_raise(HUMAN_IX)
 func _on_NextButton_pressed():
 	if state == SHOW_DOWN:
-		next_hand()
+		close_and_collect_cards()
+		#next_hand()
