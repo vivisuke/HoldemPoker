@@ -808,5 +808,6 @@ func _on_RaiseButton_pressed():
 	do_raise(HUMAN_IX)
 func _on_NextButton_pressed():
 	if state == SHOW_DOWN:
+		waiting = 0.0
 		close_and_collect_cards()
 		#next_hand()
