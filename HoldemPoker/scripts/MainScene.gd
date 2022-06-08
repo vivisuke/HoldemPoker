@@ -738,6 +738,7 @@ func calc_win_rate(pix : int, nEnemy : int) -> float:
 		for i in range(v.size()):
 			var ix = card_to_suit(v[i]) * 13 + card_to_rank(v[i])
 			dk[ix] = -1			# 使用済みフラグON
+		dk.shuffle()			# デッキシャフル
 		# 自分の手札
 		var u = v.duplicate()
 		while u.size() < 7:
@@ -894,15 +895,19 @@ func show_user_hand(n):
 # ランクも考慮した手役比較
 # return: -1 for hand1 < hand2, +1 for hand1 > hand2
 func compare(hand1 : Array, hand2 : Array):
-	if hand1[0] == hand2[0]:
-		for i in range(1, hand1.size()):
-			if hand1[i] < hand2[i]: return -1
-			elif hand1[i] > hand2[i]: return 1
-		return 0
-	elif hand1[0] < hand2[0]:
-		return -1
-	else:
-		return 1
+	for i in range(hand1.size()):
+		if hand1[i] < hand2[i]: return -1
+		elif hand1[i] > hand2[i]: return 1
+	return 0
+	#if hand1[0] == hand2[0]:
+	#	for i in range(1, hand1.size()):
+	#		if hand1[i] < hand2[i]: return -1
+	#		elif hand1[i] > hand2[i]: return 1
+	#	return 0
+	#elif hand1[0] < hand2[0]:
+	#	return -1
+	#else:
+	#	return 1
 # bc0 を超えてベットしたプレイヤーリスト、ベット最小額を返す
 func players_to_div(bc0):
 	#var n = 0
@@ -1081,6 +1086,8 @@ func next_player():
 		if !is_folded[nix]: break
 	update_next_player()
 	$RaiseSpinBox.set_value(BB_CHIPS)
+	if nix == HUMAN_IX:
+		print("HUMAN's win rate = ", calc_win_rate(HUMAN_IX, nActPlayer - 1))
 #func _on_CheckButton_pressed():
 #	do_check(HUMAN_IX)
 #	next_player()

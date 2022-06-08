@@ -691,6 +691,7 @@ func do_raise(pix):
 func do_fold(pix):
 	print("*** folded")
 	act_history += "F"
+	players[pix].set_hand("")
 	is_folded[pix] = true
 	n_act_players -= 1
 	set_act_panel_text(pix, "folded", Color.darkgray)
@@ -792,6 +793,7 @@ func next_hand():
 		is_folded[i] = false
 	$NextButton.disabled = true
 	$CheckCallButton.text = "Check"
+	dealing_cards_animation()
 	pass
 
 
