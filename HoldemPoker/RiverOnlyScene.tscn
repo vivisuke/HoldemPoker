@@ -101,6 +101,7 @@ custom_fonts/font = SubResource( 3 )
 text = "balance: 0"
 
 [node name="RankAveLabel" type="Label" parent="Table"]
+visible = false
 margin_left = 63.0
 margin_top = 260.0
 margin_right = 137.0
