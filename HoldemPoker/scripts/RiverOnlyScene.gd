@@ -205,6 +205,8 @@ func _ready():
 	#act_buttons[BB5] = $BB5Button
 	for i in range(N_ACT_BUTTONS):
 		act_buttons[i].disabled = true
+	$NextButton.disabled = true
+	$PauseButton.disabled = true
 	#$RaiseSpinBox.set_value(BB_CHIPS)
 	#$RaiseSpinBox.editable = false
 	update_players_BG()
@@ -349,6 +351,7 @@ func on_chip_moving_finished():
 		players[winner_ix].show_diff_chips(true)	# チップ増減表示
 		disable_act_buttons()
 		$NextButton.disabled = false
+		$PauseButton.disabled = false
 		pass
 func collect_cards_to_the_deck():
 	n_moving = 0
@@ -516,6 +519,7 @@ func update_act_buttons():
 			$CheckCallButton.text = "Call 1"
 		$RaiseButton.disabled = n_raised != 0
 		$NextButton.disabled = true
+		$PauseButton.disabled = true
 func update_n_raised_label():
 	$NRaisedLabel.text = "# raised: %d/1" % n_raised
 func update_players_BG():
@@ -757,6 +761,7 @@ func set_act_panel_text(i, txt, col):
 	act_panels[i].show()
 func close_and_collect_cards():
 	$NextButton.disabled = true		# Next ボタンディセーブル
+	$PauseButton.disabled = true
 	n_closing = 0
 	for i in range(comu_cards.size()):
 		comu_cards[i].connect("closing_finished", self, "on_closing_finished")
@@ -796,6 +801,7 @@ func next_hand():
 		act_panels[i].hide()
 		is_folded[i] = false
 	$NextButton.disabled = true
+	$PauseButton.disabled = true
 	$CheckCallButton.text = "Check"
 	dealing_cards_animation()
 	pass
