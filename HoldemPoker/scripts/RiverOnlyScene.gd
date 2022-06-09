@@ -353,7 +353,6 @@ func on_chip_moving_finished():
 		disable_act_buttons()
 		$NextButton.disabled = false
 		$PauseButton.disabled = false
-		paused = false
 		pass
 func collect_cards_to_the_deck():
 	n_moving = 0
@@ -804,6 +803,9 @@ func next_hand():
 		is_folded[i] = false
 	$NextButton.disabled = true
 	$PauseButton.disabled = true
+	paused = false
+	#	$NextButton.disabled = false
+	#	$PauseButton.disabled = false
 	$CheckCallButton.text = "Check"
 	dealing_cards_animation()
 	pass
