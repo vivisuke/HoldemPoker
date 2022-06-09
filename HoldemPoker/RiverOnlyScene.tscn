@@ -178,3 +178,4 @@ texture_disabled = ExtResource( 14 )
 [connection signal="pressed" from="CheckCallButton" to="." method="_on_CheckCallButton_pressed"]
 [connection signal="pressed" from="RaiseButton" to="." method="_on_RaiseButton_pressed"]
 [connection signal="pressed" from="NextButton" to="." method="_on_NextButton_pressed"]
+[connection signal="pressed" from="PauseButton" to="." method="_on_PauseButton_pressed"]

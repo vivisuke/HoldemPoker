@@ -92,6 +92,7 @@ var dealer_ix = 0		# ディーラプレイヤーインデックス
 var winner_ix			# 勝者インデックス
 var loser1_ix			# 敗者インデックス
 var loser2_ix			# 敗者インデックス
+var paused = false		# ポーズフラグ
 #var alpha = 0.0			# Ｊレイズ確率
 var act_buttons = []		# アクションボタン
 #var cards = [0, 0, 0, 0, 0]		# 使用カード
@@ -352,6 +353,7 @@ func on_chip_moving_finished():
 		disable_act_buttons()
 		$NextButton.disabled = false
 		$PauseButton.disabled = false
+		paused = false
 		pass
 func collect_cards_to_the_deck():
 	n_moving = 0
@@ -573,7 +575,7 @@ func do_wait():
 func _process(delta):
 	#if state == SHOW_DOWN:	#|| state == ROUND_FINISHED:
 	#	return
-	if waiting > 0.0:		# 行動後のウェイト状態の場合
+	if waiting > 0.0 && !paused:		# 行動後のウェイト状態の場合
 		waiting -= delta
 		if sec_to_trans != 0:
 			var sec : int = ceil(waiting)
@@ -823,3 +825,6 @@ func _on_NextButton_pressed():
 		waiting = 0.0
 		close_and_collect_cards()
 		#next_hand()
+func _on_PauseButton_pressed():
+	paused = !paused
+	pass # Replace with function body.
