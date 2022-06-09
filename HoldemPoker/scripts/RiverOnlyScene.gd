@@ -557,6 +557,8 @@ func determine_who_won():
 			winner_ix = i
 func emphasize_next_player():		# 次の手番のプレイヤー背景上部を黄色強調
 	print("nix = ", nix)
+	if nix == HUMAN_IX:
+		enable_act_buttons()
 	for i in range(N_PLAYERS):
 		if is_folded[i]:
 			players[i].set_BG(BG_FOLDED)
@@ -767,6 +769,7 @@ func close_and_collect_cards():
 				players_card2[i].connect("closing_finished", self, "on_closing_finished")
 				players_card2[i].do_close()
 				n_closing += 2
+				players[i].set_hand("")
 
 func next_hand():
 	state = INIT
